@@ -232,10 +232,8 @@ function initHeroTyping() {
     if (!el) return;
     
     const phrases = [
-        "INNOVATING FUTURE MINDS",
         "WELCOME TO MPSC IT CLUB",
-        "THE NEXUS OF TECHNOLOGY",
-        "EMPOWERING LEADERS"
+        "EMPOWER YOURSELF THROUGH IT"
     ];
     
     let phraseIndex = 0;
