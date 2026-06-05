@@ -207,3 +207,112 @@ function toggleModal(id) {
     const modal = document.getElementById(id);
     modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
 }
+
+// ==========================================
+// Password Reset Tool Logic
+// ==========================================
+
+async function adminFindUser() {
+    const emailInput = document.getElementById('reset-email-input').value.trim();
+    if (!emailInput) {
+        window.showToast('Please enter an email address.', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('find-user-btn');
+    btn.innerHTML = `<span class="spinner"></span>...`;
+    btn.disabled = true;
+
+    // Reset visibility of elements
+    document.getElementById('user-identity-card').style.display = 'none';
+    document.getElementById('user-not-found').style.display = 'none';
+    document.getElementById('reset-link-section').style.display = 'none';
+    document.getElementById('reset-link-result').style.display = 'none';
+
+    try {
+        const res = await fetch(`/admin/api/find_user?email=${encodeURIComponent(emailInput)}`);
+        const data = await res.json();
+
+        if (res.ok && data.found) {
+            // Populate the identity card
+            document.getElementById('ri-name').innerText = data.full_name;
+            document.getElementById('ri-member-id').innerText = data.member_id;
+            document.getElementById('ri-email').innerText = data.email;
+            
+            // Format join date nicely
+            const d = new Date(data.joined);
+            document.getElementById('ri-joined').innerText = isNaN(d) ? data.joined : d.toLocaleDateString();
+
+            // Show identity card and link generation section
+            document.getElementById('user-identity-card').style.display = 'block';
+            document.getElementById('reset-link-section').style.display = 'block';
+        } else {
+            // Show not found error
+            document.getElementById('user-not-found').style.display = 'block';
+        }
+    } catch (err) {
+        console.error('Error finding user:', err);
+        window.showToast('Error looking up user', 'error');
+    } finally {
+        btn.innerHTML = 'Look Up';
+        btn.disabled = false;
+    }
+}
+
+async function adminGenerateReset() {
+    const email = document.getElementById('ri-email').innerText;
+    if (!email || email === '—') return;
+
+    const btn = document.getElementById('gen-link-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<span class="spinner"></span>Generating Secure Link...`;
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/admin/api/generate_reset_link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok && data.success) {
+            const linkBox = document.getElementById('reset-link-box');
+            linkBox.value = data.reset_link;
+            
+            // Hide the generate button, show the result section
+            btn.style.display = 'none';
+            document.getElementById('reset-link-result').style.display = 'block';
+            window.showToast('Reset link generated successfully!', 'success');
+        } else {
+            window.showToast(data.error || 'Failed to generate link', 'error');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    } catch (err) {
+        console.error('Error generating link:', err);
+        window.showToast('Network error while generating link', 'error');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+function copyResetLink() {
+    const linkBox = document.getElementById('reset-link-box');
+    linkBox.select();
+    linkBox.setSelectionRange(0, 99999); /* For mobile devices */
+
+    navigator.clipboard.writeText(linkBox.value).then(() => {
+        const confirmMsg = document.getElementById('copy-confirm');
+        confirmMsg.style.display = 'block';
+        
+        // Hide confirmation after a few seconds
+        setTimeout(() => {
+            confirmMsg.style.display = 'none';
+        }, 3000);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+        window.showToast('Failed to copy to clipboard', 'error');
+    });
+}

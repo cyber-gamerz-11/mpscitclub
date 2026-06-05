@@ -1,0 +1,28 @@
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Environment variables
+.env
+.env.local
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# IDEs and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# SQLite database
+instance/
+*.sqlite3
+*.db
+backend/config/*.db
+backend/config/instance/

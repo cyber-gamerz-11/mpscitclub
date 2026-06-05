@@ -8,6 +8,13 @@ from werkzeug.utils import secure_filename
 
 admin_bp = Blueprint('admin', __name__)
 
+# --- Admin-only password reset helpers ---
+def _generate_reset_token(email):
+    """Reuse the same token logic as auth_routes so the link works on /auth/reset-password."""
+    from itsdangerous import URLSafeTimedSerializer
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    return s.dumps(email, salt='password-reset-salt')
+
 def admin_required(func):
     def wrapper(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != 'admin':
@@ -194,3 +201,79 @@ def get_stats():
         "total_revenue": total_revenue,
         "pending_payments": pending_count
     })
+
+# ── Password Reset Tools (Admin Only) ──────────────────────────────────────
+
+@admin_bp.route('/api/find_user')
+@login_required
+@admin_required
+def find_user():
+    """
+    GET /admin/api/find_user?email=someone@email.com
+    Returns the user's name, member ID, join date, and role so the admin
+    can visually verify the person's identity before generating a reset link.
+    Passwords are never exposed.
+    """
+    email = request.args.get('email', '').strip().lower()
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    db = get_db()
+    try:
+        result = db.table("users") \
+            .select("id, full_name, email, role, join_date, student_id") \
+            .eq("email", email) \
+            .execute()
+
+        if not result.data:
+            return jsonify({"error": "No account found with that email"}), 404
+
+        user = result.data[0]
+        return jsonify({
+            "found": True,
+            "full_name": user.get("full_name", "—"),
+            "email": user.get("email", "—"),
+            "member_id": user.get("student_id", "—"),
+            "role": user.get("role", "member"),
+            "joined": user.get("join_date", "—")
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@admin_bp.route('/api/generate_reset_link', methods=['POST'])
+@login_required
+@admin_required
+def admin_generate_reset_link():
+    """
+    POST /admin/api/generate_reset_link   body: { "email": "..." }
+    Generates a secure, time-limited (1 hour) reset link for the given email.
+    The admin copies the link and sends it manually to the user.
+    """
+    data = request.get_json()
+    email = (data or {}).get('email', '').strip().lower()
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    db = get_db()
+    try:
+        result = db.table("users").select("id").eq("email", email).execute()
+        if not result.data:
+            return jsonify({"error": "No account with that email"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    token = _generate_reset_token(email)
+    # Build an absolute URL so the admin can copy-paste it anywhere
+    reset_link = url_for('auth.reset_password', token=token, _external=True)
+
+    # Also print to server console as a local dev convenience
+    print(f"\n[ADMIN RESET] Link for {email}: {reset_link}\n")
+
+    return jsonify({
+        "success": True,
+        "reset_link": reset_link,
+        "expires_in": "1 hour"
+    })
+

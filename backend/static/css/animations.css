@@ -23,8 +23,13 @@
 
 /* Typing Animation Cursor */
 .typing::after {
-    content: '|';
+    content: '█';
+    color: var(--emerald-green);
+    text-shadow: 0 0 8px var(--glow-green);
     animation: blink 0.7s infinite;
+    font-size: 0.9em;
+    vertical-align: middle;
+    margin-left: 4px;
 }
 
 @keyframes blink {
@@ -39,34 +44,134 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--matte-black);
+    background: radial-gradient(circle at center, #0a2524 0%, var(--matte-black) 100%);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 99999;
+    overflow: hidden;
+}
+
+.loader-content-box {
+    display: flex;
     flex-direction: column;
-    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+.loader-graphics {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .loader-ring {
-    width: 100px;
-    height: 100px;
-    border: 3px solid transparent;
-    border-top: 3px solid var(--emerald-green);
+    position: absolute;
     border-radius: 50%;
-    animation: rotate 1.5s linear infinite;
+    border: 2px solid transparent;
 }
 
-@keyframes rotate {
+.loader-ring.outer {
+    width: 140px;
+    height: 140px;
+    border-top: 3px solid var(--emerald-green);
+    border-bottom: 3px solid var(--emerald-green);
+    animation: rotate-cw 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    filter: drop-shadow(0 0 10px var(--glow-green));
+}
+
+.loader-ring.inner {
+    width: 100px;
+    height: 100px;
+    border-left: 2px dashed rgba(0, 245, 180, 0.4);
+    border-right: 2px dashed rgba(0, 245, 180, 0.4);
+    animation: rotate-ccw 2s linear infinite;
+}
+
+.loader-core {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--emerald-green) 0%, #0f3534 80%);
+    box-shadow: 0 0 30px var(--emerald-green);
+    animation: pulse-core 1.5s ease-in-out infinite;
+}
+
+.loader-counter {
+    font-family: 'Fira Code', monospace;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--emerald-green);
+    text-shadow: 0 0 15px var(--glow-green);
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.loader-status {
+    font-size: 0.95rem;
+    color: var(--white);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    text-shadow: 0 0 8px rgba(255,255,255,0.2);
+}
+
+.loader-console {
+    width: 100%;
+    height: 110px;
+    background: rgba(3, 12, 12, 0.85);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    color: #a6c0be;
+    text-align: left;
+    overflow-y: hidden;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+    line-height: 1.5;
+}
+
+.loader-console .log-line {
+    opacity: 0;
+    transform: translateY(5px);
+    animation: print-line 0.2s ease-out forwards;
+    margin-bottom: 4px;
+}
+
+.loader-console .log-success {
+    color: var(--emerald-green);
+    font-weight: 600;
+}
+
+@keyframes rotate-cw {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-.loader-text {
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: var(--emerald-green);
-    letter-spacing: 3px;
-    text-transform: uppercase;
+@keyframes rotate-ccw {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+}
+
+@keyframes pulse-core {
+    0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 15px var(--emerald-green); }
+    50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 35px var(--emerald-green); }
+}
+
+@keyframes print-line {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Interactive Cursor Glow */

@@ -16,6 +16,7 @@
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
         .status-pending { background: rgba(255, 166, 0, 0.2); color: orange; border: 1px solid orange; }
         .status-approved { background: rgba(0, 255, 136, 0.2); color: var(--emerald-green); border: 1px solid var(--emerald-green); }
+        .status-rejected { background: rgba(255, 77, 77, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d; }
         @media (max-width: 900px) { .dash-container { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -92,7 +93,10 @@
                             <p style="margin:0; font-weight:600;">TxID: ${p.transaction_id}</p>
                             <p style="margin:0; font-size:0.8rem; color:var(--soft-gray);">${p.created_at ? p.created_at.split('T')[0] : 'N/A'}</p>
                         </div>
-                        <span class="status-badge status-${p.status}">${p.status === 'pending' ? 'Verification Pending' : 'Verification Complete'}</span>
+                        <span class="status-badge status-${p.status}">
+                            ${p.status === 'pending' ? 'Verification Pending' : 
+                              (p.status === 'rejected' ? 'Payment Rejected - <a href="/contact" style="color:inherit; text-decoration:underline;">Contact Admin</a>' : 'Verification Complete')}
+                        </span>
                     </div>
                 `).join('');
 

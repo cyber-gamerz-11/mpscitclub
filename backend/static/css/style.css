@@ -1,13 +1,13 @@
 :root {
-    --deep-green: #002d1a;
-    --emerald-green: #00ff88;
-    --matte-black: #0a0a0a;
+    --deep-green: #0f3534; /* Canva Pine Green */
+    --emerald-green: #00f5b4; /* Glowing Neon Mint */
+    --matte-black: #051413; /* Premium Dark Jade BG */
     --white: #ffffff;
-    --soft-gray: #b0b0b0;
-    --glow-green: rgba(0, 255, 136, 0.4);
-    --glass-bg: rgba(10, 10, 10, 0.7);
-    --glass-border: rgba(0, 255, 136, 0.1);
-    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --soft-gray: #a6c0be; /* Silvery Pine Gray */
+    --glow-green: rgba(0, 245, 180, 0.35);
+    --glass-bg: rgba(5, 20, 19, 0.75);
+    --glass-border: rgba(0, 245, 180, 0.15);
+    --transition-smooth: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 * {
@@ -855,3 +855,522 @@ footer {
 @media (max-width: 576px) {
     .gallery-masonry { columns: 1; }
 }
+
+/* Floating AI Neural Core Widget Styles */
+.ai-neural-core {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999;
+}
+
+.ai-orb-wrapper {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    background: radial-gradient(circle at center, #0f3534 0%, var(--matte-black) 80%);
+    box-shadow: 0 0 25px var(--glow-green), inset 0 0 10px rgba(0, 245, 180, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(0, 245, 180, 0.3);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+}
+
+.ai-orb-wrapper:hover {
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 0 35px var(--emerald-green);
+}
+
+.ai-orb-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid transparent;
+}
+
+.ai-orb-ring.outer {
+    width: 76px;
+    height: 76px;
+    border-top: 1px dashed rgba(0, 245, 180, 0.5);
+    border-bottom: 1px dashed rgba(0, 245, 180, 0.5);
+    animation: rotate-cw 8s linear infinite;
+}
+
+.ai-orb-ring.middle {
+    width: 68px;
+    height: 68px;
+    border-left: 1px dotted rgba(0, 245, 180, 0.3);
+    border-right: 1px dotted rgba(0, 245, 180, 0.3);
+    animation: rotate-ccw 5s linear infinite;
+}
+
+.ai-orb-ring.inner {
+    width: 52px;
+    height: 52px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-orb-core {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+.ai-pulse-wave {
+    position: absolute;
+    top: -5px; left: -5px; right: -5px; bottom: -5px;
+    border: 1px solid var(--emerald-green);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    animation: pulse-wave-anim 3s ease-out infinite;
+}
+
+@keyframes pulse-wave-anim {
+    0% { transform: scale(0.9); opacity: 0.5; }
+    50% { opacity: 0.1; }
+    100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* AI Command Panel Layout */
+.ai-panel {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 480px;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: rgba(3, 14, 13, 0.95) !important;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 245, 180, 0.1) !important;
+}
+
+.ai-panel.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.ai-panel-header {
+    padding: 1.2rem;
+    background: rgba(15, 53, 52, 0.4);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-panel-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ai-panel-title-group h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin: 0;
+}
+
+.ai-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--emerald-green);
+    box-shadow: 0 0 8px var(--emerald-green);
+}
+
+.ai-indicator.pulsing {
+    animation: simple-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes simple-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.3); opacity: 1; }
+}
+
+.ai-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--soft-gray);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: var(--transition-smooth);
+}
+
+.ai-close-btn:hover {
+    color: var(--emerald-green);
+    transform: scale(1.1);
+}
+
+.ai-panel-body {
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: hidden;
+}
+
+.ai-status-bar {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.65rem;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.05);
+    color: var(--soft-gray);
+    display: flex;
+    align-items: center;
+}
+
+.ai-status-bar .spacer {
+    margin: 0 10px;
+    opacity: 0.3;
+}
+
+.ai-status-bar .status-val {
+    color: var(--white);
+    font-weight: 600;
+}
+
+.ai-status-bar .status-val.emerald {
+    color: var(--emerald-green);
+}
+
+.ai-shell-log {
+    flex: 1;
+    background: rgba(3, 10, 9, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-y: auto;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.72rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+}
+
+.ai-shell-log::-webkit-scrollbar {
+    width: 4px;
+}
+.ai-shell-log::-webkit-scrollbar-thumb {
+    background: rgba(15, 53, 52, 0.8);
+    border-radius: 4px;
+}
+
+.shell-line {
+    margin-bottom: 12px;
+    animation: print-line 0.15s ease-out forwards;
+}
+
+.shell-line.user {
+    color: #e2e8f0;
+    border-left: 2px solid var(--soft-gray);
+    padding-left: 6px;
+}
+
+.shell-line.bot {
+    color: #a6c0be;
+    border-left: 2px solid var(--emerald-green);
+    padding-left: 6px;
+}
+
+.ai-panel-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--glass-border);
+    background: rgba(15, 53, 52, 0.2);
+}
+
+.ai-shell-input {
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    color: var(--white);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    transition: var(--transition-smooth);
+}
+
+.ai-shell-input:focus {
+    outline: none;
+    border-color: var(--emerald-green);
+    background: rgba(0,0,0,0.7);
+    box-shadow: 0 0 10px rgba(0, 245, 180, 0.1);
+}
+
+/* Utilities */
+.font-code { font-family: 'Fira Code', monospace; }
+.font-xs { font-size: 0.65rem; }
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .ai-neural-core {
+        bottom: 20px;
+        right: 20px;
+    }
+    .ai-panel {
+        width: 300px;
+        height: 420px;
+        bottom: 75px;
+    }
+}
+
+/* Navbar Mobile Responsiveness – refined */
+@media (max-width: 768px) {
+    .nav-content {
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    .logo img {
+        height: 55px !important; /* slightly larger than before */
+    }
+    .nav-actions {
+        gap: 0.8rem;
+        margin-top: 0.5rem;
+    }
+    .nav-actions .btn-primary {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    .hamburger {
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo img {
+        height: 45px !important;
+    }
+    .nav-actions .btn-primary {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+    .nav-actions {
+        gap: 0.5rem;
+    }
+    .nav-content {
+        padding: 0 0.5rem;
+    }
+}
+
+/* === Nav logo & login button — CSS-controlled (no inline override) === */
+.nav-logo-img {
+    height: 65px;
+}
+
+.nav-login-btn {
+    display: inline-block !important;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .nav-logo-img {
+        height: 55px;
+    }
+    .nav-login-btn {
+        padding: 0.55rem 1.1rem;
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-logo-img {
+        height: 48px;
+    }
+    .nav-login-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.3px;
+    }
+}
+
+/* =============================================
+   PREMIUM POPUP MODAL — Payment / Registration
+   ============================================= */
+
+/* Hidden by default */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    padding: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Show when JS adds .is-open */
+.modal-overlay.is-open {
+    display: flex;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: modalFadeIn 0.25s ease both;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.reg-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: linear-gradient(145deg, rgba(5,20,19,0.98), rgba(15,53,52,0.96));
+    border: 1px solid var(--emerald-green);
+    border-radius: 20px;
+    padding: 2.5rem 2rem 2rem;
+    box-shadow: 0 0 60px rgba(0,245,180,0.15), 0 30px 80px rgba(0,0,0,0.7);
+    animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    scrollbar-width: thin;
+    scrollbar-color: var(--deep-green) transparent;
+}
+
+/* Remove white scrollbar — custom dark themed */
+.reg-modal-content::-webkit-scrollbar {
+    width: 4px;
+}
+.reg-modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.reg-modal-content::-webkit-scrollbar-thumb {
+    background: var(--emerald-green);
+    border-radius: 10px;
+    opacity: 0.5;
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(50px) scale(0.9); opacity: 0; }
+    to   { transform: translateY(0)     scale(1);   opacity: 1; }
+}
+
+/* Close button — top-left corner */
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+    z-index: 10;
+}
+
+.close-btn:hover {
+    background: rgba(255, 77, 77, 0.25);
+    border-color: #ff4d4d;
+    color: #ff4d4d;
+    transform: rotate(90deg);
+}
+
+/* Modal heading — push right to clear close btn */
+#modal-title {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    text-shadow: 0 0 20px var(--emerald-green);
+    padding-left: 2.8rem;
+}
+
+/* Payment box */
+.payment-box {
+    background: rgba(0, 245, 180, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 1.4rem;
+    margin-bottom: 1.2rem;
+}
+
+.payment-box h3 {
+    color: var(--emerald-green);
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.payment-number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 3px;
+    text-align: center;
+    padding: 0.8rem;
+    margin: 0.8rem 0;
+    background: rgba(0,245,180,0.08);
+    border: 1px dashed var(--emerald-green);
+    border-radius: 10px;
+    text-shadow: 0 0 10px var(--emerald-green);
+}
+
+.payment-box .small {
+    font-size: 0.82rem;
+    color: var(--soft-gray);
+    margin-top: 0.5rem;
+}
+
+/* Modal meta info row */
+.modal-meta {
+    color: var(--soft-gray);
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.modal-info p {
+    color: var(--soft-gray);
+    font-size: 0.93rem;
+    line-height: 1.7;
+}
+
+/* Utility helpers */
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 1.5rem; }
+.w-full { width: 100%; }
+
+/* Mobile modal */
+@media (max-width: 600px) {
+    .reg-modal-content {
+        padding: 2rem 1.2rem 1.5rem;
+        border-radius: 16px;
+    }
+    .payment-number {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+}
+

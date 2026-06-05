@@ -44,27 +44,30 @@
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats" id="stats">
-        <div class="container stats-grid">
-            <div class="stat-card glass-card">
-                <h3 class="stat-number" id="stat-members" data-target="0">0</h3>
-                <p>Members</p>
-            </div>
-            <div class="stat-card glass-card">
-                <h3 class="stat-number" id="stat-events" data-target="0">0</h3>
-                <p>Past Programs</p>
-            </div>
-            <div class="stat-card glass-card">
-                <h3 class="stat-number" id="stat-projects" data-target="0">0</h3>
-                <p>Active Events</p>
-            </div>
-            <div class="stat-card glass-card">
-                <h3 class="stat-number" id="stat-ec" data-target="0">0</h3>
-                <p>EC Members</p>
+    <!-- Highlights / Features Section -->
+    <section class="features" style="padding: 4rem 0;">
+        <div class="container">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 3rem;">Why Join The <span class="emerald">IT Club</span>?</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="glass-card" style="padding: 2.5rem; text-align: center; border-top: 3px solid var(--emerald-green); transition: transform 0.4s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem; text-shadow: 0 0 20px var(--emerald-green);">🤖</div>
+                    <h3 style="color: var(--white); margin-bottom: 1rem; font-size: 1.3rem;">Robotics & AI</h3>
+                    <p style="color: var(--soft-gray); font-size: 0.95rem; line-height: 1.6;">Build real-world robotics projects and dive into Artificial Intelligence. From line-following bots to neural networks, shape the future.</p>
+                </div>
+                <div class="glass-card" style="padding: 2.5rem; text-align: center; border-top: 3px solid var(--emerald-green); transition: transform 0.4s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem; text-shadow: 0 0 20px var(--emerald-green);">💻</div>
+                    <h3 style="color: var(--white); margin-bottom: 1rem; font-size: 1.3rem;">Software Development</h3>
+                    <p style="color: var(--soft-gray); font-size: 0.95rem; line-height: 1.6;">Learn to code, build stunning websites, and create applications. Master modern stacks like React, Python, and Full-Stack Development.</p>
+                </div>
+                <div class="glass-card" style="padding: 2.5rem; text-align: center; border-top: 3px solid var(--emerald-green); transition: transform 0.4s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem; text-shadow: 0 0 20px var(--emerald-green);">🏆</div>
+                    <h3 style="color: var(--white); margin-bottom: 1rem; font-size: 1.3rem;">Tech Competitions</h3>
+                    <p style="color: var(--soft-gray); font-size: 0.95rem; line-height: 1.6;">Participate in national hackathons, programming contests, and IT Olympiads. Represent the club and win prestigious awards.</p>
+                </div>
             </div>
         </div>
     </section>
+
 
     {% include 'components/footer.html' %}
 

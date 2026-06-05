@@ -30,7 +30,7 @@
     </section>
 
     <!-- Registration Modal -->
-    <div id="reg-modal" class="modal-overlay" style="display:none;">
+    <div id="reg-modal" class="modal-overlay">
         <div class="glass-card reg-modal-content">
             <button class="close-btn" onclick="closeModal()">&times;</button>
             <div id="modal-body">
@@ -47,7 +47,7 @@
                         <h3>Manual Payment (bKash Only)</h3>
                         <p>Please send <strong id="modal-fee" class="emerald"></strong> BDT to the number below:</p>
                         <div class="payment-number">+880 1889 726721</div>
-                        <p class="small" style="color: var(--emerald-green); margin-top: 10px;">> Give your email address as reference.</p>
+                        <p class="small" style="color: #ff4d4d; margin-top: 10px;">&#9654; Give your email address as reference.</p>
                         <p class="small">> Please save a proof of payment (screenshot) for verification.</p>
                     </div>
                     
@@ -87,6 +87,8 @@
     <script>
         let currentEvents = [];
 
+        const isLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
+
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('events-container');
             
@@ -100,15 +102,23 @@
                 </div>
             `).join('');
             
-            // Fetch events and user history
-            const [eventsRes, historyRes] = await Promise.all([
-                fetch('/events/'),
-                fetch('/payments/history')
-            ]);
-            
-            currentEvents = await eventsRes.json();
-            const userHistory = historyRes.ok ? await historyRes.json() : [];
-            const registeredIds = userHistory.map(p => p.event_id);
+            try {
+                // Fetch events
+                const eventsRes = await fetch('/events/');
+                currentEvents = await eventsRes.json();
+                
+                let registeredIds = [];
+                // Only fetch history if user is logged in
+                if (isLoggedIn) {
+                    const historyRes = await fetch('/payments/history');
+                    // Check if response is actually JSON to avoid redirect HTML parsing errors
+                    const contentType = historyRes.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        const userHistory = await historyRes.json();
+                        // Filter out rejected payments so user can pay again
+                        registeredIds = userHistory.filter(p => p.status !== 'rejected').map(p => p.event_id);
+                    }
+                }
 
             if (currentEvents.length === 0) {
                 container.innerHTML = '<p>No events scheduled.</p>';
@@ -117,6 +127,7 @@
 
             container.innerHTML = currentEvents.map(event => {
                 const isRegistered = registeredIds.includes(event.id);
+                const buttonText = event.fee > 0 ? (isRegistered ? 'View Details (Registered)' : 'Register (' + event.fee + ' BDT)') : 'View Details';
                 return `
                 <div class="glass-card event-card">
                     <div class="event-badge ${event.status.toLowerCase()}">${event.status}</div>
@@ -128,7 +139,7 @@
                         <span>${event.venue}</span>
                     </div>
                     <button class="btn-primary w-full mt-1" onclick="openRegistration('${event.id}', ${isRegistered})">
-                        ${isRegistered ? 'View Details (Registered)' : (event.fee > 0 ? 'Register (' + event.fee + ' BDT)' : 'Register for Free')}
+                        ${buttonText}
                     </button>
                 </div>
             `}).join('');
@@ -137,17 +148,26 @@
                 { opacity: 0, y: 30 }, 
                 { opacity: 1, y: 0, stagger: 0.1, duration: 0.5, ease: "power2.out", clearProps: "all" }
             );
+            } catch (err) {
+                container.innerHTML = '<p>Error loading events.</p>';
+            }
+
+            gsap.fromTo('.event-card', 
+                { opacity: 0, y: 30 }, 
+                { opacity: 1, y: 0, stagger: 0.1, duration: 0.5, ease: "power2.out", clearProps: "all" }
+            );
         });
 
         async function openRegistration(eventId, isRegistered) {
-            const res = await fetch('/user/profile_data');
-            if (!res.ok) {
-                window.showToast('Please login to view details', 'error');
+            const event = currentEvents.find(e => e.id === eventId);
+            
+            // Redirect to login if user clicks register on a paid event and is not logged in
+            if (event.fee > 0 && !isLoggedIn && !isRegistered) {
+                window.showToast('Please login to register for this event', 'error');
                 setTimeout(() => window.location.href = '/auth/login', 1500);
                 return;
             }
 
-            const event = currentEvents.find(e => e.id === eventId);
             document.getElementById('modal-title').innerText = event.title;
             document.getElementById('modal-desc').innerText = event.description;
             document.getElementById('modal-date').innerText = event.date;
@@ -169,17 +189,22 @@
                     fSection.style.display = 'none';
                     document.getElementById('modal-fee').innerText = event.fee;
                 } else {
+                    // It's free, so just view details, no registration section at all
                     pSection.style.display = 'none';
-                    fSection.style.display = 'block';
+                    fSection.style.display = 'none';
                 }
             }
 
-            document.getElementById('reg-modal').style.display = 'flex';
-            gsap.from('.reg-modal-content', { scale: 0.8, opacity: 0, duration: 0.5, ease: "back.out(1.7)" });
+            document.getElementById('reg-modal').classList.add('is-open');
+            // Force re-run animation on modal content
+            const content = document.querySelector('.reg-modal-content');
+            content.style.animation = 'none';
+            content.offsetHeight; // reflow
+            content.style.animation = '';
         }
 
         function closeModal() {
-            document.getElementById('reg-modal').style.display = 'none';
+            document.getElementById('reg-modal').classList.remove('is-open');
         }
 
         document.getElementById('payment-form').addEventListener('submit', async (e) => {
