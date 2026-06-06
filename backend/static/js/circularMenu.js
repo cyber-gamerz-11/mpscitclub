@@ -59,17 +59,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function animateMenuItemsIn() {
+        if (typeof synth !== 'undefined') synth.playClick();
         gsap.fromTo(menuItems, 
             { scale: 0, opacity: 0 },
             { 
                 scale: 1, 
                 opacity: 1, 
-                duration: 0.6, 
-                stagger: 0.05, 
-                ease: "power3.out" 
+                duration: 0.8, 
+                stagger: 0.08, 
+                ease: "back.out(1.5)" 
             }
         );
     }
+
+    // Add HUD interaction on hover
+    const circularContainer = document.querySelector('.circular-container');
+    menuItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            if (circularContainer) circularContainer.classList.add('fast-spin');
+            if (typeof synth !== 'undefined') synth.playBackspace(); // Small blip sound
+        });
+        item.addEventListener('mouseleave', () => {
+            if (circularContainer) circularContainer.classList.remove('fast-spin');
+        });
+    });
 
     // 3. Update Rotation & Keep Text Upright
     function updateMenuRotation() {

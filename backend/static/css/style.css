@@ -297,28 +297,66 @@ nav.scrolled {
     }
 }
 
-.rotating-ring {
+.hud-ring {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 1px dashed rgba(0, 255, 136, 0.2); /* Holographic ring */
     border-radius: 50%;
     pointer-events: none;
-    box-shadow: inset 0 0 50px rgba(0, 255, 136, 0.05);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s ease;
 }
 
-.rotating-ring::after {
-    content: '';
-    position: absolute;
-    top: -5px; left: -5px; right: -5px; bottom: -5px;
-    border: 1px solid rgba(0, 255, 136, 0.1);
-    border-radius: 50%;
-    animation: pulse 4s ease-in-out infinite;
+.outer-ring {
+    width: 110%;
+    height: 110%;
+    border: 2px dashed rgba(0, 245, 180, 0.2);
+    animation: rotateClockwise 25s linear infinite;
+    box-shadow: 0 0 30px rgba(0, 245, 180, 0.05), inset 0 0 30px rgba(0, 245, 180, 0.05);
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.1; }
-    50% { transform: scale(1.05); opacity: 0.3; }
+.middle-ring {
+    width: 90%;
+    height: 90%;
+    border: 1px solid rgba(0, 245, 180, 0.4);
+    animation: rotateCounterClockwise 15s linear infinite;
+    box-shadow: 0 0 20px rgba(0, 245, 180, 0.1);
+}
+
+.inner-core {
+    width: 40%;
+    height: 40%;
+    background: radial-gradient(circle, rgba(0, 245, 180, 0.15) 0%, transparent 70%);
+    animation: pulseCore 3s ease-in-out infinite;
+}
+
+@keyframes rotateClockwise {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes rotateCounterClockwise {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+@keyframes pulseCore {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+}
+
+/* Speed up rings when a menu item is hovered */
+.circular-container.fast-spin .outer-ring {
+    animation-duration: 5s;
+    border-color: rgba(0, 245, 180, 0.6);
+    box-shadow: 0 0 50px rgba(0, 245, 180, 0.2), inset 0 0 50px rgba(0, 245, 180, 0.2);
+}
+.circular-container.fast-spin .middle-ring {
+    animation-duration: 3s;
+    border-color: rgba(0, 245, 180, 0.8);
+}
+.circular-container.fast-spin .inner-core {
+    animation-duration: 0.8s;
 }
 
 .circular-menu {
