@@ -21,7 +21,25 @@ def get_ec_list():
     db = get_db()
     if not db: return jsonify([])
     response = db.table("ec_members").select("*").order("display_order", desc=False).execute()
-    return jsonify(response.data)
+    
+    parsed_members = []
+    for m in response.data:
+        cat = m.get('category') or 'BVB'
+        year = '2026'
+        actual_category = cat
+        if '_' in cat:
+            parts = cat.split('_', 1)
+            if parts[0].isdigit() and len(parts[0]) == 4:
+                year = parts[0]
+                actual_category = parts[1]
+        
+        m_copy = dict(m)
+        m_copy['year'] = year
+        m_copy['category'] = actual_category
+        parsed_members.append(m_copy)
+        
+    return jsonify(parsed_members)
+
 
 @user_bp.route('/gallery_list')
 def get_gallery_list():

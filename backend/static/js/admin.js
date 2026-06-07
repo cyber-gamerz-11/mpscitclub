@@ -1,4 +1,5 @@
 // Admin Command Center Logic
+let allEcMembers = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
@@ -92,18 +93,9 @@ async function loadAllData() {
     fetchPendingPayments();
 
     // Render EC
-    const ecList = document.getElementById('ec-list');
-    ecList.innerHTML = data.ec_members.map(m => `
-        <tr>
-            <td>${m.name}</td>
-            <td>${m.designation}</td>
-            <td>${m.category || 'N/A'}</td>
-            <td>${m.display_order}</td>
-            <td>
-                <button class="action-btn delete-btn" onclick="deleteItem('ec_members', '${m.id}')">Remove</button>
-            </td>
-        </tr>
-    `).join('');
+    allEcMembers = data.ec_members;
+    updateYearDropdownOptions();
+    renderECList();
 
     // Render Gallery
     const galleryList = document.getElementById('gallery-list');
@@ -316,3 +308,149 @@ function copyResetLink() {
         window.showToast('Failed to copy to clipboard', 'error');
     });
 }
+
+// Year Management Functions for EC Members
+function updateYearDropdownOptions() {
+    const yearSelect = document.getElementById('admin-ec-year-select');
+    if (!yearSelect) return;
+    
+    const years = new Set(['2026']);
+    allEcMembers.forEach(m => {
+        let year = '2026';
+        if (m.category && m.category.includes('_')) {
+            const parts = m.category.split('_');
+            if (parts[0].length === 4 && !isNaN(parts[0])) {
+                year = parts[0];
+            }
+        }
+        years.add(year);
+    });
+    
+    const currentVal = yearSelect.value || '2026';
+    const sortedYears = Array.from(years).sort((a, b) => b - a);
+    
+    yearSelect.innerHTML = sortedYears.map(yr => `<option value="${yr}">${yr}</option>`).join('');
+    if (sortedYears.includes(currentVal)) {
+        yearSelect.value = currentVal;
+    } else {
+        yearSelect.value = sortedYears[0];
+    }
+}
+
+function renderECList() {
+    const yearSelect = document.getElementById('admin-ec-year-select');
+    const ecList = document.getElementById('ec-list');
+    if (!ecList || !yearSelect) return;
+    
+    const selectedYear = yearSelect.value;
+    const filtered = allEcMembers.filter(m => {
+        let year = '2026';
+        if (m.category && m.category.includes('_')) {
+            const parts = m.category.split('_');
+            if (parts[0].length === 4 && !isNaN(parts[0])) {
+                year = parts[0];
+            }
+        }
+        return year === selectedYear;
+    });
+    
+    ecList.innerHTML = filtered.map(m => {
+        let displayCat = m.category || 'N/A';
+        let year = '2026';
+        if (m.category && m.category.includes('_')) {
+            const parts = m.category.split('_');
+            if (parts[0].length === 4 && !isNaN(parts[0])) {
+                year = parts[0];
+                displayCat = m.category.substring(m.category.indexOf('_') + 1);
+            }
+        }
+        return `
+            <tr>
+                <td>${m.name}</td>
+                <td>${m.designation}</td>
+                <td>${displayCat}</td>
+                <td>${year}</td>
+                <td>${m.display_order}</td>
+                <td>
+                    <button class="action-btn delete-btn" onclick="deleteItem('ec_members', '${m.id}')">Remove</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function filterECByYear() {
+    renderECList();
+}
+
+function openAddECModal() {
+    const yearSelect = document.getElementById('admin-ec-year-select');
+    const modalYear = document.getElementById('ec-modal-year');
+    if (yearSelect && modalYear) {
+        modalYear.value = yearSelect.value || '2026';
+    }
+    toggleModal('ec-modal');
+}
+
+function adminAddYearPrompt() {
+    const newYear = prompt("Enter new year (4 digits):");
+    if (!newYear) return;
+    if (newYear.length !== 4 || isNaN(newYear)) {
+        window.showToast("Please enter a valid 4-digit year", "error");
+        return;
+    }
+    
+    const yearSelect = document.getElementById('admin-ec-year-select');
+    if (yearSelect) {
+        let exists = false;
+        for (let i = 0; i < yearSelect.options.length; i++) {
+            if (yearSelect.options[i].value === newYear) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            const opt = document.createElement('option');
+            opt.value = newYear;
+            opt.innerHTML = newYear;
+            yearSelect.insertBefore(opt, yearSelect.firstChild);
+            
+            const sortedVals = Array.from(yearSelect.options)
+                .map(o => o.value)
+                .sort((a, b) => b - a);
+            yearSelect.innerHTML = sortedVals.map(yr => `<option value="${yr}">${yr}</option>`).join('');
+        }
+        yearSelect.value = newYear;
+        renderECList();
+        window.showToast(`Year ${newYear} added. Add members to this year now!`, "success");
+    }
+}
+
+async function adminDeleteYearPrompt() {
+    const yearSelect = document.getElementById('admin-ec-year-select');
+    if (!yearSelect) return;
+    const year = yearSelect.value;
+    
+    if (!confirm(`Are you sure you want to delete all EC members for the year ${year}?`)) {
+        return;
+    }
+    
+    try {
+        const res = await fetch('/admin/ec/delete_year', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ year: year })
+        });
+        if (res.ok) {
+            window.showToast(`Deleted all EC members for year ${year}`, 'success');
+            loadAllData();
+        } else {
+            const err = await res.json();
+            window.showToast(err.error || 'Failed to delete year', 'error');
+        }
+    } catch (err) {
+        console.error("Delete Year Error:", err);
+        window.showToast('Network error', 'error');
+    }
+}
+

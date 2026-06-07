@@ -158,11 +158,16 @@ def add_ec_member():
     data = request.form.to_dict()
     image_url = upload_to_supabase(request.files.get('image'), 'ec')
     
+    # Category stored in DB is "{year}_{category}" (e.g. "2026_BVB")
+    year = data.get('year', '2026').strip()
+    category = data['category']
+    full_category = f"{year}_{category}"
+    
     db = get_db()
     db.table("ec_members").insert({
         "name": data['name'],
         "designation": data['designation'],
-        "category": data['category'],
+        "category": full_category,
         "image_path": image_url or '/static/assets/images/ec/default.jpg',
         "facebook": data.get('facebook', ''),
         "instagram": data.get('instagram', ''),
@@ -172,6 +177,23 @@ def add_ec_member():
     }).execute()
     
     return jsonify({"success": "EC Member added"})
+
+@admin_bp.route('/ec/delete_year', methods=['POST'])
+@login_required
+@admin_required
+def delete_ec_year():
+    data = request.json
+    year = str(data.get('year', '')).strip()
+    if not year:
+        return jsonify({"error": "Year is required"}), 400
+        
+    db = get_db()
+    try:
+        db.table("ec_members").delete().like("category", f"{year}_%").execute()
+        return jsonify({"success": f"All members for year {year} deleted successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @admin_bp.route('/stats')
 @login_required
