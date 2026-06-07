@@ -91,6 +91,7 @@ async function loadAllData() {
 
     // Render Payments
     fetchPendingPayments();
+    fetchVerifiedPayments();
 
     // Render EC
     allEcMembers = data.ec_members;
@@ -137,6 +138,41 @@ async function verifyPayment(id, status) {
     if (res.ok) {
         window.showToast(`Payment ${status}`, 'success');
         fetchPendingPayments();
+        fetchVerifiedPayments();
+    }
+}
+
+async function fetchVerifiedPayments() {
+    try {
+        const res = await fetch('/admin/api/verified_payments');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        
+        const list = document.getElementById('verified-payments-list');
+        if (!list) return;
+
+        if (data.length === 0) {
+            list.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--soft-gray);">No verified records found.</td></tr>';
+            return;
+        }
+
+        list.innerHTML = data.map(p => {
+            const d = new Date(p.date_verified);
+            const dateStr = isNaN(d) ? p.date_verified : d.toLocaleDateString();
+            return `
+            <tr>
+                <td>${p.member_name}</td>
+                <td style="color: var(--emerald-green); font-weight: 600;">${p.student_id}</td>
+                <td>${p.event_name}</td>
+                <td style="font-family: monospace; font-size: 0.85rem;">${p.transaction_id}</td>
+                <td>${dateStr}</td>
+            </tr>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error(err);
+        const list = document.getElementById('verified-payments-list');
+        if (list) list.innerHTML = '<tr><td colspan="5" style="text-align:center; color: #ff4d4d;">Failed to load records.</td></tr>';
     }
 }
 
@@ -314,26 +350,34 @@ function updateYearDropdownOptions() {
     const yearSelect = document.getElementById('admin-ec-year-select');
     if (!yearSelect) return;
     
-    const years = new Set(['2026']);
-    allEcMembers.forEach(m => {
-        let year = '2026';
-        if (m.category && m.category.includes('_')) {
-            const parts = m.category.split('_');
-            if (parts[0].length === 4 && !isNaN(parts[0])) {
-                year = parts[0];
+    const currentYr = new Date().getFullYear().toString();
+    const years = new Set([]);
+    
+    if (allEcMembers.length > 0) {
+        allEcMembers.forEach(m => {
+            let year = currentYr;
+            if (m.category && m.category.includes('_')) {
+                const parts = m.category.split('_');
+                if (parts[0].length === 4 && !isNaN(parts[0])) {
+                    year = parts[0];
+                }
             }
-        }
-        years.add(year);
-    });
+            years.add(year);
+        });
+    }
     
     const currentVal = yearSelect.value || '2026';
     const sortedYears = Array.from(years).sort((a, b) => b - a);
     
-    yearSelect.innerHTML = sortedYears.map(yr => `<option value="${yr}">${yr}</option>`).join('');
-    if (sortedYears.includes(currentVal)) {
-        yearSelect.value = currentVal;
+    if (sortedYears.length > 0) {
+        yearSelect.innerHTML = sortedYears.map(yr => `<option value="${yr}">${yr}</option>`).join('');
+        if (sortedYears.includes(currentVal)) {
+            yearSelect.value = currentVal;
+        } else {
+            yearSelect.value = sortedYears[0];
+        }
     } else {
-        yearSelect.value = sortedYears[0];
+        yearSelect.innerHTML = '<option value="" disabled selected>No Years Found</option>';
     }
 }
 
@@ -343,8 +387,9 @@ function renderECList() {
     if (!ecList || !yearSelect) return;
     
     const selectedYear = yearSelect.value;
+    const currentYr = new Date().getFullYear().toString();
     const filtered = allEcMembers.filter(m => {
-        let year = '2026';
+        let year = currentYr;
         if (m.category && m.category.includes('_')) {
             const parts = m.category.split('_');
             if (parts[0].length === 4 && !isNaN(parts[0])) {
@@ -356,7 +401,7 @@ function renderECList() {
     
     ecList.innerHTML = filtered.map(m => {
         let displayCat = m.category || 'N/A';
-        let year = '2026';
+        let year = currentYr;
         if (m.category && m.category.includes('_')) {
             const parts = m.category.split('_');
             if (parts[0].length === 4 && !isNaN(parts[0])) {
@@ -387,7 +432,7 @@ function openAddECModal() {
     const yearSelect = document.getElementById('admin-ec-year-select');
     const modalYear = document.getElementById('ec-modal-year');
     if (yearSelect && modalYear) {
-        modalYear.value = yearSelect.value || '2026';
+        modalYear.value = yearSelect.value || new Date().getFullYear().toString();
     }
     toggleModal('ec-modal');
 }
@@ -430,6 +475,11 @@ async function adminDeleteYearPrompt() {
     const yearSelect = document.getElementById('admin-ec-year-select');
     if (!yearSelect) return;
     const year = yearSelect.value;
+    
+    if (!year) {
+        window.showToast("No active year to delete", "error");
+        return;
+    }
     
     if (!confirm(`Are you sure you want to delete all EC members for the year ${year}?`)) {
         return;

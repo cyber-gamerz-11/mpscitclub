@@ -71,130 +71,123 @@
             display: block;
         }
 
-        /* Right Side Floating Timeline */
+        /* Left Side Floating Timeline - High Tech */
         .ec-timeline-container {
             position: fixed;
-            right: 40px;
+            left: 30px;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1rem;
             z-index: 100;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(15px);
-            padding: 1.5rem 0.8rem;
-            border-radius: 50px;
-            border: 1px solid var(--glass-border);
+            padding: 2rem 0;
             align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
         }
-        
-        .timeline-dot-wrapper {
+
+        .ec-timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 255, 136, 0.2), transparent);
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+
+        .timeline-item {
+            position: relative;
+            cursor: pointer;
+            padding: 12px 20px;
+            border-radius: 30px;
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--soft-gray);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            position: relative;
-            width: 32px;
-            height: 32px;
+            letter-spacing: 1px;
+            min-width: 90px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .timeline-year-label {
+        .timeline-item::before {
+            content: '';
             position: absolute;
-            right: 45px;
-            background: rgba(0, 0, 0, 0.85);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+
+        .timeline-item:hover {
+            border-color: rgba(0, 255, 136, 0.4);
             color: var(--white);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            opacity: 0;
-            transform: translateX(10px);
-            pointer-events: none;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            border: 1px solid var(--glass-border);
+            transform: scale(1.1) translateX(10px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.15);
         }
 
-        .timeline-dot-wrapper:hover .timeline-year-label {
-            opacity: 1;
-            transform: translateX(0);
+        .timeline-item:hover::before {
+            transform: translateX(100%);
         }
 
-        .timeline-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.25);
-            border: 2px solid transparent;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .timeline-dot-wrapper:hover .timeline-dot {
-            background: var(--white);
-            transform: scale(1.2);
-            box-shadow: 0 0 10px var(--white);
-        }
-
-        .timeline-dot-wrapper.active .timeline-dot {
-            background: var(--emerald-green);
-            transform: scale(1.4);
-            box-shadow: 0 0 15px var(--emerald-green);
-        }
-        
-        .timeline-dot-wrapper.active .timeline-year-label {
-            color: var(--emerald-green);
+        .timeline-item.active {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 0, 0, 0.8));
             border-color: var(--emerald-green);
-            opacity: 1;
-            transform: translateX(0);
+            color: var(--emerald-green);
+            transform: scale(1.15) translateX(15px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2), inset 0 0 10px rgba(0, 255, 136, 0.1);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .timeline-item.active::after {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: var(--emerald-green);
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--emerald-green);
         }
 
         /* Responsive timeline */
         @media (max-width: 991px) {
             .ec-timeline-container {
                 position: sticky;
-                top: 75px; /* Directly below sticky navigation */
-                right: auto;
+                top: 75px; 
                 left: 0;
+                right: 0; 
                 transform: none;
                 flex-direction: row;
                 width: 100%;
-                justify-content: center;
-                border-radius: 0;
-                border: none;
-                border-bottom: 1px solid var(--glass-border);
+                justify-content: flex-start;
+                overflow-x: auto;
                 background: rgba(10, 10, 10, 0.95);
-                padding: 0.8rem;
-                gap: 1.5rem;
+                padding: 1rem;
+                gap: 1rem;
                 margin-bottom: 2rem;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                scroll-snap-type: x mandatory;
             }
-            .timeline-year-label {
-                position: static;
-                opacity: 1;
-                transform: none;
-                pointer-events: auto;
-                background: transparent;
-                border: none;
-                padding: 0;
-                font-size: 0.95rem;
-                color: var(--soft-gray);
+            .ec-timeline-container::before { display: none; }
+            .timeline-item {
+                min-width: 80px;
+                padding: 8px 16px;
+                scroll-snap-align: center;
+                font-size: 0.85rem;
             }
-            .timeline-dot-wrapper {
-                width: auto;
-                height: auto;
-                flex-direction: column-reverse;
-                gap: 4px;
-            }
-            .timeline-dot {
-                width: 8px;
-                height: 8px;
-            }
-            .timeline-dot-wrapper.active .timeline-year-label {
-                color: var(--emerald-green);
-                font-weight: 700;
+            .timeline-item:hover, .timeline-item.active {
+                transform: scale(1.1) translateX(0); /* Disable translateX on mobile */
             }
         }
     </style>
@@ -230,6 +223,14 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/circularMenu.js') }}"></script>
     <script>
+        let globalYearsMap = {};
+        let globalCategories = { 
+            BVB: 'Bangla Version Boys (BVB)', 
+            BVG: 'Bangla Version Girls (BVG)', 
+            EVB: 'English Version Boys (EVB)', 
+            EVG: 'English Version Girls (EVG)' 
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('ec-container');
             
@@ -243,141 +244,121 @@
                 </div>
             `;
 
-            const res = await fetch('/user/ec_list');
-            const members = await res.json();
+            try {
+                const res = await fetch('/user/ec_list');
+                const members = await res.json();
 
-            if (members.length === 0) {
-                container.innerHTML = '<p>The committee list is being updated.</p>';
-                return;
-            }
-
-            // Group by Year
-            const yearsMap = {};
-            members.forEach(m => {
-                const yr = m.year || '2026';
-                if (!yearsMap[yr]) {
-                    yearsMap[yr] = [];
+                if (!members || members.length === 0) {
+                    container.innerHTML = '<p>The committee list is being updated.</p>';
+                    return;
                 }
-                yearsMap[yr].push(m);
-            });
 
-            const categories = { 
-                BVB: 'Bangla Version Boys (BVB)', 
-                BVG: 'Bangla Version Girls (BVG)', 
-                EVB: 'English Version Boys (EVB)', 
-                EVG: 'English Version Girls (EVG)' 
-            };
-
-            const sortedYears = Object.keys(yearsMap).sort((a, b) => b - a);
-
-            // Render Timeline
-            const timeline = document.getElementById('ec-timeline');
-            if (timeline) {
-                timeline.innerHTML = sortedYears.map((yr, idx) => `
-                    <div class="timeline-dot-wrapper ${idx === 0 ? 'active' : ''}" data-year="${yr}" onclick="scrollToYear('${yr}')">
-                        <span class="timeline-year-label">${yr}</span>
-                        <div class="timeline-dot"></div>
-                    </div>
-                `).join('');
-            }
-
-            let html = '';
-            sortedYears.forEach(yr => {
-                const yrMembers = yearsMap[yr];
-                const grouped = { BVB: [], BVG: [], EVB: [], EVG: [] };
-
-                yrMembers.forEach(m => {
-                    if (grouped[m.category]) {
-                        grouped[m.category].push(m);
+                // Group by Year
+                members.forEach(m => {
+                    const yr = m.year || '2026';
+                    if (!globalYearsMap[yr]) {
+                        globalYearsMap[yr] = [];
                     }
+                    globalYearsMap[yr].push(m);
                 });
 
-                let yearHtml = `
-                    <div class="ec-year-section" id="year-section-${yr}" style="margin-bottom: 6rem; position: relative;">
-                        <h2 class="year-heading" style="font-size: 2.8rem; color: var(--emerald-green); text-align: center; margin-bottom: 3rem; font-weight: 700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);"><span style="color:var(--white);">Committee of</span> ${yr}</h2>
-                `;
+                const sortedYears = Object.keys(globalYearsMap).sort((a, b) => b - a);
 
-                for (const [key, title] of Object.entries(categories)) {
-                    if (grouped[key].length > 0) {
-                        yearHtml += `
-                            <div class="ec-category-section">
-                                <h3 class="ec-category-title">${title}</h3>
-                                <div class="ec-scroll-container">
-                                    ${grouped[key].map(m => `
-                                        <div class="glass-card ec-card">
-                                            <div class="ec-photo">
-                                                <img src="${m.image_path || '/static/assets/images/ec/default.jpg'}" alt="${m.name}">
-                                            </div>
-                                            <h3 class="emerald" style="text-transform: uppercase; letter-spacing: 2px;">${m.name}</h3>
-                                            <p class="role" style="color: var(--soft-gray); font-weight: 600;">${m.designation}</p>
-                                            
-                                            <div class="social-links" style="flex-wrap: wrap;">
-                                                ${m.facebook ? `<a href="${m.facebook}" target="_blank">Facebook</a>` : ''}
-                                                ${m.instagram ? `<a href="${m.instagram}" target="_blank">Instagram</a>` : ''}
-                                                ${m.website ? `<a href="${m.website}" target="_blank">Website</a>` : ''}
-                                                ${m.whatsapp ? `<a href="https://wa.me/${m.whatsapp.replace(/[^0-9]/g, '')}" target="_blank">WhatsApp</a>` : ''}
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }
+                // Render Timeline
+                const timeline = document.getElementById('ec-timeline');
+                if (timeline) {
+                    timeline.innerHTML = sortedYears.map((yr, idx) => `
+                        <div class="timeline-item ${idx === 0 ? 'active' : ''}" data-year="${yr}" onclick="loadYear('${yr}')">
+                            ${yr}
+                        </div>
+                    `).join('');
                 }
-                yearHtml += `</div>`;
-                html += yearHtml;
+
+                // Load initial year (latest)
+                if (sortedYears.length > 0) {
+                    loadYear(sortedYears[0]);
+                }
+            } catch (err) {
+                console.error("Error fetching EC List:", err);
+                container.innerHTML = '<p>Failed to load committee members. Please try again later.</p>';
+            }
+        });
+
+        window.loadYear = (year) => {
+            const container = document.getElementById('ec-container');
+            const yrMembers = globalYearsMap[year];
+            if (!yrMembers) return;
+
+            // Update timeline UI
+            document.querySelectorAll('.timeline-item').forEach(dot => {
+                if (dot.getAttribute('data-year') === String(year)) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
             });
 
-            container.innerHTML = html;
+            const grouped = { BVB: [], BVG: [], EVB: [], EVG: [] };
+            yrMembers.forEach(m => {
+                if (grouped[m.category]) {
+                    grouped[m.category].push(m);
+                }
+            });
 
+            let yearHtml = `
+                <div class="ec-year-section" id="year-section-${year}" style="margin-bottom: 6rem; position: relative;">
+                    <h2 class="year-heading" style="font-size: 2.8rem; color: var(--emerald-green); text-align: center; margin-bottom: 3rem; font-weight: 700; letter-spacing: 3px; text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);"><span style="color:var(--white);">Committee of</span> ${year}</h2>
+            `;
+
+            for (const [key, title] of Object.entries(globalCategories)) {
+                if (grouped[key].length > 0) {
+                    yearHtml += `
+                        <div class="ec-category-section">
+                            <h3 class="ec-category-title">${title}</h3>
+                            <div class="ec-scroll-container">
+                                ${grouped[key].map(m => `
+                                    <div class="glass-card ec-card">
+                                        <div class="ec-photo">
+                                            <img src="${m.image_path || '/static/assets/images/ec/default.jpg'}" alt="${m.name}">
+                                        </div>
+                                        <h3 class="emerald" style="text-transform: uppercase; letter-spacing: 2px;">${m.name}</h3>
+                                        <p class="role" style="color: var(--soft-gray); font-weight: 600;">${m.designation}</p>
+                                        
+                                        <div class="social-links" style="flex-wrap: wrap;">
+                                            ${m.facebook ? `<a href="${m.facebook}" target="_blank">Facebook</a>` : ''}
+                                            ${m.instagram ? `<a href="${m.instagram}" target="_blank">Instagram</a>` : ''}
+                                            ${m.website ? `<a href="${m.website}" target="_blank">Website</a>` : ''}
+                                            ${m.whatsapp ? `<a href="https://wa.me/${m.whatsapp.replace(/[^0-9]/g, '')}" target="_blank">WhatsApp</a>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            yearHtml += `</div>`;
+            
+            container.innerHTML = yearHtml;
+
+            // Trigger animation
             gsap.from('.ec-year-section', { 
                 opacity: 0, 
                 y: 50, 
-                stagger: 0.3, 
-                duration: 1, 
+                duration: 0.8, 
                 ease: "power3.out",
                 clearProps: "all" 
             });
-
-            setupTimelineHighlighting(sortedYears);
-        });
-
-        window.scrollToYear = (year) => {
-            const section = document.getElementById(`year-section-${year}`);
-            if (section) {
-                const yOffset = -120; // Scroll offset to clear headers
-                const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({ top: y, behavior: 'smooth' });
-            }
-        };
-
-        function setupTimelineHighlighting(years) {
-            window.addEventListener('scroll', () => {
-                let currentActive = years[0];
-                let minDiff = Infinity;
-                
-                years.forEach(yr => {
-                    const section = document.getElementById(`year-section-${yr}`);
-                    if (section) {
-                        const rect = section.getBoundingClientRect();
-                        const diff = Math.abs(rect.top - 150);
-                        if (diff < minDiff) {
-                            minDiff = diff;
-                            currentActive = yr;
-                        }
-                    }
-                });
-
-                document.querySelectorAll('.timeline-dot-wrapper').forEach(dot => {
-                    if (dot.getAttribute('data-year') === currentActive) {
-                        dot.classList.add('active');
-                    } else {
-                        dot.classList.remove('active');
-                    }
-                });
+            gsap.from('.ec-card', { 
+                opacity: 0, 
+                scale: 0.9,
+                y: 30, 
+                stagger: 0.1, 
+                duration: 0.6, 
+                ease: "back.out(1.7)",
+                clearProps: "all" 
             });
-        }
+        };
     </script>
 </body>
 </html>
-

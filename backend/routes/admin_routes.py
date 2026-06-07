@@ -5,7 +5,9 @@ import datetime
 import time
 import os
 from werkzeug.utils import secure_filename
-
+import csv
+import io
+from flask import Response
 admin_bp = Blueprint('admin', __name__)
 
 # --- Admin-only password reset helpers ---
@@ -298,4 +300,99 @@ def admin_generate_reset_link():
         "reset_link": reset_link,
         "expires_in": "1 hour"
     })
+
+@admin_bp.route('/api/verified_payments')
+@login_required
+@admin_required
+def get_verified_payments():
+    db = get_db()
+    
+    # Get all approved payments
+    payments_res = db.table("payments").select("*").eq("status", "approved").order("created_at", desc=True).execute()
+    payments = payments_res.data if payments_res.data else []
+    
+    # Get users map
+    users_res = db.table("users").select("id, full_name, email, student_id").execute()
+    users_map = {u['id']: u for u in users_res.data} if users_res.data else {}
+    
+    # Get events map
+    events_res = db.table("events").select("id, title").execute()
+    events_map = {e['id']: e['title'] for e in events_res.data} if events_res.data else {}
+    
+    result = []
+    for p in payments:
+        user = users_map.get(p.get('member_id'), {})
+        event_title = events_map.get(p.get('event_id'), 'Unknown Event')
+        verified_date = p.get('updated_at', p.get('created_at', ''))
+        
+        result.append({
+            "event_name": event_title,
+            "member_name": user.get('full_name', 'Unknown'),
+            "student_id": user.get('student_id', 'Unknown'),
+            "email": user.get('email', 'Unknown'),
+            "ref_email": p.get('ref_email', ''),
+            "transaction_id": p.get('transaction_id', ''),
+            "date_verified": verified_date
+        })
+        
+    return jsonify(result)
+
+@admin_bp.route('/api/export_verified_payments')
+@login_required
+@admin_required
+def export_verified_payments():
+    db = get_db()
+    
+    # Get all approved payments
+    payments_res = db.table("payments").select("*").eq("status", "approved").execute()
+    if not payments_res.data:
+        return jsonify({"error": "No verified payments found"}), 404
+        
+    payments = payments_res.data
+    
+    # Get all users and create a map
+    users_res = db.table("users").select("id, full_name, email, student_id").execute()
+    users_map = {u['id']: u for u in users_res.data} if users_res.data else {}
+    
+    # Get all events and create a map
+    events_res = db.table("events").select("id, title").execute()
+    events_map = {e['id']: e['title'] for e in events_res.data} if events_res.data else {}
+    
+    # Generate CSV
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow([
+        'Event Name',
+        'Member Name',
+        'Student ID',
+        'Registered Email',
+        'Payment Reference Email',
+        'Transaction ID',
+        'Date Verified'
+    ])
+    
+    for p in payments:
+        user = users_map.get(p.get('member_id'), {})
+        event_title = events_map.get(p.get('event_id'), 'Unknown Event')
+        
+        # created_at or updated_at for verified date. We'll use created_at or updated_at if available.
+        verified_date = p.get('updated_at', p.get('created_at', ''))
+        
+        writer.writerow([
+            event_title,
+            user.get('full_name', 'Unknown'),
+            user.get('student_id', 'Unknown'),
+            user.get('email', 'Unknown'),
+            p.get('ref_email', ''),
+            p.get('transaction_id', ''),
+            verified_date
+        ])
+    
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=Verified_Payments_Report.csv"}
+    )
 

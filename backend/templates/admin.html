@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <style>
-        .admin-grid { display: grid; grid-template-columns: 260px 1fr; height: 100vh; overflow: hidden; font-size: 0.95rem; }
-        .admin-sidebar { background: rgba(0,0,0,0.6); backdrop-filter: blur(30px); border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; display: flex; flex-direction: column; overflow-y: auto; }
-        .admin-main { padding: 3rem; overflow-y: auto; background: rgba(0,0,0,0.2); }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+        .admin-grid { display: grid; grid-template-columns: 260px 1fr; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; overflow: hidden; font-size: 0.95rem; z-index: 10; background: var(--matte-black); }
+        .admin-sidebar { background: rgba(0,0,0,0.8); backdrop-filter: blur(30px); border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; }
+        .admin-main { padding: 2rem 3rem; overflow-y: auto; background: rgba(0,0,0,0.2); height: 100vh; }
         .sidebar-menu { list-style: none; margin-top: 2rem; flex-grow: 1; }
         .sidebar-menu li { margin-bottom: 0.5rem; }
         .sidebar-menu a { color: var(--soft-gray); text-decoration: none; padding: 12px 16px; border-radius: 8px; display: block; transition: 0.3s; font-weight: 500; font-size: 0.9rem; }
@@ -58,7 +59,8 @@
                 <li><a href="#gallery">Gallery</a></li>
                 <li><a href="#users">Users</a></li>
                 <li><a href="#ec">EC Panel</a></li>
-                <li><a href="#payments">Payments</a></li>
+                <li><a href="#payments">Pending Payments</a></li>
+                <li><a href="#verified-payments">Verified Records</a></li>
                 <li><a href="#password-reset">🔑 Password Reset</a></li>
                 <li style="margin-top: 2rem;"><a href="/" class="btn-secondary" style="text-align: center;">Exit Site</a></li>
                 <li style="margin-top: 1rem;"><a href="/auth/logout" class="btn-primary" style="background: #ff4d4d; border-color: #ff4d4d; color: white; text-align: center;">Logout</a></li>
@@ -152,7 +154,7 @@
                             <option value="2022">2022</option>
                             <option value="2021">2021</option>
                         </select>
-                        <button onclick="adminAddYearPrompt()" class="btn-secondary" style="padding: 8px 12px; font-size: 0.85rem;">+ Add Year</button>
+                        <button onclick="adminAddYearPrompt()" class="btn-primary" style="background: transparent; color: white; border: 1px solid var(--emerald-green); padding: 8px 12px; font-size: 0.85rem;">+ Add Year</button>
                         <button onclick="adminDeleteYearPrompt()" class="btn-primary" style="background: #ff4d4d; border-color: #ff4d4d; color: white; padding: 8px 12px; font-size: 0.85rem;">🗑️ Delete Year</button>
                         <button onclick="openAddECModal()" class="btn-primary">Add EC Member</button>
                     </div>
@@ -172,6 +174,36 @@
                     <table class="list-table">
                         <thead><tr><th>Member ID</th><th>Ref Email</th><th>TxID</th><th>Actions</th></tr></thead>
                         <tbody id="payments-list"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Verified Records -->
+            <section id="verified-payments-section" class="dash-section" style="display:none;">
+                <h2 class="section-title">Verified Records & Exports</h2>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+                    <p style="color: var(--soft-gray); font-size: 0.95rem; margin: 0; max-width: 60%;">
+                        View all verified payments and their details. Use the export button to download an Excel (CSV) report.
+                    </p>
+                    <button onclick="window.location.href='/admin/api/export_verified_payments'" class="btn-primary" style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; box-shadow: 0 0 15px rgba(0,255,136,0.2);">
+                        📥 Download Excel Report
+                    </button>
+                </div>
+
+                <div class="glass-card mt-2" style="max-height: 500px; overflow-y: auto;">
+                    <table class="list-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Event</th>
+                                <th>TxID</th>
+                                <th>Date Verified</th>
+                            </tr>
+                        </thead>
+                        <tbody id="verified-payments-list">
+                            <tr><td colspan="5" style="text-align:center; color: var(--soft-gray);">Loading verified records...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
@@ -303,7 +335,18 @@
                 <input type="number" id="ec-modal-year" name="year" required class="w-full" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 8px; border-radius: 6px; color: white;">
             </div>
             <input type="text" name="name" placeholder="Full Name" required class="w-full mb-1">
-            <input type="text" name="designation" placeholder="Designation (e.g. President)" required class="w-full mb-1">
+            <select name="designation" class="w-full mb-1" required style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
+                <option value="" disabled selected>Select Designation</option>
+                <option value="President">President</option>
+                <option value="Vice President">Vice President</option>
+                <option value="General secretary">General secretary</option>
+                <option value="Organizing secretary">Organizing secretary</option>
+                <option value="Office Secretary">Office Secretary</option>
+                <option value="Publication secretary">Publication secretary</option>
+                <option value="External affairs secretary">External affairs secretary</option>
+                <option value="Head of volunteers">Head of volunteers</option>
+                <option value="Treasurer">Treasurer</option>
+            </select>
             <select name="category" class="w-full mb-1" required>
                 <option value="BVB">Bangla Version Boys (BVB)</option>
                 <option value="BVG">Bangla Version Girls (BVG)</option>

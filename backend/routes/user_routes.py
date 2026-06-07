@@ -25,7 +25,7 @@ def get_ec_list():
     parsed_members = []
     for m in response.data:
         cat = m.get('category') or 'BVB'
-        year = '2026'
+        year = '2026' # Fallback
         actual_category = cat
         if '_' in cat:
             parts = cat.split('_', 1)
