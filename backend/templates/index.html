@@ -130,13 +130,21 @@
                         </div>
                     </div>`;
 
+                // Shift the last 2 members to the front so the left side isn't blank, 
+                // and the President starts offset from the left edge.
+                if (current.length > 2) {
+                    const tail = current.splice(-2);
+                    current.unshift(...tail);
+                }
+
                 const screenW = window.innerWidth;
                 const cardW = 270; // 250px card + 20px gap
                 const setsNeeded = Math.max(2, Math.ceil((screenW * 2) / (Math.max(1, current.length) * cardW)));
                 
+                let ecHTML = current.map(buildCard).join('');
                 let cards = '';
                 for (let i = 0; i < setsNeeded; i++) {
-                    cards += current.map(buildCard).join('');
+                    cards += ecHTML;
                 }
 
                 const html = `
