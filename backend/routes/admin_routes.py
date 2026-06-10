@@ -47,6 +47,18 @@ def upload_to_supabase(file, folder):
         print(f"Supabase Upload Error: {e}")
         return None
 
+def delete_file_from_supabase(url):
+    if not url or 'supabase.co' not in url:
+        return
+    try:
+        parts = url.split('/public/mpsc-it-club/')
+        if len(parts) == 2:
+            file_path = parts[1]
+            db = get_db()
+            db.storage.from_('mpsc-it-club').remove([file_path])
+    except Exception as e:
+        print(f"Supabase Delete Error: {e}")
+
 @admin_bp.route('/')
 @login_required
 @admin_required
@@ -79,12 +91,17 @@ def get_all_data():
 def delete_item(collection, id):
     db = get_db()
     
-    # In Supabase, we delete by ID
-    # Before deleting from DB, we should delete from storage if applicable
-    # To keep it simple, we'll just delete the record for now
-    # Cleanup can be handled manually or via a more complex logic
-    
     try:
+        # 1. Fetch the record first to get the image URL
+        res = db.table(collection).select("*").eq("id", id).execute()
+        if res.data:
+            item = res.data[0]
+            # Check common image fields
+            image_url = item.get('image_path') or item.get('banner') or item.get('url')
+            if image_url:
+                delete_file_from_supabase(image_url)
+                
+        # 2. Delete the record from DB
         db.table(collection).delete().eq("id", id).execute()
         return jsonify({"success": "Deleted successfully"})
     except Exception as e:
@@ -191,6 +208,14 @@ def delete_ec_year():
         
     db = get_db()
     try:
+        # Fetch all members to delete their images
+        res = db.table("ec_members").select("image_path").like("category", f"{year}_%").execute()
+        if res.data:
+            for m in res.data:
+                if m.get('image_path'):
+                    delete_file_from_supabase(m['image_path'])
+                    
+        # Now delete from DB
         db.table("ec_members").delete().like("category", f"{year}_%").execute()
         return jsonify({"success": f"All members for year {year} deleted successfully"})
     except Exception as e:
@@ -312,7 +337,7 @@ def get_verified_payments():
     payments = payments_res.data if payments_res.data else []
     
     # Get users map
-    users_res = db.table("users").select("id, full_name, email, student_id").execute()
+    users_res = db.table("users").select("id, full_name, email, student_id, phone").execute()
     users_map = {u['id']: u for u in users_res.data} if users_res.data else {}
     
     # Get events map
@@ -326,9 +351,11 @@ def get_verified_payments():
         verified_date = p.get('updated_at', p.get('created_at', ''))
         
         result.append({
+            "payment_id": p.get('id', ''),
             "event_name": event_title,
             "member_name": user.get('full_name', 'Unknown'),
             "student_id": user.get('student_id', 'Unknown'),
+            "phone": user.get('phone', 'N/A'),
             "email": user.get('email', 'Unknown'),
             "ref_email": p.get('ref_email', ''),
             "transaction_id": p.get('transaction_id', ''),
@@ -336,6 +363,66 @@ def get_verified_payments():
         })
         
     return jsonify(result)
+
+@admin_bp.route('/api/delete_payment/<payment_id>', methods=['DELETE'])
+@login_required
+@admin_required
+def delete_payment(payment_id):
+    db = get_db()
+    try:
+        db.table("payments").delete().eq("id", payment_id).execute()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@admin_bp.route('/api/delete_all_payments', methods=['DELETE'])
+@login_required
+@admin_required
+def delete_all_payments():
+    db = get_db()
+    try:
+        db.table("payments").delete().eq("status", "approved").execute()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+import uuid
+import bcrypt
+
+@admin_bp.route('/api/add_offline_payment', methods=['POST'])
+@login_required
+@admin_required
+def add_offline_payment():
+    data = request.json
+    db = get_db()
+    
+    # 1. Create a dummy offline user to hold the name and ID
+    dummy_email = f"offline_{uuid.uuid4().hex[:8]}@mpsc.local"
+    user_data = {
+        "email": dummy_email,
+        "full_name": data.get('full_name', 'Offline User'),
+        "student_id": data.get('student_id', 'N/A'),
+        "phone": data.get('phone', 'N/A'),
+        "password": bcrypt.hashpw(uuid.uuid4().hex.encode(), bcrypt.gensalt()).decode('utf-8'),
+        "role": "member",
+        "institution": "Offline Entry"
+    }
+    try:
+        user_res = db.table("users").insert(user_data).execute()
+        new_user_id = user_res.data[0]['id']
+        
+        # 2. Create the approved payment record
+        payment_data = {
+            "member_id": new_user_id,
+            "event_id": data.get('event_id'),
+            "transaction_id": data.get('transaction_id') or "OFFLINE-CASH",
+            "ref_email": data.get('email') or "Added by Admin (Offline)",
+            "status": "approved"
+        }
+        db.table("payments").insert(payment_data).execute()
+        return jsonify({"success": "Offline record added successfully!"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @admin_bp.route('/api/export_verified_payments')
 @login_required
@@ -351,7 +438,7 @@ def export_verified_payments():
     payments = payments_res.data
     
     # Get all users and create a map
-    users_res = db.table("users").select("id, full_name, email, student_id").execute()
+    users_res = db.table("users").select("id, full_name, email, student_id, phone").execute()
     users_map = {u['id']: u for u in users_res.data} if users_res.data else {}
     
     # Get all events and create a map
@@ -367,6 +454,7 @@ def export_verified_payments():
         'Event Name',
         'Member Name',
         'Student ID',
+        'Phone Number',
         'Registered Email',
         'Payment Reference Email',
         'Transaction ID',
@@ -384,6 +472,7 @@ def export_verified_payments():
             event_title,
             user.get('full_name', 'Unknown'),
             user.get('student_id', 'Unknown'),
+            user.get('phone', 'N/A'),
             user.get('email', 'Unknown'),
             p.get('ref_email', ''),
             p.get('transaction_id', ''),

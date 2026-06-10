@@ -27,10 +27,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Form Submissions
-    handleAdminForm('add-event-form', '/admin/events/add');
-    handleAdminForm('add-program-form', '/admin/programs/add');
+    handleAdminForm('add-event-form', '/admin/add_event');
+    handleAdminForm('add-program-form', '/admin/add_program');
     handleAdminForm('add-ec-form', '/admin/ec/add');
     handleAdminForm('add-gallery-form', '/admin/gallery/add');
+
+    const offlineForm = document.getElementById('offline-payment-form');
+    if (offlineForm) {
+        offlineForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = offlineForm.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner"></span>Saving...`;
+            
+            try {
+                const formData = new FormData(offlineForm);
+                const dataObj = {};
+                formData.forEach((value, key) => { dataObj[key] = value; });
+                
+                const res = await fetch('/admin/api/add_offline_payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataObj)
+                });
+                
+                if (res.ok) {
+                    window.showToast('Offline record saved successfully!', 'success');
+                    offlineForm.reset();
+                    toggleModal('offline-payment-modal');
+                    fetchVerifiedPayments();
+                    fetchStats();
+                } else {
+                    const err = await res.json();
+                    window.showToast(err.error || 'Server Error', 'error');
+                }
+            } catch (err) {
+                window.showToast('Network Error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    }
 });
 
 async function fetchStats() {
@@ -158,14 +197,17 @@ async function fetchVerifiedPayments() {
 
         list.innerHTML = data.map(p => {
             const d = new Date(p.date_verified);
-            const dateStr = isNaN(d) ? p.date_verified : d.toLocaleDateString();
+            const dateStr = isNaN(d) ? (p.date_verified || '—') : d.toLocaleDateString();
+            const name    = p.member_name   || '—';
+            const phone   = p.phone         || '—';
+            const event   = p.event_name    || '—';
             return `
             <tr>
-                <td>${p.member_name}</td>
-                <td style="color: var(--emerald-green); font-weight: 600;">${p.student_id}</td>
-                <td>${p.event_name}</td>
-                <td style="font-family: monospace; font-size: 0.85rem;">${p.transaction_id}</td>
+                <td>${name}</td>
+                <td>${phone}</td>
+                <td>${event}</td>
                 <td>${dateStr}</td>
+                <td><button class="action-btn delete-btn" onclick="deleteVerifiedPayment('${p.payment_id}')">Delete</button></td>
             </tr>
             `;
         }).join('');
@@ -173,6 +215,38 @@ async function fetchVerifiedPayments() {
         console.error(err);
         const list = document.getElementById('verified-payments-list');
         if (list) list.innerHTML = '<tr><td colspan="5" style="text-align:center; color: #ff4d4d;">Failed to load records.</td></tr>';
+    }
+}
+
+async function deleteVerifiedPayment(paymentId) {
+    if (!confirm('Delete this payment record permanently?')) return;
+    try {
+        const res = await fetch(`/admin/api/delete_payment/${paymentId}`, { method: 'DELETE' });
+        if (res.ok) {
+            window.showToast('Record deleted', 'success');
+            fetchVerifiedPayments();
+        } else {
+            const err = await res.json();
+            window.showToast(err.error || 'Failed to delete', 'error');
+        }
+    } catch (e) {
+        window.showToast('Network error', 'error');
+    }
+}
+
+async function deleteAllVerifiedPayments() {
+    if (!confirm('Delete ALL verified payment records permanently? This cannot be undone.')) return;
+    try {
+        const res = await fetch('/admin/api/delete_all_payments', { method: 'DELETE' });
+        if (res.ok) {
+            window.showToast('All records deleted', 'success');
+            fetchVerifiedPayments();
+        } else {
+            const err = await res.json();
+            window.showToast(err.error || 'Failed to delete all', 'error');
+        }
+    } catch (e) {
+        window.showToast('Network error', 'error');
     }
 }
 
@@ -234,6 +308,29 @@ function handleAdminForm(formId, url) {
 function toggleModal(id) {
     const modal = document.getElementById(id);
     modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+}
+
+async function openOfflineModal() {
+    toggleModal('offline-payment-modal');
+    
+    // Fetch events if not already fetched
+    const select = document.getElementById('offline-event-select');
+    if (select && select.options.length <= 1) {
+        try {
+            const res = await fetch('/events/');
+            if (res.ok) {
+                const events = await res.json();
+                select.innerHTML = '<option value="">Select Event / Program</option>';
+                events.forEach(e => {
+                    select.innerHTML += `<option value="${e.id}">${e.title}</option>`;
+                });
+            } else {
+                select.innerHTML = '<option value="">Failed to load events</option>';
+            }
+        } catch (err) {
+            select.innerHTML = '<option value="">Failed to load events</option>';
+        }
+    }
 }
 
 // ==========================================

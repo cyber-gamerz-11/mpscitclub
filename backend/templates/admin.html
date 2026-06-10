@@ -181,13 +181,21 @@
             <!-- Verified Records -->
             <section id="verified-payments-section" class="dash-section" style="display:none;">
                 <h2 class="section-title">Verified Records & Exports</h2>
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
-                    <p style="color: var(--soft-gray); font-size: 0.95rem; margin: 0; max-width: 60%;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <p style="color: var(--soft-gray); font-size: 0.95rem; margin: 0; max-width: 50%;">
                         View all verified payments and their details. Use the export button to download an Excel (CSV) report.
                     </p>
-                    <button onclick="window.location.href='/admin/api/export_verified_payments'" class="btn-primary" style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; box-shadow: 0 0 15px rgba(0,255,136,0.2);">
-                        📥 Download Excel Report
-                    </button>
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="openOfflineModal()" class="btn-primary" style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; background: transparent; color: var(--emerald-green);">
+                            ➕ Add Offline Record
+                        </button>
+                        <button onclick="deleteAllVerifiedPayments()" class="btn-primary" style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; background: #ff4d4d; border-color: #ff4d4d; color: white;">
+                            🗑️ Delete All Records
+                        </button>
+                        <button onclick="window.location.href='/admin/api/export_verified_payments'" class="btn-primary" style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; box-shadow: 0 0 15px rgba(0,255,136,0.2);">
+                            📥 Download Excel Report
+                        </button>
+                    </div>
                 </div>
 
                 <div class="glass-card mt-2" style="max-height: 500px; overflow-y: auto;">
@@ -195,10 +203,10 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Student ID</th>
+                                <th>Phone</th>
                                 <th>Event</th>
-                                <th>TxID</th>
                                 <th>Date Verified</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="verified-payments-list">
@@ -285,6 +293,24 @@
     </div>
 
     <!-- Modals (Add Forms) -->
+    
+    <!-- Add Offline Payment Modal -->
+    <div id="offline-payment-modal" class="modal glass-card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 500px; padding: 2rem;">
+        <h3 class="emerald">Add Offline Registration</h3>
+        <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Create a verified record for someone who registered manually. This will generate an offline account for them to appear in exports.</p>
+        <form id="offline-payment-form" class="mt-1">
+            <input type="text" name="full_name" placeholder="Full Name *" required class="w-full mb-1">
+            <input type="text" name="phone" placeholder="Phone Number *" required class="w-full mb-1">
+            <input type="email" name="email" placeholder="Email Address (Optional)" class="w-full mb-1">
+            
+            <select id="offline-event-select" name="event_id" required class="w-full mb-1">
+                <option value="">Select Event / Program (Loading...)</option>
+            </select>
+            
+            <button type="submit" class="btn-primary w-full">Save Offline Record</button>
+            <button type="button" onclick="toggleModal('offline-payment-modal')" class="btn-secondary w-full mt-1">Cancel</button>
+        </form>
+    </div>
     <div id="gallery-modal" class="modal glass-card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
         <h3 class="emerald">Add to Gallery</h3>
         <form id="add-gallery-form" class="mt-1" enctype="multipart/form-data">

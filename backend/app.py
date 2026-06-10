@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 from flask_login import LoginManager
 from dotenv import load_dotenv
 
@@ -32,6 +32,15 @@ def create_app():
     app.register_blueprint(payment_bp, url_prefix='/payments')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(admin_bp, url_prefix='/admin')
+
+    # Aggressive Caching for Static Files
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000
+
+    @app.after_request
+    def add_cache_headers(response):
+        if request.path.startswith('/static/'):
+            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+        return response
 
     # Main Routes
     @app.route('/')

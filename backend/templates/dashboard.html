@@ -8,16 +8,187 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <style>
-        .dash-container { display: grid; grid-template-columns: 350px 1fr; gap: 2rem; padding: 2rem 0; }
-        .member-card { text-align: center; padding: 3rem 2rem; position: relative; overflow: hidden; }
-        .member-pfp { width: 150px; height: 150px; border-radius: 50%; border: 3px solid var(--emerald-green); margin: 0 auto 1.5rem; background-size: cover; background-position: center; box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
-        .status-box { margin-top: 2rem; text-align: left; }
-        .status-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); }
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
-        .status-pending { background: rgba(255, 166, 0, 0.2); color: orange; border: 1px solid orange; }
-        .status-approved { background: rgba(0, 255, 136, 0.2); color: var(--emerald-green); border: 1px solid var(--emerald-green); }
-        .status-rejected { background: rgba(255, 77, 77, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d; }
-        @media (max-width: 900px) { .dash-container { grid-template-columns: 1fr; } }
+        /* ── Layout ── */
+        .dash-wrapper {
+            padding: 130px 0 4rem;
+        }
+
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        /* ── Profile Card ── */
+        .profile-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            position: sticky;
+            top: 90px;
+        }
+
+        .profile-banner {
+            height: 90px;
+            background: linear-gradient(135deg, rgba(0,255,136,0.25), rgba(0,80,50,0.5));
+        }
+
+        .profile-avatar-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: -30px;
+            padding: 0 1.5rem 1.5rem;
+            text-align: center;
+        }
+
+        .profile-name {
+            margin: 0.75rem 0 0.15rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--emerald-green);
+            letter-spacing: 0.5px;
+        }
+
+        .profile-id {
+            font-size: 0.8rem;
+            color: var(--soft-gray);
+            margin-bottom: 0.6rem;
+        }
+
+        /* Info rows */
+        .profile-info {
+            width: 100%;
+            margin-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.55rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.85rem;
+        }
+
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: var(--soft-gray); font-weight: 500; }
+        .info-value { color: #fff; font-weight: 600; text-align: right; max-width: 55%; word-break: break-word; }
+
+        .logout-btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.2rem;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255,77,77,0.1);
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255,77,77,0.2);
+            box-shadow: 0 0 12px rgba(255,77,77,0.3);
+        }
+
+        /* ── Main Panel ── */
+        .dash-main-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        /* Payment status */
+        .status-box { margin-top: 0; }
+        .status-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--emerald-green);
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        .status-item {
+            background: rgba(255,255,255,0.04);
+            padding: 1rem 1.2rem;
+            border-radius: 14px;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--glass-border);
+            gap: 1rem;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .status-pending  { background: rgba(255,166,0,0.15);  color: orange;               border: 1px solid orange; }
+        .status-approved { background: rgba(0,255,136,0.15);  color: var(--emerald-green); border: 1px solid var(--emerald-green); }
+        .status-rejected { background: rgba(255,77,77,0.15);  color: #ff4d4d;              border: 1px solid #ff4d4d; }
+
+        /* ── Mobile ── */
+        @media (max-width: 768px) {
+            .dash-wrapper { padding: 110px 0 3rem; }
+
+            .dash-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            /* Horizontal compact card on mobile */
+            .profile-card { position: static; border-radius: 16px; }
+
+            .profile-banner { height: 60px; }
+
+            .profile-avatar-wrap {
+                flex-direction: row;
+                align-items: center;
+                text-align: left;
+                margin-top: -20px;
+                gap: 1rem;
+                padding: 0 1.2rem 1.2rem;
+            }
+
+            .profile-text-group { flex: 1; }
+            .profile-name { font-size: 1rem; margin-top: 0; }
+            .profile-id   { font-size: 0.72rem; margin-bottom: 0.3rem; }
+
+            .profile-info { margin-top: 0.7rem; }
+            .info-row     { font-size: 0.8rem; }
+
+            .logout-btn   { padding: 10px; font-size: 0.82rem; margin-top: 0.9rem; }
+
+            .dash-main-title { font-size: 1.4rem; letter-spacing: 1px; margin-bottom: 1rem; }
+
+            .status-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.6rem;
+                padding: 0.85rem 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -26,43 +197,53 @@
 
     {% include 'components/navbar.html' %}
 
-    <div class="container" style="margin-top: 100px;">
-        <div class="dash-container">
-            <!-- Profile Card -->
+    <div class="container dash-wrapper">
+        <div class="dash-grid">
+
+            <!-- ── Profile Card ── -->
             <aside>
-                <div class="glass-card member-card">
-                    <h2 class="emerald">{{ current_user.full_name }}</h2>
-                    <p style="color: var(--soft-gray); font-size: 0.9rem;">ID: {{ current_user.student_id }}</p>
-                    <div class="mt-1">
-                        <span class="role-badge role-{{ current_user.role }}">{{ current_user.role }}</span>
+                <div class="profile-card">
+                    <div class="profile-banner"></div>
+                    <div class="profile-avatar-wrap">
+                        <div class="profile-text-group">
+                            <h2 class="profile-name">{{ current_user.full_name }}</h2>
+                            <p class="profile-id">ID: {{ current_user.student_id }}</p>
+                            <span class="role-badge role-{{ current_user.role }}">{{ current_user.role }}</span>
+                        </div>
                     </div>
-                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--glass-border);">
-                    <div style="text-align: left; font-size: 0.9rem;">
-                        <p><strong>Institution:</strong> {{ current_user.institution or 'N/A' }}</p>
-                        <p><strong>Class:</strong> {{ current_user.section or 'N/A' }}</p>
-                        <p><strong>Joined:</strong> {{ current_user.join_date[:10] if current_user.join_date else 'N/A' }}</p>
-                    </div>
-                    <div style="margin-top: 2rem;">
-                        <a href="/auth/logout" class="btn-primary" style="background: rgba(255, 77, 77, 0.1); border-color: #ff4d4d; color: #ff4d4d; display: block; width: 100%; text-align: center;">Logout</a>
+
+                    <div class="profile-info" style="padding: 0 1.2rem 1.2rem;">
+                        <div class="info-row">
+                            <span class="info-label">Institution</span>
+                            <span class="info-value">{{ current_user.institution or 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Class / Section</span>
+                            <span class="info-value">{{ current_user.section or 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Joined</span>
+                            <span class="info-value">{{ current_user.join_date[:10] if current_user.join_date else 'N/A' }}</span>
+                        </div>
+                        <a href="/auth/logout" class="logout-btn">Logout</a>
                     </div>
                 </div>
             </aside>
 
-            <!-- Status and Content -->
+            <!-- ── Main Content ── -->
             <main>
-                <h1 class="hero-title" style="font-size: 2.5rem;">Member Dashboard</h1>
-                
+                <h1 class="hero-title dash-main-title">Member Dashboard</h1>
+
                 <div class="status-box">
-                    <h3 class="emerald mb-1">Payment & Verification Status</h3>
+                    <p class="status-section-title">Payment &amp; Verification Status</p>
                     <div id="payment-status-list">
-                        <!-- Loaded via JS -->
                         <div class="status-item">
-                            <span>Scanning for active requests...</span>
+                            <span style="color: var(--soft-gray); font-size:0.85rem;">Scanning for active requests...</span>
                         </div>
                     </div>
                 </div>
-
             </main>
+
         </div>
     </div>
 
@@ -79,33 +260,30 @@
                 const history = await res.json();
 
                 if (history.length === 0) {
-                    list.innerHTML = `
-                        <div class="status-item">
-                            <span>No active payments or registrations.</span>
-                        </div>
-                    `;
+                    list.innerHTML = `<div class="status-item"><span style="color:var(--soft-gray);font-size:0.85rem;">No active payments or registrations.</span></div>`;
                     return;
                 }
 
                 list.innerHTML = history.map(p => `
                     <div class="status-item">
                         <div>
-                            <p style="margin:0; font-weight:600;">TxID: ${p.transaction_id}</p>
-                            <p style="margin:0; font-size:0.8rem; color:var(--soft-gray);">${p.created_at ? p.created_at.split('T')[0] : 'N/A'}</p>
+                            <p style="margin:0; font-weight:600; font-size:0.9rem;">TxID: ${p.transaction_id}</p>
+                            <p style="margin:4px 0 0; font-size:0.75rem; color:var(--soft-gray);">${p.created_at ? p.created_at.split('T')[0] : 'N/A'}</p>
                         </div>
                         <span class="status-badge status-${p.status}">
-                            ${p.status === 'pending' ? 'Verification Pending' : 
-                              (p.status === 'rejected' ? 'Payment Rejected - <a href="/contact" style="color:inherit; text-decoration:underline;">Contact Admin</a>' : 'Verification Complete')}
+                            ${p.status === 'pending' ? 'Verification Pending' :
+                              (p.status === 'rejected' ? 'Rejected — <a href="/contact" style="color:inherit;text-decoration:underline;">Contact Admin</a>' : 'Verified ✓')}
                         </span>
                     </div>
                 `).join('');
 
-                gsap.from('.status-item', { opacity: 0, x: -20, stagger: 0.1 });
+                gsap.from('.status-item', { opacity: 0, y: 15, stagger: 0.08 });
 
             } catch (err) {
-                list.innerHTML = '<p>Failed to load status.</p>';
+                list.innerHTML = '<p style="color:#ff4d4d; padding:1rem;">Failed to load status.</p>';
             }
         });
     </script>
 </body>
 </html>
+

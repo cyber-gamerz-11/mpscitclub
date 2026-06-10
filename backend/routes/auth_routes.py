@@ -82,7 +82,7 @@ def login():
         
         if user_data and User.verify_password(user_data['password'], data['password']):
             user = User(user_data)
-            login_user(user)
+            login_user(user, remember=True)
             return jsonify({"success": "Access Granted"}), 200
     except:
         pass
