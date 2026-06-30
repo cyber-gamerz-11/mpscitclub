@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isMenuOpen = false;
     let rotation = 0;
     let radius = 0;
+    let hintShown = localStorage.getItem('menuScrollHintSeen') === 'true';
 
     // 1. Position items in a circle
     function positionMenuItems() {
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const containerWidth = container.offsetWidth || 320;
         
         // Dynamic radius: smaller percentage for mobile to prevent overflow
-        const radiusFactor = window.innerWidth < 500 ? 2.5 : 2.2;
+        const radiusFactor = window.innerWidth < 500 ? 2.1 : 2.2;
         radius = containerWidth / radiusFactor; 
 
         menuItems.forEach((li, index) => {
@@ -40,6 +41,20 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', positionMenuItems);
 
     // 2. Toggle Menu
+    const scrollHint = document.getElementById('menu-scroll-hint');
+
+    function dismissHint() {
+        if (scrollHint && !hintShown) {
+            scrollHint.classList.remove('show');
+            hintShown = true;
+            localStorage.setItem('menuScrollHintSeen', 'true');
+        }
+    }
+
+    // Dismiss the hint immediately when the user interacts / scrolls / touches
+    window.addEventListener('wheel', dismissHint, { passive: true });
+    window.addEventListener('touchmove', dismissHint, { passive: true });
+
     menuToggle.addEventListener('click', () => {
         isMenuOpen = !isMenuOpen;
         menuToggle.classList.toggle('active');
@@ -48,6 +63,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isMenuOpen) {
             document.body.style.overflow = 'hidden';
             
+            // Show hint on first open
+            if (!hintShown && scrollHint) {
+                setTimeout(() => {
+                    scrollHint.classList.add('show');
+                }, 400); // Wait for overlay open animation
+            }
+            
             // Re-calculate positions just in case container size changed while hidden
             setTimeout(() => {
                 positionMenuItems();
@@ -55,6 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 50); // Small delay to let overlay animate in
         } else {
             document.body.style.overflow = 'auto';
+            if (scrollHint) {
+                scrollHint.classList.remove('show');
+            }
         }
     });
 

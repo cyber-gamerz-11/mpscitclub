@@ -50,11 +50,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Login Logic
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
+        const emailInput = document.getElementById('email');
+        if (emailInput) {
+            emailInput.value = localStorage.getItem('rememberedEmail') || '';
+        }
+
         const btn = loginForm.querySelector('button[type="submit"]');
         const originalText = btn.innerHTML;
 
+        const errorEl = document.getElementById('login-error');
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (errorEl) errorEl.style.display = 'none'; // Clear previous errors
             setButtonLoading(btn, true, originalText);
             const formData = new FormData(loginForm);
             
@@ -66,17 +74,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const data = await response.json();
                 if (response.ok) {
-                    window.showToast('Access Granted. Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/user/dashboard';
-                    }, 1500);
+                    // Remember email in browser localStorage
+                    localStorage.setItem('rememberedEmail', formData.get('email'));
+                    // Instant redirect on success
+                    window.location.href = '/user/dashboard';
                 } else {
-                    window.showToast(data.error, 'error');
+                    if (errorEl) {
+                        errorEl.innerText = data.error || 'Invalid email or password';
+                        errorEl.style.display = 'block';
+                    }
                     setButtonLoading(btn, false, originalText);
                 }
             } catch (err) {
                 console.error(err);
-                window.showToast('Login failed. Try again.', 'error');
+                if (errorEl) {
+                    errorEl.innerText = 'Login failed. Please check your connection and try again.';
+                    errorEl.style.display = 'block';
+                }
                 setButtonLoading(btn, false, originalText);
             }
         });
