@@ -311,6 +311,7 @@ nav.scrolled {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0; /* Prevent flexbox from squeezing the circle into an ellipse */
 }
 @media (max-width: 500px) {
     .circular-container {
