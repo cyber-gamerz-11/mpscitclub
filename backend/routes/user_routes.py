@@ -16,6 +16,35 @@ def profile_data():
         "join_date": current_user.join_date
     })
 
+from flask import request
+from backend.models.user import User
+
+@user_bp.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    try:
+        data = request.get_json()
+        
+        # Allowed fields to update
+        update_data = {
+            "full_name": data.get('full_name'),
+            "email": data.get('email'),
+            "phone": data.get('phone'),
+            "section": data.get('section'),
+            "institution": data.get('institution')
+        }
+        
+        # Remove any None values just in case
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+        
+        if User.update_profile(current_user.id, update_data):
+            # Also optionally check if email changed to verify if we need to do anything, but let's just let it update for now.
+            return jsonify({"success": True, "message": "Profile updated successfully."})
+        else:
+            return jsonify({"success": False, "error": "Failed to update profile."}), 500
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 400
+
 @user_bp.route('/ec_list')
 def get_ec_list():
     db = get_db()

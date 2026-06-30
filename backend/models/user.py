@@ -48,6 +48,17 @@ class User(UserMixin):
         return response.data[0]['id'] if response.data else None
 
     @staticmethod
+    def update_profile(user_id, update_data):
+        db = get_db()
+        if not db: return False
+        try:
+            db.table("users").update(update_data).eq("id", user_id).execute()
+            return True
+        except Exception as e:
+            print(f"Error updating profile: {e}")
+            return False
+
+    @staticmethod
     def verify_password(stored_password, provided_password):
         return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 

@@ -248,12 +248,10 @@ function initHeroTyping() {
             el.innerText = currentPhrase.substring(0, charIndex - 1);
             charIndex--;
             typingSpeed = 35; // Backspacing speed is fast
-            synth.playBackspace();
         } else {
             el.innerText = currentPhrase.substring(0, charIndex + 1);
             charIndex++;
             typingSpeed = 70 + Math.random() * 40; // Natural variable spacing
-            synth.playClick();
         }
         
         // State transitions

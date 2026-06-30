@@ -3,18 +3,17 @@
     <div class="container nav-content">
         <div class="logo">
             <a href="/" style="display: flex; align-items: center; text-decoration: none;">
-                <img src="{{ url_for('static', filename='assets/images/logo.png') }}" 
-                     alt="MPSC IT CLUB" 
-                     class="nav-logo-img"
-                     style="height: 95px; width: auto; filter: drop-shadow(0 0 10px var(--emerald-green));">
+                <img src="{{ url_for('static', filename='assets/images/logo.png') }}" alt="MPSC IT CLUB"
+                    class="nav-logo-img"
+                    style="height: 95px; width: auto; filter: drop-shadow(0 0 10px var(--emerald-green));">
             </a>
         </div>
-        
+
         <div class="nav-actions">
             {% if current_user.is_authenticated %}
-                <a href="/user/dashboard" class="btn-primary nav-login-btn">{{ current_user.full_name }}</a>
+            <a href="/user/dashboard" class="btn-primary nav-login-btn">{{ current_user.full_name }}</a>
             {% else %}
-                <a href="/auth/login" class="btn-primary nav-login-btn">Login</a>
+            <a href="/auth/login" class="btn-primary nav-login-btn">Login</a>
             {% endif %}
             <div class="hamburger" id="menu-toggle">
                 <span></span>
@@ -41,9 +40,9 @@
             <li style="--i:6;"><a href="/auth/signup">Join Club</a></li>
             <li style="--i:7;"><a href="/contact">Contact</a></li>
             {% if current_user.is_authenticated %}
-                <li style="--i:8;"><a href="/user/dashboard">My Account</a></li>
+            <li style="--i:8;"><a href="/user/dashboard">My Account</a></li>
             {% else %}
-                <li style="--i:8;"><a href="/auth/login">Login</a></li>
+            <li style="--i:8;"><a href="/auth/login">Login</a></li>
             {% endif %}
         </ul>
     </div>
