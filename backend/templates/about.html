@@ -789,51 +789,6 @@
         }
 
         /* ═══════════════════════════════════════
-           CURRENT EC BADGE
-        ═══════════════════════════════════════ */
-        .tl-card-current {
-            border-color: rgba(0, 245, 180, 0.3);
-            background: rgba(0, 245, 180, 0.04);
-        }
-
-        .tl-current-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: #00f5b4;
-            background: rgba(0, 245, 180, 0.1);
-            border: 1px solid rgba(0, 245, 180, 0.3);
-            border-radius: 20px;
-            padding: 3px 10px;
-            margin-bottom: 0.8rem;
-        }
-
-        .tl-current-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #00f5b4;
-            animation: blink 1.5s ease-in-out infinite;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1
-            }
-
-            50% {
-                opacity: 0.2
-            }
-        }
-
-        /* ═══════════════════════════════════════
            EVENTS GRID
         ═══════════════════════════════════════ */
         .events-grid {
@@ -1033,81 +988,6 @@
 
             .ws-card:last-child {
                 border-bottom: none;
-            }
-        }
-
-        /* ═══════════════════════════════════════
-           ACHIEVEMENTS LIST
-        ═══════════════════════════════════════ */
-        .ach-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-
-        .ach-row {
-            display: grid;
-            grid-template-columns: 120px 1fr 48px;
-            gap: 24px;
-            align-items: start;
-            padding: 28px 0;
-            border-bottom: 1px solid rgba(0, 245, 180, 0.07);
-            transition: background 0.3s;
-        }
-
-        .ach-row:last-child {
-            border-bottom: none;
-        }
-
-        .ach-row:hover {
-            background: rgba(0, 245, 180, 0.02);
-        }
-
-        .ach-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .ach-year {
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: #00f5b4;
-            letter-spacing: -0.5px;
-            line-height: 1;
-        }
-
-        .ach-scope {
-            font-size: 0.62rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.25);
-        }
-
-        .ach-body h4 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 0.4rem;
-        }
-
-        .ach-body p {
-            font-size: 0.86rem;
-            color: rgba(255, 255, 255, 0.38);
-            line-height: 1.7;
-        }
-
-        .ach-trophy {
-            font-size: 1.5rem;
-            text-align: right;
-            padding-top: 2px;
-        }
-
-        @media (max-width: 640px) {
-            .ach-row {
-                grid-template-columns: 80px 1fr 36px;
-                gap: 14px;
             }
         }
     </style>
