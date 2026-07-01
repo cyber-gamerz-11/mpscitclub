@@ -4,229 +4,1481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us | MPSC IT CLUB</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Fira+Code:wght@400;600&display=swap"
+    <title>About | MPSC IT Club</title>
+    <meta name="description"
+        content="Founded in 2019, MPSC IT Club empowers students of Mohammadpur Preparatory School & College with programming, robotics, design, and real-world technology skills.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <style>
-        /* Tech specific styling */
-        .terminal-header {
+        /* ═══════════════════════════════════════
+   BASE
+═══════════════════════════════════════ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #050d07;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* ambient */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(130px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-a {
+            width: 700px;
+            height: 700px;
+            background: rgba(0, 245, 180, 0.12);
+            top: -300px;
+            left: -200px;
+        }
+
+        .orb-b {
+            width: 500px;
+            height: 500px;
+            background: rgba(0, 245, 180, 0.08);
+            bottom: 0;
+            right: -150px;
+        }
+
+        /* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+        .hero {
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 160px 24px 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-kicker {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #00f5b4;
+            margin-bottom: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.05) 0%, transparent 70%);
-            padding: 80px 20px 20px 20px;
-            box-sizing: border-box;
+            gap: 12px;
         }
 
-        .terminal-box {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--emerald-green);
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 0 50px rgba(0, 255, 136, 0.15);
-            max-width: 1000px;
-            width: 95%;
-            text-align: left;
+        .hero-kicker::before,
+        .hero-kicker::after {
+            content: '';
+            display: block;
+            width: 32px;
+            height: 1px;
+            background: #00f5b4;
+            opacity: 0.5;
         }
 
-        .terminal-top {
-            display: flex;
-            gap: 8px;
+        .hero h1 {
+            font-size: clamp(3.2rem, 8vw, 6.5rem);
+            font-weight: 900;
+            line-height: 1.0;
+            letter-spacing: -3px;
+            color: #fff;
             margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
+        .hero h1 em {
+            font-style: normal;
+            color: #00f5b4;
         }
 
-        .dot.red {
-            background: #ff5f56;
+        .hero h1 .outline {
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.25);
         }
 
-        .dot.yellow {
-            background: #ffbd2e;
+        .hero-lead {
+            font-size: clamp(1rem, 2vw, 1.18rem);
+            color: rgba(255, 255, 255, 0.45);
+            max-width: 600px;
+            line-height: 1.85;
+            margin-bottom: 3rem;
         }
 
-        .dot.green {
-            background: #27c93f;
-        }
-
-        .about-split {
+        .hero-chips {
             display: flex;
-            gap: 3rem;
+            gap: 12px;
             flex-wrap: wrap;
-        }
-
-        .about-left {
-            flex: 1;
-            min-width: 300px;
-            border-right: 1px solid rgba(0, 255, 136, 0.2);
-            padding-right: 2rem;
-            font-family: 'Fira Code', monospace;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
         }
 
-        .about-right {
-            flex: 1.5;
-            min-width: 300px;
-            font-family: 'Outfit', sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        .chip {
+            padding: 8px 18px;
+            border: 1px solid rgba(0, 245, 180, 0.2);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.5px;
+            background: rgba(0, 245, 180, 0.03);
         }
 
-        .code-title {
-            color: var(--white);
-            font-size: 2.2rem;
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.18);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 55px;
+            background: linear-gradient(to bottom, rgba(0, 245, 180, 0.5), transparent);
+            animation: scrl 2s ease-in-out infinite;
+        }
+
+        @keyframes scrl {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scaleY(0.6)
+            }
+
+            60% {
+                opacity: 1;
+                transform: scaleY(1)
+            }
+        }
+
+        /* ═══════════════════════════════════════
+   SECTION WRAPPER
+═══════════════════════════════════════ */
+        .sec {
+            padding: 110px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sec-sm {
+            padding: 70px 0;
+        }
+
+        .container {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .sec-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #00f5b4;
             margin-bottom: 1rem;
-        }
-
-        .code-title span {
-            color: var(--emerald-green);
-        }
-
-        .about-right h3 {
-            color: var(--emerald-green);
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .about-right p {
-            color: var(--soft-gray);
-            line-height: 1.7;
-            font-size: 1.1rem;
+        .sec-label::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: #00f5b4;
+        }
+
+        .sec-h {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.1;
+            color: #fff;
+            letter-spacing: -1px;
             margin-bottom: 1.5rem;
         }
 
-        .domain-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 0.5rem;
+        .sec-h em {
+            font-style: normal;
+            color: #00f5b4;
         }
 
-        .tag {
-            background: rgba(0, 255, 136, 0.1);
-            color: var(--emerald-green);
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: 1px solid rgba(0, 255, 136, 0.3);
+        .sec-p {
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.85;
             font-size: 1rem;
+            max-width: 640px;
+        }
+
+        .rule {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 180, 0.1), transparent);
+            margin: 0;
+        }
+
+        /* ═══════════════════════════════════════
+   STORY (split)
+═══════════════════════════════════════ */
+        .story-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .story-body p {
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.85;
+            font-size: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .story-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .story-body strong {
+            color: rgba(255, 255, 255, 0.8);
             font-weight: 600;
+        }
+
+        .story-aside {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5px;
+        }
+
+        .story-card {
+            padding: 28px 30px;
+            border: 1px solid rgba(0, 245, 180, 0.1);
+            background: rgba(0, 245, 180, 0.02);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .story-card:first-child {
+            border-radius: 16px 16px 0 0;
+        }
+
+        .story-card:last-child {
+            border-radius: 0 0 16px 16px;
+        }
+
+        .story-card:hover {
+            border-color: rgba(0, 245, 180, 0.25);
+            background: rgba(0, 245, 180, 0.04);
+        }
+
+        .story-card-num {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(0, 245, 180, 0.5);
+            margin-bottom: 0.5rem;
+        }
+
+        .story-card h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.4rem;
+        }
+
+        .story-card p {
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.38);
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════
+   STATS
+═══════════════════════════════════════ */
+        .stats-band {
+            border-top: 1px solid rgba(0, 245, 180, 0.08);
+            border-bottom: 1px solid rgba(0, 245, 180, 0.08);
+            background: rgba(0, 245, 180, 0.015);
+        }
+
+        .stats-inner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .stat-cell {
+            padding: 56px 24px;
+            text-align: center;
+            border-right: 1px solid rgba(0, 245, 180, 0.07);
+            transition: background 0.3s;
+        }
+
+        .stat-cell:last-child {
+            border-right: none;
+        }
+
+        .stat-cell:hover {
+            background: rgba(0, 245, 180, 0.03);
+        }
+
+        .stat-val {
+            font-size: clamp(2.8rem, 5vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+            color: #00f5b4;
+            line-height: 1;
+            margin-bottom: 0.6rem;
+        }
+
+        .stat-val sup {
+            font-size: 0.45em;
+            color: rgba(0, 245, 180, 0.6);
+        }
+
+        .stat-lbl {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ═══════════════════════════════════════
+   MODERATOR SPOTLIGHT
+═══════════════════════════════════════ */
+        .moderator-wrap {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 60px;
+            align-items: center;
+            border: 1px solid rgba(0, 245, 180, 0.12);
+            border-radius: 20px;
+            padding: 50px 60px;
+            background: rgba(0, 245, 180, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .moderator-wrap::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 245, 180, 0.07) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .mod-photo-ring {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 245, 180, 0.25);
+            padding: 4px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .mod-photo-ring::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 1px dashed rgba(0, 245, 180, 0.15);
+            animation: spinSlow 20s linear infinite;
+        }
+
+        @keyframes spinSlow {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .mod-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background: rgba(0, 245, 180, 0.06);
+        }
+
+        .mod-role {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #00f5b4;
+            margin-bottom: 0.6rem;
+            display: block;
+        }
+
+        .mod-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .mod-dept {
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 1.6rem;
+        }
+
+        .mod-bio {
+            font-size: 0.97rem;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.8;
+            max-width: 520px;
+        }
+
+        /* ═══════════════════════════════════════
+   TIMELINE (founding history)
+═══════════════════════════════════════ */
+        .timeline {
+            position: relative;
+            max-width: 820px;
+        }
+
+        .tl-rail {
+            position: absolute;
+            left: 0;
+            top: 6px;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, #00f5b4, transparent);
+        }
+
+        .tl-entry {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: 28px;
+            padding-bottom: 48px;
+            position: relative;
+        }
+
+        .tl-entry:last-child {
+            padding-bottom: 0;
+        }
+
+        .tl-year-col {
+            padding-left: 16px;
+        }
+
+        .tl-dot {
+            position: absolute;
+            left: -5px;
+            top: 6px;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #00f5b4;
+            box-shadow: 0 0 10px #00f5b4;
+        }
+
+        .tl-yr {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #00f5b4;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .tl-card {
+            border: 1px solid rgba(0, 245, 180, 0.08);
+            border-radius: 14px;
+            padding: 22px 26px;
+            background: rgba(0, 245, 180, 0.015);
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .tl-card:hover {
+            border-color: rgba(0, 245, 180, 0.2);
+            background: rgba(0, 245, 180, 0.035);
+        }
+
+        .tl-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .tl-card p {
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.38);
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════
+   WHAT WE DO (activities)
+═══════════════════════════════════════ */
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            border: 1px solid rgba(0, 245, 180, 0.08);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .act-cell {
+            padding: 36px 30px;
+            background: rgba(0, 245, 180, 0.015);
+            border-right: 1px solid rgba(0, 245, 180, 0.06);
+            border-bottom: 1px solid rgba(0, 245, 180, 0.06);
+            transition: background 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .act-cell:nth-child(3n) {
+            border-right: none;
+        }
+
+        .act-cell:nth-child(4),
+        .act-cell:nth-child(5),
+        .act-cell:nth-child(6) {
+            border-bottom: none;
+        }
+
+        .act-cell:hover {
+            background: rgba(0, 245, 180, 0.04);
+        }
+
+        .act-icon {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            display: block;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 245, 180, 0.15);
+            background: rgba(0, 245, 180, 0.05);
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: 0.3s;
+            justify-content: center;
         }
 
-        .tag:hover {
-            background: var(--emerald-green);
-            color: var(--matte-black);
+        .act-cell h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .act-cell p {
+            font-size: 0.86rem;
+            color: rgba(255, 255, 255, 0.38);
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════
+   CTA
+═══════════════════════════════════════ */
+        .cta-wrap {
+            border: 1px solid rgba(0, 245, 180, 0.15);
+            border-radius: 20px;
+            padding: 72px 60px;
+            text-align: center;
+            background: rgba(0, 245, 180, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-wrap::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 245, 180, 0.06) 0%, transparent 65%);
+            border-radius: 50%;
+        }
+
+        .cta-wrap h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: #fff;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .cta-wrap p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.4);
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.8;
+            position: relative;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .btn-primary-green {
+            padding: 15px 38px;
+            background: #00f5b4;
+            color: #050d07 !important;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 245, 180, 0.25);
+        }
+
+        .btn-primary-green:hover {
             transform: translateY(-3px);
+            box-shadow: 0 0 50px rgba(0, 245, 180, 0.45);
         }
 
-        @media (max-width: 768px) {
-            .about-left {
+        .btn-outline-white {
+            padding: 15px 38px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.55) !important;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-white:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        /* ═══════════════════════════════════════
+   REVEAL ANIMATIONS
+═══════════════════════════════════════ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+
+        .reveal.in {
+            opacity: 1;
+            transform: none;
+        }
+
+        .d1 {
+            transition-delay: 0.1s;
+        }
+
+        .d2 {
+            transition-delay: 0.2s;
+        }
+
+        .d3 {
+            transition-delay: 0.3s;
+        }
+
+        .d4 {
+            transition-delay: 0.4s;
+        }
+
+        /* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .story-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .stats-inner {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-cell:nth-child(2) {
                 border-right: none;
+            }
+
+            .stat-cell:nth-child(1),
+            .stat-cell:nth-child(2) {
+                border-bottom: 1px solid rgba(0, 245, 180, 0.07);
+            }
+
+            .moderator-wrap {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding: 40px 28px;
+                gap: 28px;
+            }
+
+            .mod-photo-ring {
+                margin: 0 auto;
+            }
+
+            .mod-bio {
+                max-width: 100%;
+            }
+
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .act-cell {
+                border-right: none !important;
+            }
+
+            .act-cell:last-child {
+                border-bottom: none;
+            }
+
+            .cta-wrap {
+                padding: 50px 28px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .tl-entry {
+                grid-template-columns: 44px 1fr;
+                gap: 16px;
+            }
+
+            .stats-inner {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           CURRENT EC BADGE
+        ═══════════════════════════════════════ */
+        .tl-card-current {
+            border-color: rgba(0, 245, 180, 0.3);
+            background: rgba(0, 245, 180, 0.04);
+        }
+
+        .tl-current-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #00f5b4;
+            background: rgba(0, 245, 180, 0.1);
+            border: 1px solid rgba(0, 245, 180, 0.3);
+            border-radius: 20px;
+            padding: 3px 10px;
+            margin-bottom: 0.8rem;
+        }
+
+        .tl-current-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00f5b4;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.2
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           EVENTS GRID
+        ═══════════════════════════════════════ */
+        .events-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .ev-year-block {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 0;
+            position: relative;
+            padding: 28px 0;
+            border-bottom: 1px solid rgba(0, 245, 180, 0.07);
+        }
+
+        .ev-year-block:last-child {
+            border-bottom: none;
+        }
+
+        .ev-year-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: rgba(0, 245, 180, 0.55);
+            text-transform: uppercase;
+            padding-top: 4px;
+            padding-right: 20px;
+            white-space: nowrap;
+        }
+
+        .ev-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .ev-card {
+            flex: 1;
+            min-width: 240px;
+            padding: 20px 22px;
+            border: 1px solid rgba(0, 245, 180, 0.08);
+            border-radius: 12px;
+            background: rgba(0, 245, 180, 0.015);
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .ev-card:hover {
+            border-color: rgba(0, 245, 180, 0.2);
+            background: rgba(0, 245, 180, 0.035);
+        }
+
+        .ev-card-live {
+            border-color: rgba(0, 245, 180, 0.2);
+            background: rgba(0, 245, 180, 0.03);
+        }
+
+        .ev-type {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .ev-type-live {
+            color: #00f5b4;
+        }
+
+        .ev-card h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.4rem;
+        }
+
+        .ev-card p {
+            font-size: 0.83rem;
+            color: rgba(255, 255, 255, 0.38);
+            line-height: 1.65;
+        }
+
+        @media (max-width: 640px) {
+            .ev-year-block {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .ev-year-label {
                 padding-right: 0;
-                border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-                padding-bottom: 2rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           WORKSHOPS GRID
+        ═══════════════════════════════════════ */
+        .ws-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            border: 1px solid rgba(0, 245, 180, 0.08);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .ws-card {
+            padding: 32px 28px;
+            background: rgba(0, 245, 180, 0.015);
+            border-right: 1px solid rgba(0, 245, 180, 0.06);
+            border-bottom: 1px solid rgba(0, 245, 180, 0.06);
+            transition: background 0.3s;
+        }
+
+        .ws-card:nth-child(3n) {
+            border-right: none;
+        }
+
+        .ws-card:nth-child(4),
+        .ws-card:nth-child(5),
+        .ws-card:nth-child(6) {
+            border-bottom: none;
+        }
+
+        .ws-card:hover {
+            background: rgba(0, 245, 180, 0.04);
+        }
+
+        .ws-num {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: rgba(0, 245, 180, 0.35);
+            margin-bottom: 1rem;
+        }
+
+        .ws-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.6rem;
+        }
+
+        .ws-card p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.38);
+            line-height: 1.7;
+            margin-bottom: 1.2rem;
+        }
+
+        .ws-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .ws-tags span {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(0, 245, 180, 0.5);
+            border: 1px solid rgba(0, 245, 180, 0.15);
+            border-radius: 20px;
+            padding: 3px 9px;
+        }
+
+        @media (max-width: 900px) {
+            .ws-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .ws-card:nth-child(3n) {
+                border-right: 1px solid rgba(0, 245, 180, 0.06);
+            }
+
+            .ws-card:nth-child(2n) {
+                border-right: none;
+            }
+
+            .ws-card:nth-child(5),
+            .ws-card:nth-child(6) {
+                border-bottom: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .ws-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ws-card {
+                border-right: none !important;
+            }
+
+            .ws-card:last-child {
+                border-bottom: none;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           ACHIEVEMENTS LIST
+        ═══════════════════════════════════════ */
+        .ach-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .ach-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 48px;
+            gap: 24px;
+            align-items: start;
+            padding: 28px 0;
+            border-bottom: 1px solid rgba(0, 245, 180, 0.07);
+            transition: background 0.3s;
+        }
+
+        .ach-row:last-child {
+            border-bottom: none;
+        }
+
+        .ach-row:hover {
+            background: rgba(0, 245, 180, 0.02);
+        }
+
+        .ach-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .ach-year {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #00f5b4;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .ach-scope {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .ach-body h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.4rem;
+        }
+
+        .ach-body p {
+            font-size: 0.86rem;
+            color: rgba(255, 255, 255, 0.38);
+            line-height: 1.7;
+        }
+
+        .ach-trophy {
+            font-size: 1.5rem;
+            text-align: right;
+            padding-top: 2px;
+        }
+
+        @media (max-width: 640px) {
+            .ach-row {
+                grid-template-columns: 80px 1fr 36px;
+                gap: 14px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="futuristic-grid"></div>
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="futuristic-grid" style="opacity: 0.06;"></div>
     <div class="cursor-glow" id="cursor-glow"></div>
 
     {% include 'components/navbar.html' %}
 
-    <header class="terminal-header">
-        <div class="container" style="display: flex; justify-content: center;">
-            <div class="terminal-box glass-card" id="about-card">
-                <div class="terminal-top">
-                    <div class="dot red"></div>
-                    <div class="dot yellow"></div>
-                    <div class="dot green"></div>
+    <!-- ╔══════════════════════════════════╗
+         ║  HERO                            ║
+         ╚══════════════════════════════════╝ -->
+    <section class="hero">
+        <div class="hero-kicker reveal">MPSC IT Club · Est. 2019</div>
+        <h1 class="reveal d1">
+            We are a club<br>
+            of <em>builders</em>.<br>
+
+        </h1>
+        <p class="hero-lead reveal d2">
+            Since 2019, students of Mohammadpur Preparatory School &amp; College have been
+            coming together to code, design, compete, and ship — under the MPSC IT Club banner.
+        </p>
+        <div class="hero-chips reveal d3">
+            <span class="chip">Programming &amp; Algorithms</span>
+            <span class="chip">Robotics &amp; IoT</span>
+            <span class="chip">Graphics &amp; UI/UX</span>
+            <span class="chip">Competitions &amp; Events</span>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-line"></div>
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- ╔══════════════════════════════════╗
+         ║  STORY                           ║
+         ╚══════════════════════════════════╝ -->
+    <section class="sec">
+        <div class="container">
+            <div class="story-grid">
+                <div class="story-body">
+                    <div class="sec-label reveal">Our Foundation</div>
+                    <h2 class="sec-h reveal d1">
+                        Six years of turning<br>curiosity into <em>capability.</em>
+                    </h2>
+                    <p class="reveal d2">
+                        The MPSC IT Club was officially founded in <strong>2019</strong>, driven by a
+                        collective vision to empower students with the skills and mindset
+                        needed to thrive in an increasingly digital world. What began as a
+                        small initiative quickly became a dynamic platform where tech
+                        enthusiasts could explore programming, robotics, graphic design,
+                        and everything IT — beyond the classroom.
+                    </p>
+                    <p class="reveal d3">
+                        From its earliest days, the club has bridged the gap between
+                        theoretical knowledge and real-world application. Under the guidance
+                        of passionate moderators and dedicated executive committees, the
+                        club has organised workshops, competitions, and collaborative
+                        projects that sparked genuine innovation among its members.
+                    </p>
+                    <p class="reveal d4">
+                        Over the years, MPSC IT Club has grown not just in size but in scope —
+                        adapting to emerging technologies and redefining what a student-led
+                        tech initiative can achieve. Its legacy rests on <strong>teamwork,
+                            creativity, and a shared love for technology.</strong>
+                    </p>
                 </div>
 
-                <div class="about-split">
-                    <!-- Developer Vibe (Left) -->
-                    <div class="about-left">
-                        <div id="type-comment"
-                            style="color: var(--soft-gray); font-size: 0.9rem; margin-bottom: 1rem; min-height: 1.2rem;">
-                        </div>
-                        <h1 id="type-code" class="code-title" style="min-height: 5.5rem; color: var(--emerald-green);">
-                        </h1>
-                        <p id="type-intro"
-                            style="color: var(--emerald-green); font-size: 1.1rem; line-height: 1.6; min-height: 100px;"></p>
+                <div class="story-aside reveal d2">
+                    <div class="story-card">
+                        <div class="story-card-num">01 / landmark</div>
+                        <h4>1st IT Carnival</h4>
+                        <p>The beginning of the MPSC IT Club journey. The founding members introduced the first-ever IT
+                            Carnival, featuring student projects, technology exhibitions, and innovative ideas that
+                            inspired a culture of creativity.</p>
                     </div>
-
-                    <!-- Human Readable (Right) -->
-                    <div class="about-right">
-                        <h3 id="type-h1" style="min-height: 2rem;"></h3>
-                        <p id="type-p1" style="min-height: 6rem;"></p>
-
-                        <h3 id="type-h2" style="min-height: 2rem; margin-top: 1rem;"></h3>
-                        <p id="type-p2" style="margin-bottom: 1rem; min-height: 3.5rem;"></p>
-
-                        <div class="domain-tags">
-                            <div class="tag" style="opacity: 0; transform: scale(0.5);">💻 Web Development</div>
-                            <div class="tag" style="opacity: 0; transform: scale(0.5);">🤖 Robotics</div>
-                            <div class="tag" style="opacity: 0; transform: scale(0.5);">🎨 UI/UX Design</div>
-                            <div class="tag" style="opacity: 0; transform: scale(0.5);">🧠 Competitive Logic</div>
-                        </div>
+                    <div class="story-card">
+                        <div class="story-card-num">02 / momentum</div>
+                        <h4>2nd IT Carnival</h4>
+                        <p>Building on the success of the first edition, the second IT Carnival expanded participation
+                            and strengthened the club's identity as a home for young innovators and future
+                            technologists.</p>
+                    </div>
+                    <div class="story-card">
+                        <div class="story-card-num">03 / revival</div>
+                        <h4>03 / 3rd IT Carnival</h4>
+                        <p>After the pandemic pause, the club returned stronger than ever. The 3rd IT Carnival revived
+                            the spirit of innovation through exhibitions, competitions, and renewed student engagement.
+                        </p>
+                    </div>
+                    <div class="story-card">
+                        <div class="story-card-num">04 / breakthrough</div>
+                        <h4>TECH ODYSSEY</h4>
+                        <p>A milestone that united students across multiple wings. Tech Odyssey encouraged
+                            collaboration, healthy competition, and groundbreaking projects while setting a new
+                            benchmark for future events.</p>
                     </div>
                 </div>
-
             </div>
         </div>
-    </header>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ╔══════════════════════════════════╗
+         ║  STATS                           ║
+         ╚══════════════════════════════════╝ -->
+    <div class="stats-band">
+        <div class="stats-inner">
+            <div class="stat-cell reveal">
+                <div class="stat-val"><span class="counter" data-to="6">0</span><sup>+</sup></div>
+                <div class="stat-lbl">Years Active</div>
+            </div>
+            <div class="stat-cell reveal d1">
+                <div class="stat-val"><span class="counter" data-to="6">0</span><sup>+</sup></div>
+                <div class="stat-lbl">EC Committees</div>
+            </div>
+            <div class="stat-cell reveal d2">
+                <div class="stat-val"><span class="counter" data-to="40">0</span><sup>+</sup></div>
+                <div class="stat-lbl">EC Members (total)</div>
+            </div>
+            <div class="stat-cell reveal d3">
+                <div class="stat-val"><span class="counter" data-to="500">0</span><sup>+</sup></div>
+                <div class="stat-lbl">Students Impacted</div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="rule">
+
+    <!-- ╔══════════════════════════════════╗
+         ║  MODERATOR                       ║
+         ╚══════════════════════════════════╝ -->
+    <section class="sec">
+        <div class="container">
+            <div class="sec-label reveal">Faculty Guidance</div>
+            <h2 class="sec-h reveal d1">The mentor behind<br>the <em>movement.</em></h2>
+
+            <div class="moderator-wrap reveal d2" style="margin-top: 3rem;">
+                <div class="mod-photo-ring">
+                    <img src="https://college.mpsc.edu.bd/storage/employee/photos/7egVS0STPzTpRUSjpcivXKu3DIXkLqfL5KOuP1bv.jpg"
+                        alt="Mohammad Rasheduzzaman" class="mod-photo"
+                        onerror="this.style.background='rgba(0,245,180,0.08)';this.style.display='flex';this.alt='';this.parentElement.innerHTML+='<div style=\'position:absolute;inset:4px;border-radius:50%;background:rgba(0,245,180,0.06);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:800;color:rgba(0,245,180,0.6);\'>R</div>'">
+                </div>
+                <div class="mod-text">
+                    <span class="mod-role">Club Moderator · Faculty</span>
+                    <h3 class="mod-name">Mohammad Rasheduzzaman</h3>
+                    <p class="mod-dept">Mohammadpur Preparatory School &amp; College</p>
+                    <p class="mod-bio">
+                        Sir Rasheduzzaman's mentorship has been the quiet engine behind the club's growth since
+                        inception.
+                        He has consistently encouraged creativity, critical thinking, and hands-on learning —
+                        helping align the club's vision with real-world industry standards.
+                        His deep understanding of both technology and education has shaped every committee
+                        and every initiative this club has taken on.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ╔══════════════════════════════════╗
+         ║  WHAT WE DO                      ║
+         ╚══════════════════════════════════╝ -->
+    <section class="sec">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 4rem;">
+                <div class="sec-label reveal" style="justify-content:center;">Activities</div>
+                <h2 class="sec-h reveal d1" style="text-align:center; max-width:500px; margin: 0 auto 1rem;">What we
+                    actually <em>do.</em></h2>
+                <p class="sec-p reveal d2" style="text-align:center; margin: 0 auto;">
+                    Not just talks and meetings — real workshops, real competitions, real output.
+                </p>
+            </div>
+            <div class="activity-grid reveal d2">
+                <div class="act-cell">
+                    <div class="act-icon">>_</div>
+                    <h3>Programming Workshops</h3>
+                    <p>Hands-on sessions on Python, competitive algorithms, web development, and data structures — run
+                        by and for students.</p>
+                </div>
+                <div class="act-cell">
+                    <div class="act-icon">🤖</div>
+                    <h3>Robotics &amp; IoT Projects</h3>
+                    <p>Arduino-based robots, sensor systems, and IoT experiments — students build and program hardware
+                        from scratch.</p>
+                </div>
+                <div class="act-cell">
+                    <div class="act-icon">🎨</div>
+                    <h3>Graphics &amp; UI/UX Design</h3>
+                    <p>Visual identity design, interface prototyping, and motion graphics — the creative arm of the
+                        club.</p>
+                </div>
+                <div class="act-cell">
+                    <div class="act-icon">🏆</div>
+                    <h3>Intra-College Competitions</h3>
+                    <p>Annual tech fests with programming contests, project exhibitions, and design hackathons — open to
+                        all students.</p>
+                </div>
+                <div class="act-cell">
+                    <div class="act-icon">📡</div>
+                    <h3>National-Level Events</h3>
+                    <p>Members represent MPSC in robotics championships and coding olympiads at the national level
+                        across Bangladesh.</p>
+                </div>
+                <div class="act-cell">
+                    <div class="act-icon">🌐</div>
+                    <h3>The IT Core Portal</h3>
+                    <p>This very platform — built entirely by club members. A full-stack member system, event
+                        management, and admin dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ╔══════════════════════════════════╗
+         ║  WORKSHOPS & SEMINARS            ║
+         ╚══════════════════════════════════╝ -->
+    <section class="sec">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 4rem;">
+                <div class="sec-label reveal" style="justify-content:center;">Knowledge Building</div>
+                <h2 class="sec-h reveal d1" style="text-align:center;">Workshops &amp; <em>Seminars.</em></h2>
+                <p class="sec-p reveal d2" style="text-align:center; margin: 0 auto;">
+                    Real skill-building sessions — not lectures. Hands-on, student-led, and always applied.
+                </p>
+            </div>
+
+            <div class="ws-grid reveal d2">
+                <div class="ws-card">
+                    <div class="ws-num">01</div>
+                    <h3>First Workshop initiative</h3>
+                    <p>The JSC students of 2018 demonstrated great enthusiasm and dedication toward learning programming
+                        through the club’s initiatives. Many chose to spend their valuable leisure time engaging with
+                        coding activities, reflecting a strong commitment to developing their technical skills. This
+                        early interest signals promising potential, and we look forward to seeing these young learners
+                        excel and make significant contributions in the field of technology in the coming years.</p>
+                    <div class="ws-tags">
+                        <span>Beginner</span><span>Intermediate</span><span>Coding</span>
+                    </div>
+                </div>
+                <div class="ws-card">
+                    <div class="ws-num">02</div>
+                    <h3>Continued Learning Programs</h3>
+                    <p>Following the initial workshop, the club continued to offer learning sessions led by executive
+                        committee members, IT department teachers, and the club moderator. These classes covered a wide
+                        range of topics to equip students with practical skills and industry-relevant knowledge.
+                        Students actively participated and gained hands-on experience.These programs played a crucial
+                        role in building the technical foundation of aspiring students and nurturing their passion for
+                        technology.</p>
+                    <div class="ws-tags">
+                        <span>Web Designing</span><span>Python, C++</span><span>Graphic Design</span>
+                    </div>
+                </div>
+                <div class="ws-card">
+                    <div class="ws-num">03</div>
+                    <h3>Seminar on Robotics</h3>
+                    <p>Around 200 of our students from junior to high school attended a seminar on 'Robotics' arranged
+                        by 'The Tech Academy. It introduced students to the basics of robotics, including automation,
+                        sensors, and intelligent systems. The session aimed to bridge theoretical knowledge with
+                        real-world applications. Interactive demonstrations and live discussions kept the participants
+                        engaged throughout. It successfully sparked curiosity and encouraged many to explore robotics
+                        further beyond the classroom.</p>
+                    <div class="ws-tags">
+                        <span>Robotics</span><span>Arduino</span><span>Logic</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- Journey Continues -->
+    <section class="sec">
+        <div class="container">
+            <div style="max-width: 760px; margin: 0 auto; text-align: center;" class="reveal">
+                <div class="sec-label" style="justify-content:center;">The Journey Continues</div>
+                <h2 class="sec-h"
+                    style="text-align:center; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.15em;">FROM A SIMPLE IDEA</span>
+                    <span style="font-size: 0.9em; font-weight: 700; color: rgba(255,255,255,0.85);">is now a <em
+                            style="font-style: normal; color: #00f5b4;">TO A LIVING LEGACY.</em></span>
+                </h2>
+                <p style="font-size: 1.05rem; color: rgba(255,255,255,0.5); line-height: 1.9; margin-bottom: 1.4rem;">
+                    The journey of the MPSC IT Club from its inception in 2019 to its present form has been one of
+                    growth, passion, and relentless pursuit of innovation. Through workshops, seminars, events, and
+                    national-level participation, the club has continuously empowered students to explore the evolving
+                    world of technology beyond textbooks.
+                </p>
+                <p style="font-size: 1.05rem; color: rgba(255,255,255,0.5); line-height: 1.9; margin-bottom: 1.4rem;">
+                    Each executive committee, moderator, and mentor has played a pivotal role in shaping this legacy,
+                    while every event and initiative has added a new line of code to the club's identity. What began as
+                    a simple idea has now become a structured platform for learning, creativity, and leadership.
+                </p>
+                <p style="font-size: 1.1rem; color: rgba(255,255,255,0.7); line-height: 1.85; font-weight: 500;">
+                    As the club continues to evolve, its mission remains the same — <span style="color:#00f5b4;">to
+                        inspire, to build, and to lead</span> the next generation of thinkers, coders, and creators.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ╔══════════════════════════════════╗
+         ║  CTA                             ║
+         ╚══════════════════════════════════╝ -->
+    <section class="sec-sm">
+        <div class="container">
+            <div class="cta-wrap reveal">
+                <h2>This could be your story too.</h2>
+                <p>
+                    MPSC IT Club is open to every student of Mohammadpur Preparatory School &amp; College.
+                    Come build something real.
+                </p>
+                <div class="btn-group">
+                    <a href="/auth/signup" class="btn-primary-green">Join the Club</a>
+                    <a href="/events" class="btn-outline-white">View Events</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
     {% include 'components/footer.html' %}
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/circularMenu.js') }}"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            gsap.registerPlugin(TextPlugin);
 
-            // Card entrance animation
-            gsap.from("#about-card", {
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                ease: "power3.out"
-            });
+            // ── Intersection Observer ──
+            const els = document.querySelectorAll('.reveal');
+            const io = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+                });
+            }, { threshold: 0.1 });
+            els.forEach(el => io.observe(el));
 
-            // System Boot-up Sequence
-            const tl = gsap.timeline({ delay: 0.5 }); // Terminal starts in 0.5 seconds
+            // ── Number counters ──
+            const counters = document.querySelectorAll('.counter');
+            const co = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (!e.isIntersecting) return;
+                    const el = e.target;
+                    const target = +el.dataset.to;
+                    const step = target / 60;
+                    let n = 0;
+                    const t = setInterval(() => {
+                        n = Math.min(n + step, target);
+                        el.textContent = Math.floor(n);
+                        if (n >= target) clearInterval(t);
+                    }, 18);
+                    co.unobserve(el);
+                });
+            }, { threshold: 0.5 });
+            counters.forEach(c => co.observe(c));
 
-            tl.to("#type-comment", { duration: 0.5, text: "// initialize_club.js", ease: "none" })
-                .to("#type-code", { duration: 1, text: "const club = 'MPSC IT';", ease: "none" })
-                .to("#type-intro", { duration: 2.5, text: "> We are the hub for developers, designers, and roboticists at Mohammadpur Preparatory School & College.", ease: "none" })
-                .to("#type-h1", { duration: 0.5, text: "> Our Goal", ease: "none" })
-                .to("#type-p1", { duration: 3, text: "To empower the next generation of students by bridging the gap between theoretical knowledge and practical technological innovation. We transform passionate learners into capable creators.", ease: "none" })
-                .to("#type-h2", { duration: 0.5, text: "> Core Domains", ease: "none" })
-                .to("#type-p2", { duration: 2, text: "We specialize in four primary technology sectors to prepare our members for the future:", ease: "none" })
-                .to(".tag", { opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: "back.out(1.5)" });
         });
     </script>
 </body>
