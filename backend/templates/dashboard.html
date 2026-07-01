@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | MPSC IT CLUB</title>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/images/logo.png') }}">
+    <link rel="icon" type="image/jpeg"
+        href="https://scontent.cdninstagram.com/v/t51.2885-19/455707082_489548463706836_6164801201053764178_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=48d9Yn9vURoQ7kNvwFd-3tA&_nc_oc=Adr_H8iB-xjLSx2NJ4VlwXpcXKkgsY7MxncJnkO0FknjjVcu5uOXnPlZDbJ2y8sJ6u8&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_ss=7baaf&oh=00_AQCy3HT7xaZ433Z5jeSqEjKlHVX9xD9HDBmzFnAbNMOOTw&oe=6A4ACBA2">
     <meta name="description" content="Your MPSC IT Club member dashboard.">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <style>
@@ -24,7 +27,10 @@
             overflow: hidden;
             transition: border-color 0.3s;
         }
-        .d-card:hover { border-color: rgba(0, 245, 180, 0.3); }
+
+        .d-card:hover {
+            border-color: rgba(0, 245, 180, 0.3);
+        }
 
         .d-card-head {
             display: flex;
@@ -33,13 +39,16 @@
             padding: 0.85rem 1.1rem;
             border-bottom: 1px solid rgba(0, 245, 180, 0.08);
         }
+
         .d-card-head-icon {
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: var(--emerald-green);
             box-shadow: 0 0 6px var(--emerald-green);
             flex-shrink: 0;
         }
+
         .d-card-head-label {
             font-size: 0.7rem;
             font-weight: 700;
@@ -47,7 +56,10 @@
             letter-spacing: 2.5px;
             color: var(--emerald-green);
         }
-        .d-card-body { padding: 1rem 1.1rem; }
+
+        .d-card-body {
+            padding: 1rem 1.1rem;
+        }
 
         /* ── Page header ── */
         .dash-header {
@@ -55,6 +67,7 @@
             border-bottom: 1px solid rgba(0, 245, 180, 0.07);
             margin-bottom: 1.25rem;
         }
+
         .dash-label {
             font-size: 0.7rem;
             letter-spacing: 3px;
@@ -62,6 +75,7 @@
             color: var(--emerald-green);
             margin-bottom: 0.4rem;
         }
+
         .dash-name {
             font-size: clamp(1.8rem, 6vw, 2.8rem);
             font-weight: 800;
@@ -69,7 +83,11 @@
             color: #fff;
             letter-spacing: -0.5px;
         }
-        .dash-name span { color: var(--emerald-green); }
+
+        .dash-name span {
+            color: var(--emerald-green);
+        }
+
         .dash-id {
             font-size: 0.72rem;
             color: var(--soft-gray);
@@ -84,6 +102,7 @@
             padding: 0 1.1rem 1.25rem;
             flex-wrap: wrap;
         }
+
         .action-btn {
             display: inline-flex;
             align-items: center;
@@ -100,25 +119,34 @@
             text-decoration: none;
             font-family: 'Outfit', sans-serif;
         }
-        .action-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+        .action-btn svg {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
+        }
+
         .btn-edit {
-            background: rgba(0,245,180,0.08);
-            border-color: rgba(0,245,180,0.35);
+            background: rgba(0, 245, 180, 0.08);
+            border-color: rgba(0, 245, 180, 0.35);
             color: var(--emerald-green);
         }
+
         .btn-edit:hover {
-            background: rgba(0,245,180,0.15);
+            background: rgba(0, 245, 180, 0.15);
             border-color: var(--emerald-green);
-            box-shadow: 0 0 12px rgba(0,245,180,0.2);
+            box-shadow: 0 0 12px rgba(0, 245, 180, 0.2);
         }
+
         .btn-logout {
-            background: rgba(255,77,77,0.07);
-            border-color: rgba(255,77,77,0.3);
+            background: rgba(255, 77, 77, 0.07);
+            border-color: rgba(255, 77, 77, 0.3);
             color: #ff6b6b;
         }
+
         .btn-logout:hover {
-            background: rgba(255,77,77,0.15);
-            border-color: rgba(255,77,77,0.6);
+            background: rgba(255, 77, 77, 0.15);
+            border-color: rgba(255, 77, 77, 0.6);
         }
 
         /* ── Layout ── */
@@ -135,11 +163,19 @@
             justify-content: space-between;
             align-items: baseline;
             padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             gap: 1rem;
         }
-        .info-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .info-row:first-child { padding-top: 0; }
+
+        .info-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-row:first-child {
+            padding-top: 0;
+        }
+
         .info-lbl {
             font-size: 0.72rem;
             color: var(--soft-gray);
@@ -147,6 +183,7 @@
             letter-spacing: 1px;
             flex-shrink: 0;
         }
+
         .info-val {
             font-size: 0.88rem;
             font-weight: 600;
@@ -165,8 +202,18 @@
             letter-spacing: 1px;
             text-transform: uppercase;
         }
-        .tag-member { background: rgba(0,245,180,0.1); color: var(--emerald-green); border: 1px solid rgba(0,245,180,0.25); }
-        .tag-admin  { background: rgba(255,200,0,0.1);  color: #ffd700;             border: 1px solid rgba(255,200,0,0.25); }
+
+        .tag-member {
+            background: rgba(0, 245, 180, 0.1);
+            color: var(--emerald-green);
+            border: 1px solid rgba(0, 245, 180, 0.25);
+        }
+
+        .tag-admin {
+            background: rgba(255, 200, 0, 0.1);
+            color: #ffd700;
+            border: 1px solid rgba(255, 200, 0, 0.25);
+        }
 
         /* ── Payment items ── */
         .pay-row {
@@ -175,12 +222,30 @@
             justify-content: space-between;
             gap: 0.75rem;
             padding: 0.7rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
-        .pay-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .pay-row:first-child { padding-top: 0; }
-        .pay-txid { font-size: 0.85rem; font-weight: 700; color: #fff; }
-        .pay-date { font-size: 0.7rem; color: var(--soft-gray); margin-top: 2px; }
+
+        .pay-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .pay-row:first-child {
+            padding-top: 0;
+        }
+
+        .pay-txid {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .pay-date {
+            font-size: 0.7rem;
+            color: var(--soft-gray);
+            margin-top: 2px;
+        }
+
         .pay-badge {
             padding: 4px 10px;
             border-radius: 4px;
@@ -190,9 +255,24 @@
             letter-spacing: 0.5px;
             flex-shrink: 0;
         }
-        .badge-pending  { background: rgba(255,166,0,0.1);  color: orange;              border: 1px solid rgba(255,166,0,0.3); }
-        .badge-approved { background: rgba(0,245,180,0.1);  color: var(--emerald-green); border: 1px solid rgba(0,245,180,0.3); }
-        .badge-rejected { background: rgba(255,77,77,0.1);  color: #ff6b6b;             border: 1px solid rgba(255,77,77,0.3); }
+
+        .badge-pending {
+            background: rgba(255, 166, 0, 0.1);
+            color: orange;
+            border: 1px solid rgba(255, 166, 0, 0.3);
+        }
+
+        .badge-approved {
+            background: rgba(0, 245, 180, 0.1);
+            color: var(--emerald-green);
+            border: 1px solid rgba(0, 245, 180, 0.3);
+        }
+
+        .badge-rejected {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
 
         .dash-empty {
             color: var(--soft-gray);
@@ -205,7 +285,7 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(5,20,19,0.8);
+            background: rgba(5, 20, 19, 0.8);
             z-index: 3000;
             display: flex;
             align-items: flex-end;
@@ -214,50 +294,71 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
+
         .modal-overlay.open {
             opacity: 1;
             pointer-events: all;
         }
+
         .modal-drawer {
             width: 100%;
             max-width: 500px;
             background: rgba(5, 22, 20, 0.97);
-            border: 1px solid rgba(0,245,180,0.18);
+            border: 1px solid rgba(0, 245, 180, 0.18);
             border-bottom: none;
             border-radius: 20px 20px 0 0;
             padding: 0.6rem 1.4rem 2.5rem;
             transform: translateY(100%);
-            transition: transform 0.38s cubic-bezier(0.32,0.72,0,1);
+            transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
             max-height: 90vh;
             overflow-y: auto;
         }
-        .modal-overlay.open .modal-drawer { transform: translateY(0); }
+
+        .modal-overlay.open .modal-drawer {
+            transform: translateY(0);
+        }
 
         .modal-handle {
-            width: 36px; height: 4px;
-            background: rgba(255,255,255,0.15);
+            width: 36px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 2px;
             margin: 0.7rem auto 1.2rem;
         }
+
         .modal-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.4rem;
         }
-        .modal-title { font-size: 1.1rem; font-weight: 800; color: #fff; }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
         .modal-close {
-            width: 30px; height: 30px;
+            width: 30px;
+            height: 30px;
             border-radius: 6px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--soft-gray);
             font-size: 1rem;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s;
         }
-        .modal-close:hover { color: #fff; background: rgba(0,245,180,0.1); border-color: rgba(0,245,180,0.3); }
+
+        .modal-close:hover {
+            color: #fff;
+            background: rgba(0, 245, 180, 0.1);
+            border-color: rgba(0, 245, 180, 0.3);
+        }
 
         /* form */
         .edit-grid {
@@ -265,8 +366,17 @@
             grid-template-columns: 1fr 1fr;
             gap: 0.8rem;
         }
-        .edit-field { display: flex; flex-direction: column; gap: 5px; }
-        .edit-field.span2 { grid-column: 1 / -1; }
+
+        .edit-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .edit-field.span2 {
+            grid-column: 1 / -1;
+        }
+
         .edit-field label {
             font-size: 0.68rem;
             text-transform: uppercase;
@@ -274,9 +384,10 @@
             color: var(--soft-gray);
             font-weight: 600;
         }
+
         .edit-field input {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             padding: 11px 12px;
             color: #fff;
@@ -284,7 +395,13 @@
             font-size: 0.9rem;
             transition: border-color 0.2s;
         }
-        .edit-field input:focus { outline: none; border-color: var(--emerald-green); background: rgba(0,245,180,0.04); }
+
+        .edit-field input:focus {
+            outline: none;
+            border-color: var(--emerald-green);
+            background: rgba(0, 245, 180, 0.04);
+        }
+
         .save-btn {
             grid-column: 1 / -1;
             padding: 13px;
@@ -301,14 +418,33 @@
             margin-top: 0.4rem;
             transition: opacity 0.2s, box-shadow 0.2s;
         }
-        .save-btn:hover { box-shadow: 0 0 18px rgba(0,245,180,0.3); }
-        .save-btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+        .save-btn:hover {
+            box-shadow: 0 0 18px rgba(0, 245, 180, 0.3);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
 
         /* ── Desktop layout ── */
         @media (min-width: 768px) {
-            .dash-page { padding-top: 100px; }
-            .dash-header { padding: 2.5rem 0 1.75rem; margin-bottom: 0; border-bottom: none; }
-            .action-row { padding: 0 0 1.75rem; }
+            .dash-page {
+                padding-top: 100px;
+            }
+
+            .dash-header {
+                padding: 2.5rem 0 1.75rem;
+                margin-bottom: 0;
+                border-bottom: none;
+            }
+
+            .action-row {
+                padding: 0 0 1.75rem;
+            }
+
             .dash-layout {
                 padding: 0;
                 display: grid;
@@ -316,23 +452,40 @@
                 gap: 1.25rem;
                 align-items: start;
             }
-            .profile-col { position: sticky; top: 100px; }
+
+            .profile-col {
+                position: sticky;
+                top: 100px;
+            }
 
             /* center modal on desktop */
-            .modal-overlay { align-items: center; }
+            .modal-overlay {
+                align-items: center;
+            }
+
             .modal-drawer {
                 border-radius: 16px;
-                border-bottom: 1px solid rgba(0,245,180,0.18);
+                border-bottom: 1px solid rgba(0, 245, 180, 0.18);
                 transform: translateY(16px) scale(0.97);
             }
-            .modal-overlay.open .modal-drawer { transform: translateY(0) scale(1); }
-            .modal-handle { display: none; }
+
+            .modal-overlay.open .modal-drawer {
+                transform: translateY(0) scale(1);
+            }
+
+            .modal-handle {
+                display: none;
+            }
         }
+
         @media (min-width: 1100px) {
-            .dash-layout { grid-template-columns: 320px 1fr; }
+            .dash-layout {
+                grid-template-columns: 320px 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="futuristic-grid"></div>
     <div class="cursor-glow" id="cursor-glow"></div>
@@ -354,11 +507,17 @@
             <!-- Action Buttons -->
             <div class="action-row">
                 <button id="openEditModal" class="action-btn btn-edit">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M16.732 3.732a2.5 2.5 0 013.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536M16.732 3.732a2.5 2.5 0 013.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
                     Edit Profile
                 </button>
                 <a href="/auth/logout" class="action-btn btn-logout">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
                     Logout
                 </a>
             </div>
@@ -396,12 +555,14 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-lbl">Joined</span>
-                                <span class="info-val">{{ current_user.join_date[:10] if current_user.join_date else '—' }}</span>
+                                <span class="info-val">{{ current_user.join_date[:10] if current_user.join_date else '—'
+                                    }}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-lbl">Role</span>
                                 <span class="info-val">
-                                    <span class="role-tag {% if current_user.role == 'admin' %}tag-admin{% else %}tag-member{% endif %}">
+                                    <span
+                                        class="role-tag {% if current_user.role == 'admin' %}tag-admin{% else %}tag-member{% endif %}">
                                         {{ current_user.role }}
                                     </span>
                                 </span>
@@ -472,7 +633,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
 
             // ── Edit Modal ──
-            const modal   = document.getElementById('editProfileModal');
+            const modal = document.getElementById('editProfileModal');
             const openBtn = document.getElementById('openEditModal');
             const closeBtn = document.getElementById('closeModal');
 
@@ -538,4 +699,5 @@
         });
     </script>
 </body>
+
 </html>

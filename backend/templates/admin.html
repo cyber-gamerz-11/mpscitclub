@@ -1,49 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Club Command Center | MPSC IT CLUB</title>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/images/logo.png') }}">
+    <link rel="icon" type="image/jpeg"
+        href="https://scontent.cdninstagram.com/v/t51.2885-19/455707082_489548463706836_6164801201053764178_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=48d9Yn9vURoQ7kNvwFd-3tA&_nc_oc=Adr_H8iB-xjLSx2NJ4VlwXpcXKkgsY7MxncJnkO0FknjjVcu5uOXnPlZDbJ2y8sJ6u8&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_ss=7baaf&oh=00_AQCy3HT7xaZ433Z5jeSqEjKlHVX9xD9HDBmzFnAbNMOOTw&oe=6A4ACBA2">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <style>
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
-        .admin-grid { display: grid; grid-template-columns: 260px 1fr; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; overflow: hidden; font-size: 0.95rem; z-index: 10; background: var(--matte-black); }
-        .admin-sidebar { background: rgba(0,0,0,0.8); backdrop-filter: blur(30px); border-right: 1px solid var(--glass-border); padding: 2rem 1.5rem; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; }
-        .admin-main { padding: 2rem 3rem; overflow-y: auto; background: rgba(0,0,0,0.2); height: 100vh; }
-        .sidebar-menu { list-style: none; margin-top: 2rem; flex-grow: 1; }
-        .sidebar-menu li { margin-bottom: 0.5rem; }
-        .sidebar-menu a { color: var(--soft-gray); text-decoration: none; padding: 12px 16px; border-radius: 8px; display: block; transition: 0.3s; font-weight: 500; font-size: 0.9rem; }
-        .sidebar-menu li.active a, .sidebar-menu a:hover { background: var(--emerald-green); color: var(--matte-black); box-shadow: 0 0 15px rgba(0, 255, 136, 0.4); transform: translateX(5px); }
-        
-        .dash-card { 
-            padding: 1.5rem; 
-            text-align: center; 
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            font-size: 0.95rem;
+            z-index: 10;
+            background: var(--matte-black);
+        }
+
+        .admin-sidebar {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(30px);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .admin-main {
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            height: 100vh;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 2rem;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            color: var(--soft-gray);
+            text-decoration: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: block;
+            transition: 0.3s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-menu li.active a,
+        .sidebar-menu a:hover {
+            background: var(--emerald-green);
+            color: var(--matte-black);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            transform: translateX(5px);
+        }
+
+        .dash-card {
+            padding: 1.5rem;
+            text-align: center;
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .dash-card:hover { 
-            transform: translateY(-5px); 
-            border-color: var(--emerald-green); 
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1); 
+
+        .dash-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--emerald-green);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);
         }
-        .dash-card h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--soft-gray); margin-bottom: 0.5rem; }
-        
-        .list-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 1.5rem; font-size: 0.9rem; }
-        .list-table th { text-align: left; padding: 12px 15px; color: var(--emerald-green); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-        .list-table td { padding: 14px 15px; background: rgba(255,255,255,0.03); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); }
-        .list-table td:first-child { border-left: 1px solid var(--glass-border); border-radius: 8px 0 0 8px; }
-        .list-table td:last-child { border-right: 1px solid var(--glass-border); border-radius: 0 8px 8px 0; }
-        .role-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; text-transform: uppercase; }
-        .role-admin { background: #ff4d4d; color: white; }
-        .role-member { background: var(--emerald-green); color: var(--matte-black); }
-        .action-btn { background: none; border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; }
-        .delete-btn:hover { background: #ff4d4d; border-color: #ff4d4d; }
+
+        .dash-card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--soft-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .list-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .list-table th {
+            text-align: left;
+            padding: 12px 15px;
+            color: var(--emerald-green);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .list-table td {
+            padding: 14px 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .list-table td:first-child {
+            border-left: 1px solid var(--glass-border);
+            border-radius: 8px 0 0 8px;
+        }
+
+        .list-table td:last-child {
+            border-right: 1px solid var(--glass-border);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .role-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .role-admin {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .role-member {
+            background: var(--emerald-green);
+            color: var(--matte-black);
+        }
+
+        .action-btn {
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: var(--white);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .delete-btn:hover {
+            background: #ff4d4d;
+            border-color: #ff4d4d;
+        }
     </style>
 </head>
+
 <body class="dashboard-page">
     <div class="futuristic-grid"></div>
     <div class="cursor-glow" id="cursor-glow"></div>
@@ -52,7 +180,7 @@
         <aside class="admin-sidebar">
             <h2 class="emerald" style="letter-spacing: 2px;">COMMAND CENTER</h2>
             <p style="font-size: 0.8rem; color: var(--soft-gray);">MPSC IT CLUB OS v2.0</p>
-            
+
             <ul class="sidebar-menu">
                 <li class="active"><a href="#overview">Overview</a></li>
                 <li><a href="#events">Events</a></li>
@@ -63,8 +191,11 @@
                 <li><a href="#payments">Pending Payments</a></li>
                 <li><a href="#verified-payments">Verified Records</a></li>
                 <li><a href="#password-reset">🔑 Password Reset</a></li>
-                <li style="margin-top: 2rem;"><a href="/" class="btn-secondary" style="text-align: center;">Exit Site</a></li>
-                <li style="margin-top: 1rem;"><a href="/auth/logout" class="btn-primary" style="background: #ff4d4d; border-color: #ff4d4d; color: white; text-align: center;">Logout</a></li>
+                <li style="margin-top: 2rem;"><a href="/" class="btn-secondary" style="text-align: center;">Exit
+                        Site</a></li>
+                <li style="margin-top: 1rem;"><a href="/auth/logout" class="btn-primary"
+                        style="background: #ff4d4d; border-color: #ff4d4d; color: white; text-align: center;">Logout</a>
+                </li>
             </ul>
         </aside>
 
@@ -72,7 +203,8 @@
             <!-- Overview -->
             <section id="overview-section" class="dash-section">
                 <h1 class="hero-title" style="font-size: 2.5rem;">Dashboard Overview</h1>
-                <div class="dash-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 2rem;">
+                <div class="dash-grid"
+                    style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 2rem;">
                     <div class="glass-card dash-card">
                         <h3>Members</h3>
                         <p id="stat-members" style="font-size: 2rem; font-weight: bold;" class="emerald">0</p>
@@ -96,7 +228,14 @@
                 </div>
                 <div class="glass-card mt-2">
                     <table class="list-table">
-                        <thead><tr><th>Title</th><th>Date</th><th>Venue</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Date</th>
+                                <th>Venue</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody id="events-list"></tbody>
                     </table>
                 </div>
@@ -110,7 +249,15 @@
                 </div>
                 <div class="glass-card mt-2">
                     <table class="list-table">
-                        <thead><tr><th>Image</th><th>Title</th><th>Date</th><th>Description</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody id="programs-list"></tbody>
                     </table>
                 </div>
@@ -121,7 +268,14 @@
                 <h2 class="section-title">Member Management</h2>
                 <div class="glass-card mt-2">
                     <table class="list-table">
-                        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody id="users-list"></tbody>
                     </table>
                 </div>
@@ -135,7 +289,14 @@
                 </div>
                 <div class="glass-card mt-2">
                     <table class="list-table">
-                        <thead><tr><th>Image</th><th>Caption</th><th>Category</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Caption</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody id="gallery-list"></tbody>
                     </table>
                 </div>
@@ -146,8 +307,10 @@
                 <div class="flex-between">
                     <h2 class="section-title">EC Member Management</h2>
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                        <label for="admin-ec-year-select" style="font-weight: 600; color: var(--soft-gray);">Select Year:</label>
-                        <select id="admin-ec-year-select" class="action-btn" onchange="filterECByYear()" style="background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 8px; color: white; border-color: var(--glass-border);">
+                        <label for="admin-ec-year-select" style="font-weight: 600; color: var(--soft-gray);">Select
+                            Year:</label>
+                        <select id="admin-ec-year-select" class="action-btn" onchange="filterECByYear()"
+                            style="background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 8px; color: white; border-color: var(--glass-border);">
                             <option value="2026">2026</option>
                             <option value="2025">2025</option>
                             <option value="2024">2024</option>
@@ -155,14 +318,27 @@
                             <option value="2022">2022</option>
                             <option value="2021">2021</option>
                         </select>
-                        <button onclick="adminAddYearPrompt()" class="btn-primary" style="background: transparent; color: white; border: 1px solid var(--emerald-green); padding: 8px 12px; font-size: 0.85rem;">+ Add Year</button>
-                        <button onclick="adminDeleteYearPrompt()" class="btn-primary" style="background: #ff4d4d; border-color: #ff4d4d; color: white; padding: 8px 12px; font-size: 0.85rem;">🗑️ Delete Year</button>
+                        <button onclick="adminAddYearPrompt()" class="btn-primary"
+                            style="background: transparent; color: white; border: 1px solid var(--emerald-green); padding: 8px 12px; font-size: 0.85rem;">+
+                            Add Year</button>
+                        <button onclick="adminDeleteYearPrompt()" class="btn-primary"
+                            style="background: #ff4d4d; border-color: #ff4d4d; color: white; padding: 8px 12px; font-size: 0.85rem;">🗑️
+                            Delete Year</button>
                         <button onclick="openAddECModal()" class="btn-primary">Add EC Member</button>
                     </div>
                 </div>
                 <div class="glass-card mt-2">
                     <table class="list-table">
-                        <thead><tr><th>Name</th><th>Designation</th><th>Section</th><th>Year</th><th>Order</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Designation</th>
+                                <th>Section</th>
+                                <th>Year</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody id="ec-list"></tbody>
                     </table>
                 </div>
@@ -173,7 +349,14 @@
                 <h2 class="section-title">Pending Verifications</h2>
                 <div class="glass-card mt-2">
                     <table class="list-table">
-                        <thead><tr><th>Member ID</th><th>Ref Email</th><th>TxID</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Member ID</th>
+                                <th>Ref Email</th>
+                                <th>TxID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                         <tbody id="payments-list"></tbody>
                     </table>
                 </div>
@@ -182,18 +365,23 @@
             <!-- Verified Records -->
             <section id="verified-payments-section" class="dash-section" style="display:none;">
                 <h2 class="section-title">Verified Records & Exports</h2>
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
                     <p style="color: var(--soft-gray); font-size: 0.95rem; margin: 0; max-width: 50%;">
-                        View all verified payments and their details. Use the export button to download an Excel (CSV) report.
+                        View all verified payments and their details. Use the export button to download an Excel (CSV)
+                        report.
                     </p>
                     <div style="display: flex; gap: 1rem;">
-                        <button onclick="openOfflineModal()" class="btn-primary" style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; background: transparent; color: var(--emerald-green);">
+                        <button onclick="openOfflineModal()" class="btn-primary"
+                            style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; background: transparent; color: var(--emerald-green);">
                             ➕ Add Offline Record
                         </button>
-                        <button onclick="deleteAllVerifiedPayments()" class="btn-primary" style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; background: #ff4d4d; border-color: #ff4d4d; color: white;">
+                        <button onclick="deleteAllVerifiedPayments()" class="btn-primary"
+                            style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; background: #ff4d4d; border-color: #ff4d4d; color: white;">
                             🗑️ Delete All Records
                         </button>
-                        <button onclick="window.location.href='/admin/api/export_verified_payments'" class="btn-primary" style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; box-shadow: 0 0 15px rgba(0,255,136,0.2);">
+                        <button onclick="window.location.href='/admin/api/export_verified_payments'" class="btn-primary"
+                            style="font-size: 0.85rem; padding: 0.8rem 1.5rem; margin: 0; box-shadow: 0 0 15px rgba(0,255,136,0.2);">
                             📥 Download Excel Report
                         </button>
                     </div>
@@ -211,7 +399,10 @@
                             </tr>
                         </thead>
                         <tbody id="verified-payments-list">
-                            <tr><td colspan="5" style="text-align:center; color: var(--soft-gray);">Loading verified records...</td></tr>
+                            <tr>
+                                <td colspan="5" style="text-align:center; color: var(--soft-gray);">Loading verified
+                                    records...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -221,70 +412,109 @@
             <section id="password-reset-section" class="dash-section" style="display:none;">
                 <h2 class="section-title">🔑 Password Reset Tool</h2>
                 <p style="color: var(--soft-gray); margin-top: 0.5rem; margin-bottom: 2rem; font-size: 0.95rem;">
-                    When a member contacts you to reset their password, use this tool to verify their identity first, then generate a secure reset link to send them.
+                    When a member contacts you to reset their password, use this tool to verify their identity first,
+                    then generate a secure reset link to send them.
                 </p>
 
                 <!-- Step 1: Look up the user -->
                 <div class="glass-card" style="padding: 2rem; margin-bottom: 1.5rem;">
-                    <h3 style="font-size: 1rem; margin-bottom: 1.2rem; color: var(--emerald-green); letter-spacing: 1px;">STEP 1 — Verify Identity</h3>
-                    <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.2rem;">Ask the user to provide the email address they signed up with. Enter it below to see their account details.</p>
+                    <h3
+                        style="font-size: 1rem; margin-bottom: 1.2rem; color: var(--emerald-green); letter-spacing: 1px;">
+                        STEP 1 — Verify Identity</h3>
+                    <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.2rem;">Ask the user to
+                        provide the email address they signed up with. Enter it below to see their account details.</p>
                     <div style="display: flex; gap: 1rem; align-items: flex-end;">
                         <div class="input-group" style="flex: 1; margin: 0;">
                             <label for="reset-email-input">Member Email Address</label>
-                            <input type="email" id="reset-email-input" placeholder="e.g. member@email.com" autocomplete="off">
+                            <input type="email" id="reset-email-input" placeholder="e.g. member@email.com"
+                                autocomplete="off">
                         </div>
-                        <button id="find-user-btn" class="btn-primary" style="padding: 0.8rem 1.5rem; white-space: nowrap;" onclick="adminFindUser()">Look Up</button>
+                        <button id="find-user-btn" class="btn-primary"
+                            style="padding: 0.8rem 1.5rem; white-space: nowrap;" onclick="adminFindUser()">Look
+                            Up</button>
                     </div>
                 </div>
 
                 <!-- Identity card (hidden until user found) -->
-                <div id="user-identity-card" class="glass-card" style="display:none; padding: 2rem; margin-bottom: 1.5rem; border-color: var(--emerald-green);">
-                    <h3 style="font-size: 1rem; margin-bottom: 1.5rem; color: var(--emerald-green); letter-spacing: 1px;">✅ Account Found — Verify the Details Match</h3>
-                    <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Ask the person to confirm their <strong style="color:white">full name</strong> and <strong style="color:white">Member ID</strong>. If they match, proceed to generate the link.</p>
+                <div id="user-identity-card" class="glass-card"
+                    style="display:none; padding: 2rem; margin-bottom: 1.5rem; border-color: var(--emerald-green);">
+                    <h3
+                        style="font-size: 1rem; margin-bottom: 1.5rem; color: var(--emerald-green); letter-spacing: 1px;">
+                        ✅ Account Found — Verify the Details Match</h3>
+                    <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Ask the person to
+                        confirm their <strong style="color:white">full name</strong> and <strong
+                            style="color:white">Member ID</strong>. If they match, proceed to generate the link.</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
-                        <div style="background: rgba(0,0,0,0.3); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border);">
-                            <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 0.4rem;">Full Name</p>
+                        <div
+                            style="background: rgba(0,0,0,0.3); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border);">
+                            <p
+                                style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 0.4rem;">
+                                Full Name</p>
                             <p id="ri-name" style="font-size: 1.1rem; font-weight: 600;">—</p>
                         </div>
-                        <div style="background: rgba(0,0,0,0.3); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border);">
-                            <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 0.4rem;">Member ID</p>
-                            <p id="ri-member-id" style="font-size: 1.1rem; font-weight: 600; color: var(--emerald-green);">—</p>
+                        <div
+                            style="background: rgba(0,0,0,0.3); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border);">
+                            <p
+                                style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 0.4rem;">
+                                Member ID</p>
+                            <p id="ri-member-id"
+                                style="font-size: 1.1rem; font-weight: 600; color: var(--emerald-green);">—</p>
                         </div>
-                        <div style="background: rgba(0,0,0,0.3); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border);">
-                            <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 0.4rem;">Registered Email</p>
+                        <div
+                            style="background: rgba(0,0,0,0.3); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border);">
+                            <p
+                                style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 0.4rem;">
+                                Registered Email</p>
                             <p id="ri-email" style="font-size: 1rem;">—</p>
                         </div>
-                        <div style="background: rgba(0,0,0,0.3); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border);">
-                            <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 0.4rem;">Joined</p>
+                        <div
+                            style="background: rgba(0,0,0,0.3); padding: 1rem 1.2rem; border-radius: 10px; border: 1px solid var(--glass-border);">
+                            <p
+                                style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 0.4rem;">
+                                Joined</p>
                             <p id="ri-joined" style="font-size: 1rem;">—</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Not found error -->
-                <div id="user-not-found" class="glass-card" style="display:none; padding: 1.5rem 2rem; margin-bottom: 1.5rem; border-color: #ff4d4d;">
-                    <p style="color: #ff4d4d; font-weight: 600;">❌ No account found with that email. Double-check the address.</p>
+                <div id="user-not-found" class="glass-card"
+                    style="display:none; padding: 1.5rem 2rem; margin-bottom: 1.5rem; border-color: #ff4d4d;">
+                    <p style="color: #ff4d4d; font-weight: 600;">❌ No account found with that email. Double-check the
+                        address.</p>
                 </div>
 
                 <!-- Step 2: Generate the link -->
                 <div id="reset-link-section" class="glass-card" style="display:none; padding: 2rem;">
-                    <h3 style="font-size: 1rem; margin-bottom: 1.2rem; color: var(--emerald-green); letter-spacing: 1px;">STEP 2 — Generate & Send Reset Link</h3>
-                    <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">The link is valid for <strong style="color:white">1 hour</strong>. Copy it and send it directly to the member via WhatsApp, Facebook, or email.</p>
-                    <button id="gen-link-btn" class="btn-primary" style="width: 100%; margin-bottom: 1.5rem;" onclick="adminGenerateReset()">⚡ Generate Reset Link</button>
+                    <h3
+                        style="font-size: 1rem; margin-bottom: 1.2rem; color: var(--emerald-green); letter-spacing: 1px;">
+                        STEP 2 — Generate & Send Reset Link</h3>
+                    <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">The link is valid for
+                        <strong style="color:white">1 hour</strong>. Copy it and send it directly to the member via
+                        WhatsApp, Facebook, or email.</p>
+                    <button id="gen-link-btn" class="btn-primary" style="width: 100%; margin-bottom: 1.5rem;"
+                        onclick="adminGenerateReset()">⚡ Generate Reset Link</button>
 
                     <div id="reset-link-result" style="display:none;">
-                        <label style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); display:block; margin-bottom: 0.5rem;">Reset Link (click to copy)</label>
+                        <label
+                            style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); display:block; margin-bottom: 0.5rem;">Reset
+                            Link (click to copy)</label>
                         <div style="display:flex; gap: 0.8rem; align-items: center;">
                             <input id="reset-link-box" type="text" readonly
                                 style="flex:1; background: rgba(0,0,0,0.5); border: 1px solid var(--emerald-green); border-radius: 8px; padding: 0.8rem 1rem; color: var(--emerald-green); font-size: 0.78rem; cursor: pointer;"
                                 onclick="copyResetLink()">
-                            <button class="btn-primary" style="padding: 0.8rem 1.2rem; white-space: nowrap;" onclick="copyResetLink()">📋 Copy</button>
+                            <button class="btn-primary" style="padding: 0.8rem 1.2rem; white-space: nowrap;"
+                                onclick="copyResetLink()">📋 Copy</button>
                         </div>
-                        <p id="copy-confirm" style="display:none; color: var(--emerald-green); font-size: 0.85rem; margin-top: 0.7rem;">✅ Copied to clipboard!</p>
-                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 3px solid var(--emerald-green);">
+                        <p id="copy-confirm"
+                            style="display:none; color: var(--emerald-green); font-size: 0.85rem; margin-top: 0.7rem;">✅
+                            Copied to clipboard!</p>
+                        <div
+                            style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 3px solid var(--emerald-green);">
                             <p style="font-size: 0.82rem; color: var(--soft-gray); line-height: 1.7;">
                                 💬 <strong style="color:white;">What to tell them:</strong><br>
-                                "Here is your password reset link. Open it in your browser and set a new password. It expires in 1 hour."
+                                "Here is your password reset link. Open it in your browser and set a new password. It
+                                expires in 1 hour."
                             </p>
                         </div>
                     </div>
@@ -294,25 +524,29 @@
     </div>
 
     <!-- Modals (Add Forms) -->
-    
+
     <!-- Add Offline Payment Modal -->
-    <div id="offline-payment-modal" class="modal glass-card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 500px; padding: 2rem;">
+    <div id="offline-payment-modal" class="modal glass-card"
+        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 500px; padding: 2rem;">
         <h3 class="emerald">Add Offline Registration</h3>
-        <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Create a verified record for someone who registered manually. This will generate an offline account for them to appear in exports.</p>
+        <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Create a verified record for
+            someone who registered manually. This will generate an offline account for them to appear in exports.</p>
         <form id="offline-payment-form" class="mt-1">
             <input type="text" name="full_name" placeholder="Full Name *" required class="w-full mb-1">
             <input type="text" name="phone" placeholder="Phone Number *" required class="w-full mb-1">
             <input type="email" name="email" placeholder="Email Address (Optional)" class="w-full mb-1">
-            
+
             <select id="offline-event-select" name="event_id" required class="w-full mb-1">
                 <option value="">Select Event / Program (Loading...)</option>
             </select>
-            
+
             <button type="submit" class="btn-primary w-full">Save Offline Record</button>
-            <button type="button" onclick="toggleModal('offline-payment-modal')" class="btn-secondary w-full mt-1">Cancel</button>
+            <button type="button" onclick="toggleModal('offline-payment-modal')"
+                class="btn-secondary w-full mt-1">Cancel</button>
         </form>
     </div>
-    <div id="gallery-modal" class="modal glass-card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
+    <div id="gallery-modal" class="modal glass-card"
+        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
         <h3 class="emerald">Add to Gallery</h3>
         <form id="add-gallery-form" class="mt-1" enctype="multipart/form-data">
             <input type="file" name="image" accept="image/*" required class="w-full mb-1">
@@ -323,11 +557,13 @@
                 <option value="Workshops">Workshops</option>
             </select>
             <button type="submit" class="btn-primary w-full">Upload Image</button>
-            <button type="button" onclick="toggleModal('gallery-modal')" class="btn-secondary w-full mt-1">Cancel</button>
+            <button type="button" onclick="toggleModal('gallery-modal')"
+                class="btn-secondary w-full mt-1">Cancel</button>
         </form>
     </div>
 
-    <div id="event-modal" class="modal glass-card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
+    <div id="event-modal" class="modal glass-card"
+        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
         <h3 class="emerald">Create New Event</h3>
         <form id="add-event-form" class="mt-1" enctype="multipart/form-data">
             <input type="text" name="title" placeholder="Event Title" required class="w-full mb-1">
@@ -341,28 +577,36 @@
         </form>
     </div>
 
-    <div id="program-modal" class="modal glass-card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
+    <div id="program-modal" class="modal glass-card"
+        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
         <h3 class="emerald">Add Past Program</h3>
         <form id="add-program-form" class="mt-1" enctype="multipart/form-data">
             <input type="text" name="title" placeholder="Program Title" required class="w-full mb-1">
             <input type="date" name="date" required class="w-full mb-1">
-            <textarea name="description" placeholder="Short Description" required class="w-full mb-1" style="min-height: 80px;"></textarea>
+            <textarea name="description" placeholder="Short Description" required class="w-full mb-1"
+                style="min-height: 80px;"></textarea>
             <input type="file" name="image" accept="image/*" class="w-full mb-1" required>
             <button type="submit" class="btn-primary w-full">Save Program</button>
-            <button type="button" onclick="toggleModal('program-modal')" class="btn-secondary w-full mt-1">Cancel</button>
+            <button type="button" onclick="toggleModal('program-modal')"
+                class="btn-secondary w-full mt-1">Cancel</button>
         </form>
     </div>
 
     <!-- EC Modal -->
-    <div id="ec-modal" class="modal glass-card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
+    <div id="ec-modal" class="modal glass-card"
+        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
         <h3 class="emerald">Add EC Member</h3>
         <form id="add-ec-form" class="mt-1" enctype="multipart/form-data">
             <div class="input-group mb-1">
-                <label for="ec-modal-year" style="font-size: 0.85rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Committees Year</label>
-                <input type="number" id="ec-modal-year" name="year" required class="w-full" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 8px; border-radius: 6px; color: white;">
+                <label for="ec-modal-year"
+                    style="font-size: 0.85rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Committees
+                    Year</label>
+                <input type="number" id="ec-modal-year" name="year" required class="w-full"
+                    style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 8px; border-radius: 6px; color: white;">
             </div>
             <input type="text" name="name" placeholder="Full Name" required class="w-full mb-1">
-            <select name="designation" class="w-full mb-1" required style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
+            <select name="designation" class="w-full mb-1" required
+                style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
                 <option value="" disabled selected>Select Designation</option>
                 <option value="President">President</option>
                 <option value="Vice President">Vice President</option>
@@ -395,4 +639,5 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>
+
 </html>
