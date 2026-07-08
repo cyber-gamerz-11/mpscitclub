@@ -508,7 +508,7 @@ function renderECList() {
         }
         return `
             <tr>
-                <td>${m.name}</td>
+                <td><span style="color:#00f5b4; cursor:pointer; font-weight:600; text-decoration:underline dotted;" onclick="showECQR('${m.id}', '${m.name.replace(/'/g, "'")}')">&#x1F517; ${m.name}</span></td>
                 <td>${m.designation}</td>
                 <td>${displayCat}</td>
                 <td>${year}</td>
@@ -601,3 +601,98 @@ async function adminDeleteYearPrompt() {
     }
 }
 
+// ── EC QR Code Modal ───────────────────────────────────────────────────────
+function showECQR(memberId, memberName) {
+    const url = `${location.origin}/member/${memberId}`;
+
+    // Remove any existing QR modal
+    const existing = document.getElementById('admin-qr-modal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'admin-qr-modal';
+    overlay.style.cssText = `
+        position:fixed; inset:0; z-index:9999;
+        background:rgba(0,0,0,0.8); backdrop-filter:blur(8px);
+        display:flex; align-items:center; justify-content:center; padding:20px;
+    `;
+    overlay.onclick = (e) => { if (e.target === overlay) closeECQR(); };
+
+    overlay.innerHTML = `
+        <div style="
+            background:#0b1a10; border:1px solid rgba(0,245,180,0.2);
+            border-radius:20px; padding:36px 40px; max-width:360px; width:100%;
+            text-align:center; box-shadow:0 30px 80px rgba(0,0,0,0.6);
+            position:relative; animation: qrIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        ">
+            <style>@keyframes qrIn { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:none} }</style>
+
+            <div style="height:3px; background:linear-gradient(90deg,transparent,#00f5b4,transparent); margin:-36px -40px 28px; border-radius:20px 20px 0 0;"></div>
+
+            <p style="font-size:0.6rem; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:rgba(0,245,180,0.55); margin-bottom:6px;">QR CODE</p>
+            <h3 style="font-size:1.15rem; font-weight:800; color:#fff; margin-bottom:4px;">${memberName}</h3>
+            <p style="font-size:0.75rem; color:rgba(255,255,255,0.3); margin-bottom:24px;">Scan to open digital ID card</p>
+
+            <div id="admin-qr-box" style="display:inline-block; background:#fff; padding:10px; border-radius:12px; margin-bottom:20px;"></div>
+
+            <p style="font-size:0.68rem; color:rgba(255,255,255,0.25); margin-bottom:20px; word-break:break-all;">${url}</p>
+
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button onclick="downloadECQR('${memberName}')" style="
+                    padding:10px 22px; background:#00f5b4; color:#050d07;
+                    border:none; border-radius:30px; font-weight:700; font-size:0.82rem;
+                    cursor:pointer; letter-spacing:0.5px;
+                ">⬇ Download QR</button>
+                <button onclick="closeECQR()" style="
+                    padding:10px 22px; background:transparent; color:rgba(255,255,255,0.5);
+                    border:1px solid rgba(255,255,255,0.15); border-radius:30px;
+                    font-weight:600; font-size:0.82rem; cursor:pointer;
+                ">Close</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+
+    // Load qrcode.js if not already loaded
+    function generateQR() {
+        const box = document.getElementById('admin-qr-box');
+        if (!box) return;
+        box.innerHTML = '';
+        new QRCode(box, {
+            text: url,
+            width: 200, height: 200,
+            colorDark: '#050d07',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    }
+
+    if (typeof QRCode !== 'undefined') {
+        generateQR();
+    } else {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+        script.onload = generateQR;
+        document.head.appendChild(script);
+    }
+}
+
+function closeECQR() {
+    const modal = document.getElementById('admin-qr-modal');
+    if (modal) modal.remove();
+    document.body.style.overflow = '';
+}
+
+function downloadECQR(name) {
+    const box = document.getElementById('admin-qr-box');
+    if (!box) return;
+    const canvas = box.querySelector('canvas');
+    if (canvas) {
+        const link = document.createElement('a');
+        link.download = `QR_${name.replace(/\s+/g, '_')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+}

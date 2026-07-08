@@ -191,11 +191,139 @@
                 transform: scale(1.1) translateX(0); /* Disable translateX on mobile */
             }
         }
+        /* ── MEMBER MODAL ── */
+        #member-modal-overlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        #member-modal-overlay.open { display: flex; }
+
+        .mm-wrap {
+            background: #0b1a10;
+            border: 1px solid rgba(0,245,180,0.18);
+            border-radius: 22px;
+            width: 100%; max-width: 700px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,245,180,0.06);
+            animation: mmIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative;
+        }
+        @keyframes mmIn { from { opacity:0; transform:scale(0.88) translateY(20px); } to { opacity:1; transform:none; } }
+
+        .mm-top-bar { height: 3px; background: linear-gradient(90deg, transparent, #00f5b4, transparent); }
+
+        .mm-close {
+            position: absolute; top: 14px; right: 14px;
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5); font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; z-index: 10;
+        }
+        .mm-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+        .mm-header {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; padding: 18px 24px 0;
+        }
+        .mm-club { display: flex; align-items: center; gap: 8px; }
+        .mm-club img { width: 30px; height: 30px; border-radius: 6px; }
+        .mm-club-name { font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(0,245,180,0.7); line-height: 1.2; }
+        .mm-club-name span { color: rgba(255,255,255,0.3); font-weight: 400; display: block; font-size: 0.6rem; }
+        .mm-ec-badge { text-align: right; }
+        .mm-ec-badge .lbl { font-size: 0.58rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.25); display: block; }
+        .mm-ec-badge .yr { font-size: 1.1rem; font-weight: 900; color: #00f5b4; letter-spacing: -0.5px; }
+
+        .mm-body { display: grid; grid-template-columns: 220px 1fr; }
+
+        .mm-photo-col {
+            position: relative; overflow: hidden;
+            background: rgba(0,245,180,0.02);
+            border-right: 1px solid rgba(0,245,180,0.07);
+        }
+        .mm-photo-wm {
+            position: absolute; bottom: 6px; right: 6px;
+            font-size: 4rem; font-weight: 900;
+            color: rgba(0,245,180,0.04); pointer-events: none; user-select: none;
+        }
+        .mm-photo { width: 100%; min-height: 280px; max-height: 320px; object-fit: cover; object-position: top; display: block; }
+        .mm-photo-ph { width: 100%; height: 280px; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 900; color: rgba(0,245,180,0.12); }
+
+        .mm-info { padding: 22px 22px 18px; display: flex; flex-direction: column; justify-content: space-between; }
+
+        .mm-name { font-size: 1.55rem; font-weight: 900; color: #fff; letter-spacing: -0.5px; line-height: 1.1; margin-bottom: 4px; }
+        .mm-name em { font-style: normal; color: #00f5b4; }
+        .mm-role { font-size: 0.8rem; font-weight: 700; color: #00f5b4; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+        .mm-section { font-size: 0.72rem; color: rgba(255,255,255,0.28); font-weight: 500; letter-spacing: 1px; margin-bottom: 18px; }
+
+        .mm-contacts { display: flex; flex-direction: column; gap: 8px; }
+        .mm-cr { display: flex; flex-direction: column; gap: 1px; }
+        .mm-lbl { font-size: 0.57rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.22); }
+        .mm-val { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.65); }
+        .mm-val.blank { color: rgba(255,255,255,0.18); letter-spacing: 1px; }
+
+        .mm-socials { margin-top: 16px; }
+        .mm-social-icons { display: flex; gap: 8px; margin-top: 7px; flex-wrap: wrap; }
+        .mm-sb {
+            width: 34px; height: 34px; border-radius: 9px;
+            border: 1px solid rgba(0,245,180,0.14);
+            background: rgba(0,245,180,0.04);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; transition: all 0.22s;
+        }
+        .mm-sb:hover:not(.dis) { border-color: rgba(0,245,180,0.4); background: rgba(0,245,180,0.1); transform: translateY(-2px); }
+        .mm-sb.dis { opacity: 0.2; cursor: default; pointer-events: none; }
+        .mm-sb svg { width: 16px; height: 16px; fill: #00f5b4; }
+
+        /* QR section */
+        .mm-qr-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 24px; border-top: 1px solid rgba(0,245,180,0.07);
+        }
+        .mm-qr-canvas { border-radius: 8px; background: #fff; padding: 4px; }
+        .mm-qr-text { font-size: 0.72rem; color: rgba(255,255,255,0.3); line-height: 1.6; }
+        .mm-qr-text strong { color: rgba(255,255,255,0.6); display: block; font-size: 0.8rem; margin-bottom: 2px; }
+
+        .mm-footer {
+            padding: 10px 24px;
+            border-top: 1px solid rgba(0,245,180,0.07);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .mm-footer-tag { font-size: 0.6rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.15); }
+
+        /* Cursor pointer on ec cards */
+        .ec-card { cursor: pointer; }
+
+        /* ── MOBILE MODAL ── */
+        @media (max-width: 600px) {
+            .mm-body { grid-template-columns: 1fr; }
+            .mm-photo-col { border-right: none; border-bottom: 1px solid rgba(0,245,180,0.07); max-height: 220px; }
+            .mm-photo { max-height: 220px; min-height: unset; }
+            .mm-photo-ph { height: 180px; }
+            .mm-info { padding: 16px 18px 14px; }
+            .mm-name { font-size: 1.25rem; }
+            .mm-qr-row { padding: 12px 18px; }
+            .mm-footer { padding: 10px 18px; }
+            .mm-header { padding: 14px 18px 0; }
+        }
     </style>
 </head>
 <body>
     <div class="futuristic-grid"></div>
     <div class="cursor-glow" id="cursor-glow"></div>
+
+    <!-- MEMBER MODAL -->
+    <div id="member-modal-overlay" onclick="closeModal(event)">
+        <div class="mm-wrap" id="mm-wrap">
+            <div class="mm-top-bar"></div>
+            <div id="mm-content"></div>
+        </div>
+    </div>
 
     {% include 'components/navbar.html' %}
 
@@ -221,6 +349,7 @@
     {% include 'components/footer.html' %}
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/circularMenu.js') }}"></script>
     <script>
@@ -235,7 +364,6 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('ec-container');
             
-            // Show Skeletons instantly
             container.innerHTML = `
                 <div class="ec-category-section">
                     <h2 class="ec-category-title skeleton" style="width: 300px; height: 35px; border: none; border-radius: 4px;"></h2>
@@ -254,18 +382,14 @@
                     return;
                 }
 
-                // Group by Year
                 members.forEach(m => {
                     const yr = m.year || '2026';
-                    if (!globalYearsMap[yr]) {
-                        globalYearsMap[yr] = [];
-                    }
+                    if (!globalYearsMap[yr]) globalYearsMap[yr] = [];
                     globalYearsMap[yr].push(m);
                 });
 
                 const sortedYears = Object.keys(globalYearsMap).sort((a, b) => b - a);
 
-                // Render Timeline
                 const timeline = document.getElementById('ec-timeline');
                 if (timeline) {
                     timeline.innerHTML = sortedYears.map((yr, idx) => `
@@ -275,10 +399,7 @@
                     `).join('');
                 }
 
-                // Load initial year (latest)
-                if (sortedYears.length > 0) {
-                    loadYear(sortedYears[0]);
-                }
+                if (sortedYears.length > 0) loadYear(sortedYears[0]);
             } catch (err) {
                 console.error("Error fetching EC List:", err);
                 container.innerHTML = '<p>Failed to load committee members. Please try again later.</p>';
@@ -290,21 +411,12 @@
             const yrMembers = globalYearsMap[year];
             if (!yrMembers) return;
 
-            // Update timeline UI
             document.querySelectorAll('.timeline-item').forEach(dot => {
-                if (dot.getAttribute('data-year') === String(year)) {
-                    dot.classList.add('active');
-                } else {
-                    dot.classList.remove('active');
-                }
+                dot.classList.toggle('active', dot.getAttribute('data-year') === String(year));
             });
 
             const grouped = { BVB: [], BVG: [], EVB: [], EVG: [] };
-            yrMembers.forEach(m => {
-                if (grouped[m.category]) {
-                    grouped[m.category].push(m);
-                }
-            });
+            yrMembers.forEach(m => { if (grouped[m.category]) grouped[m.category].push(m); });
 
             let yearHtml = `
                 <div class="ec-year-section" id="year-section-${year}" style="margin-bottom: 6rem; position: relative;">
@@ -318,19 +430,14 @@
                             <h3 class="ec-category-title">${title}</h3>
                             <div class="ec-scroll-container">
                                 ${grouped[key].map(m => `
-                                    <div class="glass-card ec-card">
+                                    <div class="glass-card ec-card" onclick="openMemberModal(${JSON.stringify(m).replace(/"/g, '&quot;')})">
                                         <div class="ec-photo">
-                                            <img src="${m.image_path || '/static/assets/images/ec/default.jpg'}" alt="${m.name}">
+                                            <img src="${m.image_path || '/static/assets/images/ec/default.jpg'}" alt="${m.name}"
+                                                 onerror="this.src='/static/assets/images/ec/default.jpg'">
                                         </div>
                                         <h3 class="emerald" style="text-transform: uppercase; letter-spacing: 2px;">${m.name}</h3>
                                         <p class="role" style="color: var(--soft-gray); font-weight: 600;">${m.designation}</p>
-                                        
-                                        <div class="social-links" style="flex-wrap: wrap;">
-                                            ${m.facebook ? `<a href="${m.facebook}" target="_blank">Facebook</a>` : ''}
-                                            ${m.instagram ? `<a href="${m.instagram}" target="_blank">Instagram</a>` : ''}
-                                            ${m.website ? `<a href="${m.website}" target="_blank">Website</a>` : ''}
-                                            ${m.whatsapp ? `<a href="https://wa.me/${m.whatsapp.replace(/[^0-9]/g, '')}" target="_blank">WhatsApp</a>` : ''}
-                                        </div>
+                                        <p style="font-size:0.72rem; color:rgba(255,255,255,0.25); margin-top:0.5rem; letter-spacing:1px;">TAP TO VIEW CARD</p>
                                     </div>
                                 `).join('')}
                             </div>
@@ -339,27 +446,107 @@
                 }
             }
             yearHtml += `</div>`;
-            
             container.innerHTML = yearHtml;
 
-            // Trigger animation
-            gsap.from('.ec-year-section', { 
-                opacity: 0, 
-                y: 50, 
-                duration: 0.8, 
-                ease: "power3.out",
-                clearProps: "all" 
-            });
-            gsap.from('.ec-card', { 
-                opacity: 0, 
-                scale: 0.9,
-                y: 30, 
-                stagger: 0.1, 
-                duration: 0.6, 
-                ease: "back.out(1.7)",
-                clearProps: "all" 
-            });
+            gsap.from('.ec-year-section', { opacity: 0, y: 50, duration: 0.8, ease: "power3.out", clearProps: "all" });
+            gsap.from('.ec-card', { opacity: 0, scale: 0.9, y: 30, stagger: 0.1, duration: 0.6, ease: "back.out(1.7)", clearProps: "all" });
         };
+
+        // ── MODAL ──────────────────────────────────
+        function openMemberModal(m) {
+            const overlay = document.getElementById('member-modal-overlay');
+            const content = document.getElementById('mm-content');
+
+            const nameParts = (m.name || '').trim().split(' ');
+            const first = nameParts[0] || '';
+            const last = nameParts.slice(1).join(' ') || '';
+            const yr = m.year || '2026';
+            const nextYr = parseInt(yr) + 1;
+            const cardUrl = `${location.origin}/member/${m.id}`;
+
+            const catLabels = { BVB:'Bangla Version · Boys', BVG:'Bangla Version · Girls', EVB:'English Version · Boys', EVG:'English Version · Girls' };
+            const catLabel = catLabels[m.category] || m.category || 'MPSC IT Club';
+
+            const phone = m.whatsapp ? '+' + m.whatsapp.replace('+','') : null;
+            const waLink = m.whatsapp ? 'https://wa.me/' + m.whatsapp.replace(/[^0-9]/g,'') : null;
+
+            content.innerHTML = `
+                <div class="mm-header">
+                    <div class="mm-club">
+                        <img src="https://college.mpsc.edu.bd/storage/clubs/logos/gM73rp2FRf0ZTUr3IjUC5fsbe2SLVqK5JF481hBB.jpg" alt="MPSC IT Club" onerror="this.style.display='none'">
+                        <div class="mm-club-name">MPSC IT Club<span>Mohammadpur Preparatory</span></div>
+                    </div>
+                    <div class="mm-ec-badge">
+                        <span class="lbl">Executive Committee</span>
+                        <span class="yr">${yr}–${nextYr}</span>
+                    </div>
+                </div>
+
+                <div class="mm-body">
+                    <div class="mm-photo-col">
+                        <div class="mm-photo-wm">IT</div>
+                        ${m.image_path && m.image_path !== '/static/assets/images/ec/default.jpg'
+                            ? `<img src="${m.image_path}" alt="${m.name}" class="mm-photo" onerror="this.parentElement.innerHTML='<div class=mm-photo-ph>${first[0] || '?'}</div>'">`
+                            : `<div class="mm-photo-ph">${first[0] || '?'}</div>`
+                        }
+                    </div>
+                    <div class="mm-info">
+                        <div>
+                            <div class="mm-name">${first} <em>${last}</em></div>
+                            <div class="mm-role">${m.designation || ''}</div>
+                            <div class="mm-section">${catLabel}</div>
+
+                            <div class="mm-contacts">
+                                <div class="mm-cr">
+                                    <span class="mm-lbl">Mobile No.</span>
+                                    <span class="mm-val ${phone ? '' : 'blank'}">${phone || '+8801xxxxxxxxx'}</span>
+                                </div>
+                                ${m.email ? `<div class="mm-cr"><span class="mm-lbl">E-mail</span><span class="mm-val">${m.email}</span></div>` : ''}
+                            </div>
+
+                            <div class="mm-socials">
+                                <span class="mm-lbl">Socials</span>
+                                <div class="mm-social-icons">
+                                    <a href="${m.facebook || '#'}" ${m.facebook ? 'target="_blank"' : ''} class="mm-sb ${m.facebook ? '' : 'dis'}" title="Facebook">
+                                        <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                    </a>
+                                    <a href="${m.instagram || '#'}" ${m.instagram ? 'target="_blank"' : ''} class="mm-sb ${m.instagram ? '' : 'dis'}" title="Instagram">
+                                        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                                    </a>
+                                    <a href="${waLink || '#'}" ${waLink ? 'target="_blank"' : ''} class="mm-sb ${waLink ? '' : 'dis'}" title="WhatsApp">
+                                        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                    </a>
+                                    <a href="${m.website || '#'}" ${m.website ? 'target="_blank"' : ''} class="mm-sb ${m.website ? '' : 'dis'}" title="Website / LinkedIn">
+                                        <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mm-footer">
+                    <span class="mm-footer-tag">MPSC IT Club · Est. 2019</span>
+                </div>
+            `;
+
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+
+
+        }
+
+        function closeMemberModal() {
+            document.getElementById('member-modal-overlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function closeModal(e) {
+            if (e.target === document.getElementById('member-modal-overlay')) closeMemberModal();
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMemberModal(); });
     </script>
 </body>
 </html>
+

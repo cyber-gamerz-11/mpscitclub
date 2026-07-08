@@ -75,6 +75,22 @@ def create_app():
     def dashboard():
         return render_template('dashboard.html')
 
+    @app.route('/member/<member_id>')
+    def member_card(member_id):
+        from backend.config.db import get_db
+        db = get_db()
+        if not db:
+            return render_template('member_card.html', member=None)
+        res = db.table('ec_members').select('*').eq('id', member_id).execute()
+        member = res.data[0] if res.data else None
+        if member:
+            cat = member.get('category', '')
+            if '_' in cat:
+                parts = cat.split('_', 1)
+                member['year'] = parts[0]
+                member['category'] = parts[1]
+        return render_template('member_card.html', member=member)
+
     return app
 
 if __name__ == '__main__':
