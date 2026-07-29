@@ -302,8 +302,20 @@
         /* ── MOBILE MODAL ── */
         @media (max-width: 600px) {
             .mm-body { grid-template-columns: 1fr; }
-            .mm-photo-col { border-right: none; border-bottom: 1px solid rgba(0,245,180,0.07); max-height: 220px; }
-            .mm-photo { max-height: 220px; min-height: unset; }
+            .mm-photo-col { 
+                border-right: none; 
+                border-bottom: 1px solid rgba(0,245,180,0.07); 
+                max-height: none; 
+            }
+            .mm-photo { 
+                width: 100%;
+                height: auto;
+                min-height: unset; 
+                max-height: none; 
+                object-fit: contain;
+                object-position: top center;
+                background: rgba(0,0,0,0.4);
+            }
             .mm-photo-ph { height: 180px; }
             .mm-info { padding: 16px 18px 14px; }
             .mm-name { font-size: 1.25rem; }
@@ -533,7 +545,26 @@
             overlay.classList.add('open');
             document.body.style.overflow = 'hidden';
 
+            // Add swipe gestures to close on mobile
+            const wrap = document.getElementById('mm-wrap');
+            let touchStartY = 0;
+            let touchEndY = 0;
 
+            wrap.addEventListener('touchstart', e => {
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            wrap.addEventListener('touchend', e => {
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipeGesture();
+            }, { passive: true });
+
+            function handleSwipeGesture() {
+                const swipeDistance = Math.abs(touchEndY - touchStartY);
+                if (swipeDistance > 80) { // Swipe threshold
+                    closeMemberModal();
+                }
+            }
         }
 
         function closeMemberModal() {
