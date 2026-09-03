@@ -91,6 +91,10 @@ def create_app():
                 member['category'] = parts[1]
         return render_template('member_card.html', member=member)
 
+    @app.route('/api/health')
+    def health_check():
+        return {"status": "online", "message": "MPSC IT Club server is active"}, 200
+
     return app
 
 if __name__ == '__main__':
