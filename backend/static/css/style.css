@@ -527,20 +527,31 @@ footer {
     letter-spacing: 1px;
 }
 
-.input-group input {
+.input-group input,
+.input-group select,
+.input-group textarea {
     width: 100%;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     border-radius: 8px;
     padding: 0.8rem 1rem;
     color: var(--white);
+    font-size: 0.95rem;
     transition: var(--transition-smooth);
 }
 
-.input-group input:focus {
+.input-group select option {
+    background: #081d1c;
+    color: var(--white);
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
     outline: none;
     border-color: var(--emerald-green);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 12px var(--glow-green);
 }
 
 /* Chrome/Safari Autofill Style Overrides */
@@ -706,6 +717,8 @@ footer {
     position: relative;
     padding: 0 !important;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .event-banner {
@@ -726,6 +739,7 @@ footer {
     color: var(--soft-gray); 
     font-size: 0.9rem;
     margin-bottom: 1rem;
+    flex-grow: 1;
 }
 
 .event-details {
@@ -733,7 +747,19 @@ footer {
     justify-content: space-between;
     font-size: 0.8rem;
     color: var(--emerald-green);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
+}
+
+.event-card .btn-primary,
+.event-card .btn-secondary,
+.event-card button {
+    margin: 0 1.5rem 1.5rem 1.5rem !important;
+    width: calc(100% - 3rem) !important;
+    box-sizing: border-box;
+    margin-top: auto !important;
+    padding: 0.75rem 1.2rem;
+    border-radius: 25px;
+    text-align: center;
 }
 
 .event-badge {
@@ -1220,46 +1246,81 @@ footer {
     }
 }
 
-/* Navbar Mobile Responsiveness – refined */
+/* Navbar & Page Mobile Responsiveness — refined */
 @media (max-width: 768px) {
-    .nav-content {
-        flex-wrap: wrap;
-        justify-content: space-between;
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
     }
-    .logo img {
-        height: 55px !important; /* slightly larger than before */
+    .container {
+        padding: 0 1rem !important;
+    }
+    .nav-content {
+        flex-wrap: nowrap !important;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    .nav-logo-img {
+        height: 50px !important;
     }
     .nav-actions {
-        gap: 0.8rem;
-        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem !important;
+        margin-top: 0 !important;
     }
-    .nav-actions .btn-primary {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.85rem;
+    .nav-login-btn {
+        padding: 0.45rem 0.9rem !important;
+        font-size: 0.8rem !important;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
-    .hamburger {
-        margin-left: auto;
+    .page-header {
+        padding: 110px 0 25px !important;
+        text-align: center;
+    }
+    .page-header .hero-title {
+        font-size: 2.2rem !important;
+    }
+    .events-grid, .dash-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.2rem;
     }
 }
 
 @media (max-width: 480px) {
-    .logo img {
-        height: 45px !important;
+    .container {
+        padding: 0 0.85rem !important;
     }
-    .nav-actions .btn-primary {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
+    .nav-logo-img {
+        height: 42px !important;
     }
     .nav-actions {
-        gap: 0.5rem;
+        gap: 0.4rem !important;
     }
-    .nav-content {
-        padding: 0 0.5rem;
+    .nav-login-btn {
+        padding: 0.35rem 0.65rem !important;
+        font-size: 0.72rem !important;
+        max-width: 125px;
+        letter-spacing: 0.2px;
+    }
+    .page-header {
+        padding: 95px 0 20px !important;
+    }
+    .page-header .hero-title {
+        font-size: 1.75rem !important;
+        letter-spacing: 1px;
+    }
+    .page-header .hero-subtitle {
+        font-size: 0.9rem !important;
+        margin-bottom: 1rem;
     }
 }
 
-/* === Nav logo & login button — CSS-controlled (no inline override) === */
+/* === Nav logo & login button defaults === */
 .nav-logo-img {
     height: 65px;
 }
@@ -1267,27 +1328,6 @@ footer {
 .nav-login-btn {
     display: inline-block !important;
     white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-    .nav-logo-img {
-        height: 55px;
-    }
-    .nav-login-btn {
-        padding: 0.55rem 1.1rem;
-        font-size: 0.82rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .nav-logo-img {
-        height: 48px;
-    }
-    .nav-login-btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.75rem;
-        letter-spacing: 0.3px;
-    }
 }
 
 /* =============================================

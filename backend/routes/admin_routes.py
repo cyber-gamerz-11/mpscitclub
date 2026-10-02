@@ -485,3 +485,32 @@ def export_verified_payments():
         headers={"Content-disposition": "attachment; filename=Verified_Payments_Report.csv"}
     )
 
+# ── Query / Messages Management ───────────────────
+@admin_bp.route('/api/queries', methods=['GET'])
+@login_required
+@admin_required
+def get_queries():
+    db = get_db()
+    if not db:
+        return jsonify([])
+    try:
+        response = db.table("queries").select("*").order("created_at", desc=True).execute()
+        return jsonify(response.data or [])
+    except Exception as e:
+        print(f"[Admin Queries Fetch Error] {e}")
+        return jsonify([])
+
+@admin_bp.route('/api/queries/delete/<query_id>', methods=['DELETE', 'POST'])
+@login_required
+@admin_required
+def delete_query(query_id):
+    db = get_db()
+    if not db:
+        return jsonify({"error": "Database unavailable"}), 500
+    try:
+        db.table("queries").delete().eq("id", query_id).execute()
+        return jsonify({"success": True, "message": "Query deleted successfully."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+

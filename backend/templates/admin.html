@@ -8,6 +8,7 @@
     <link rel="icon" type="image/jpeg"
         href="https://scontent.cdninstagram.com/v/t51.2885-19/455707082_489548463706836_6164801201053764178_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=48d9Yn9vURoQ7kNvwFd-3tA&_nc_oc=Adr_H8iB-xjLSx2NJ4VlwXpcXKkgsY7MxncJnkO0FknjjVcu5uOXnPlZDbJ2y8sJ6u8&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_ss=7baaf&oh=00_AQCy3HT7xaZ433Z5jeSqEjKlHVX9xD9HDBmzFnAbNMOOTw&oe=6A4ACBA2">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <style>
@@ -190,6 +191,7 @@
                 <li><a href="#ec">EC Panel</a></li>
                 <li><a href="#payments">Pending Payments</a></li>
                 <li><a href="#verified-payments">Verified Records</a></li>
+                <li><a href="#queries"><i class="fa-solid fa-envelope-open-text"></i> User Queries <span id="queries-count-badge" class="badge" style="background:var(--emerald-green); color:var(--matte-black); padding:2px 7px; border-radius:12px; font-size:0.75rem; margin-left:6px; display:none;">0</span></a></li>
                 <li><a href="#password-reset">🔑 Password Reset</a></li>
                 <li style="margin-top: 2rem;"><a href="/" class="btn-secondary" style="text-align: center;">Exit
                         Site</a></li>
@@ -517,6 +519,40 @@
                                 expires in 1 hour."
                             </p>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Queries Section -->
+            <section id="queries-section" class="dash-section" style="display:none;">
+                <div class="flex-between">
+                    <h2 class="section-title">User Queries & Messages</h2>
+                    <button onclick="fetchQueries()" class="btn-primary" style="font-size: 0.85rem; padding: 0.4rem 1rem;">
+                        <i class="fa-solid fa-rotate-right"></i> Refresh List
+                    </button>
+                </div>
+                <p style="color: var(--soft-gray); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Messages and problem reports submitted by visitors and logged-in members.
+                </p>
+
+                <div class="glass-card mt-2">
+                    <div class="table-container">
+                        <table class="list-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>User Status</th>
+                                    <th>Name & Email</th>
+                                    <th>Institution / Phone</th>
+                                    <th>Topic</th>
+                                    <th>Message Details</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queries-list">
+                                <tr><td colspan="7" style="text-align:center;">Loading user queries...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>

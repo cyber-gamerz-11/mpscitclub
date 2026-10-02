@@ -240,6 +240,21 @@ create table payments (
 );
 ```
 
+#### Table 7: queries
+```sql
+create table queries (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  email text not null,
+  phone text,
+  institute text,
+  category text default 'General Inquiry',
+  message text not null,
+  user_id uuid references users(id) on delete set null,
+  created_at timestamp default now()
+);
+```
+
 ### 2.4 — Create the Storage Bucket
 
 1. In Supabase left sidebar, click **Storage**

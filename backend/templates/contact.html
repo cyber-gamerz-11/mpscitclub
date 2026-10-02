@@ -4,11 +4,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us | MPSC IT CLUB</title>
-    <link rel="icon" type="image/jpeg" href="https://scontent.cdninstagram.com/v/t51.2885-19/455707082_489548463706836_6164801201053764178_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=48d9Yn9vURoQ7kNvwFd-3tA&_nc_oc=Adr_H8iB-xjLSx2NJ4VlwXpcXKkgsY7MxncJnkO0FknjjVcu5uOXnPlZDbJ2y8sJ6u8&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_ss=7baaf&oh=00_AQCy3HT7xaZ433Z5jeSqEjKlHVX9xD9HDBmzFnAbNMOOTw&oe=6A4ACBA2">
+    <title>Contact & Support | MPSC IT CLUB</title>
+    <link rel="icon" type="image/jpeg"
+        href="https://scontent.cdninstagram.com/v/t51.2885-19/455707082_489548463706836_6164801201053764178_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=48d9Yn9vURoQ7kNvwFd-3tA&_nc_oc=Adr_H8iB-xjLSx2NJ4VlwXpcXKkgsY7MxncJnkO0FknjjVcu5uOXnPlZDbJ2y8sJ6u8&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_ss=7baaf&oh=00_AQCy3HT7xaZ433Z5jeSqEjKlHVX9xD9HDBmzFnAbNMOOTw&oe=6A4ACBA2">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <style>
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 868px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .user-logged-banner {
+            background: rgba(0, 245, 180, 0.08);
+            border: 1px solid rgba(0, 245, 180, 0.25);
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--white);
+        }
+
+        .user-logged-banner .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--emerald-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--emerald-green);
+        }
+
+        .contact-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .contact-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .contact-info-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(0, 245, 180, 0.1);
+            border: 1px solid rgba(0, 245, 180, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--emerald-green);
+            flex-shrink: 0;
+        }
+
+        .contact-info-text h4 {
+            font-size: 0.85rem;
+            color: var(--soft-gray);
+            letter-spacing: 1px;
+            margin-bottom: 0.2rem;
+        }
+
+        .contact-info-text p {
+            font-size: 0.95rem;
+            color: var(--white);
+            font-weight: 500;
+        }
+
+        .social-pill-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .social-pill {
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--white);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: var(--transition-smooth);
+        }
+
+        .social-pill:hover {
+            border-color: var(--emerald-green);
+            color: var(--emerald-green);
+            background: rgba(0, 245, 180, 0.1);
+            box-shadow: 0 0 15px var(--glow-green);
+            transform: translateY(-2px);
+        }
+
+        .alert-box {
+            padding: 1rem 1.2rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .alert-box.success {
+            background: rgba(0, 245, 180, 0.15);
+            border: 1px solid var(--emerald-green);
+            color: var(--white);
+        }
+
+        .alert-box.error {
+            background: rgba(255, 77, 77, 0.15);
+            border: 1px solid rgba(255, 77, 77, 0.4);
+            color: #ff8080;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,28 +145,145 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="hero-title">Contact Us</h1>
-            <p class="hero-subtitle">Get in touch with the nexus of innovation.</p>
+            <h1 class="hero-title">Contact & Help Center</h1>
+            <p class="hero-subtitle">Have a question, feedback, or need assistance? Send us a direct query.</p>
         </div>
     </header>
 
-    <section class="contact-section">
+    <section class="contact-section" style="padding-top: 1rem; padding-bottom: 4rem;">
         <div class="container">
-            <div class="dash-grid">
+            <div class="contact-grid">
+
+                <!-- Query / Message Submission Form -->
                 <div class="glass-card">
-                    <h3>Our Office</h3>
-                    <p>MOHAMMADPUR PREPARATORY SCHOOL AND COLLEGE</p>
-                    <p>Dhaka, Bangladesh</p>
-                    <p>Email: info@mpscitclub.com</p>
+                    <h3 style="font-size: 1.4rem; margin-bottom: 0.5rem;" class="emerald">Submit a Query or Problem</h3>
+                    <p style="color: var(--soft-gray); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                        Fill out the details below and our team will get back to you promptly.
+                    </p>
+
+                    <div id="query-alert" class="alert-box"></div>
+
+                    <form id="contact-query-form">
+                        {% if current_user.is_authenticated %}
+                        <div class="user-logged-banner">
+                            <div class="status-dot"></div>
+                            <div>
+                                Logged in as <strong>{{ current_user.full_name }}</strong>
+                                <span style="opacity: 0.7;">({{ current_user.email }})</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" required placeholder="Your full name">
+                            </div>
+                            <div class="input-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required placeholder="name@domain.com">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" placeholder="+880 1700-000000">
+                            </div>
+                            <div class="input-group">
+                                <label for="institute">Institution / School</label>
+                                <input type="text" id="institute" name="institute" placeholder="e.g. MPSC / College">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="input-group">
+                            <label for="category">Topic / Category *</label>
+                            <select id="category" name="category" required>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Technical Support">Technical Support / Website Issue</option>
+                                <option value="Event Registration">Event / Program Question</option>
+                                <option value="Membership Query">Club Membership Question</option>
+                                <option value="Feedback / Suggestion">Feedback or Suggestion</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="message">Your Query / Problem Details *</label>
+                            <textarea id="message" name="message" rows="5" required
+                                placeholder="Type your message, issue, or question here in detail..."></textarea>
+                        </div>
+
+                        <button type="submit" id="submit-query-btn" class="btn-primary w-full"
+                            style="padding: 0.9rem 2rem; border-radius: 30px;">
+                            <i class="fa-solid fa-paper-plane" style="margin-right: 6px;"></i> Send Query Message
+                        </button>
+                    </form>
                 </div>
-                <div class="glass-card">
-                    <h3>Follow Us</h3>
-                    <div class="social-links mt-1">
-                        <a href="#">Facebook</a>
-                        <a href="https://www.instagram.com/mpscitc/">Instagram</a>
-                        <a href="#">YouTube</a>
+
+                <!-- Info Sidebar & Social Links -->
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+                    <!-- Office Info Card -->
+                    <div class="glass-card">
+                        <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Our Headquarters</h3>
+                        <div class="contact-info-list">
+                            <div class="contact-info-item">
+                                <div class="contact-info-icon"><i class="fa-solid fa-location-dot"></i></div>
+                                <div class="contact-info-text">
+                                    <h4>LOCATION</h4>
+                                    <p>Mohammadpur Preparatory School and College</p>
+                                    <p style="font-size: 0.85rem; color: var(--soft-gray);">Dhaka, Bangladesh</p>
+                                </div>
+                            </div>
+                            <div class="contact-info-item">
+                                <div class="contact-info-icon"><i class="fa-solid fa-envelope"></i></div>
+                                <div class="contact-info-text">
+                                    <h4>OFFICIAL EMAIL</h4>
+                                    <p><a href="mailto:info@mpscitclub.com"
+                                            style="color: var(--emerald-green);">info@mpscitclub.com</a></p>
+                                </div>
+                            </div>
+                            <div class="contact-info-item">
+                                <div class="contact-info-icon"><i class="fa-solid fa-clock"></i></div>
+                                <div class="contact-info-text">
+                                    <h4>ACTIVE HOURS</h4>
+                                    <p>Sun – Thu: 8:00 AM – 4:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Connect Socials Card -->
+                    <div class="glass-card">
+                        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Connect With Us</h3>
+                        <p style="color: var(--soft-gray); font-size: 0.85rem;">Follow our official channels for
+                            real-time updates and news.</p>
+
+                        <div class="social-pill-group">
+                            <a href="https://www.facebook.com" target="_blank" class="social-pill">
+                                <i class="fa-brands fa-facebook-f" style="color: #1877f2;"></i> Facebook
+                            </a>
+                            <a href="https://www.instagram.com/mpscitc/" target="_blank" class="social-pill">
+                                <i class="fa-brands fa-instagram" style="color: #e4405f;"></i> Instagram
+                            </a>
+
+                        </div>
+                    </div>
+
+                    <!-- Quick Support Card -->
+                    <div class="glass-card"
+                        style="border-color: rgba(0, 245, 180, 0.3); background: rgba(0, 245, 180, 0.02);">
+                        <h3 style="font-size: 1.1rem; color: var(--emerald-green); margin-bottom: 0.5rem;">
+                            <i class="fa-solid fa-bolt" style="margin-right: 4px;"></i> Need Immediate Help?
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--soft-gray); margin-bottom: 0.8rem;">
+                            For urgent help, check our full EC leadership list and contact them directly.
+                        </p>
+                        <a href="/ec-panel" class="btn-secondary"
+                            style="font-size: 0.8rem; padding: 0.4rem 1rem; display: inline-block;">View EC Panel →</a>
+                    </div>
+
                 </div>
+
             </div>
         </div>
     </section>
@@ -50,6 +293,67 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/circularMenu.js') }}"></script>
+    <script>
+        document.getElementById('contact-query-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-query-btn');
+            const alertBox = document.getElementById('query-alert');
+
+            const originalBtnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Query...';
+            alertBox.style.display = 'none';
+
+            const payload = {
+                category: document.getElementById('category').value,
+                message: document.getElementById('message').value
+            };
+
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            const instituteInput = document.getElementById('institute');
+
+            if (nameInput) payload.name = nameInput.value;
+            if (emailInput) payload.email = emailInput.value;
+            if (phoneInput) payload.phone = phoneInput.value;
+            if (instituteInput) payload.institute = instituteInput.value;
+
+            try {
+                const res = await fetch('/user/submit_query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    alertBox.className = 'alert-box success';
+                    alertBox.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + data.message;
+                    alertBox.style.display = 'block';
+
+                    document.getElementById('message').value = '';
+                    if (nameInput) nameInput.value = '';
+                    if (emailInput) emailInput.value = '';
+                    if (phoneInput) phoneInput.value = '';
+                    if (instituteInput) instituteInput.value = '';
+                } else {
+                    alertBox.className = 'alert-box error';
+                    alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.error || 'Failed to submit query.');
+                    alertBox.style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+                alertBox.className = 'alert-box error';
+                alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Network error. Please try again.';
+                alertBox.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
+            }
+        });
+    </script>
 </body>
 
 </html>

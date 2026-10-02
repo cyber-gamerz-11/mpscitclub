@@ -4,6 +4,7 @@ let allEcMembers = [];
 document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
     loadAllData();
+    fetchQueries();
 
     // Navigation Logic
     const menuItems = document.querySelectorAll('.sidebar-menu li');
@@ -694,5 +695,81 @@ function downloadECQR(name) {
         link.download = `QR_${name.replace(/\s+/g, '_')}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
+    }
+}
+
+// ── User Queries Management ──────────────────────────────
+async function fetchQueries() {
+    const list = document.getElementById('queries-list');
+    const badge = document.getElementById('queries-count-badge');
+    if (!list) return;
+
+    try {
+        const res = await fetch('/admin/api/queries');
+        const queries = await res.json();
+
+        if (badge) {
+            if (queries && queries.length > 0) {
+                badge.innerText = queries.length;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        if (!queries || queries.length === 0) {
+            list.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--soft-gray); padding: 1.5rem;">No user queries received yet.</td></tr>';
+            return;
+        }
+
+        list.innerHTML = queries.map(q => {
+            const dateStr = q.created_at ? new Date(q.created_at).toLocaleString() : 'N/A';
+            const isMember = !!q.user_id;
+            const statusBadge = isMember 
+                ? '<span style="background:rgba(0,245,180,0.15); color:var(--emerald-green); padding:4px 10px; border-radius:12px; font-size:0.75rem; border:1px solid rgba(0,245,180,0.3); white-space:nowrap;"><i class="fa-solid fa-user-check"></i> Member</span>'
+                : '<span style="background:rgba(255,255,255,0.08); color:var(--soft-gray); padding:4px 10px; border-radius:12px; font-size:0.75rem; border:1px solid rgba(255,255,255,0.15); white-space:nowrap;"><i class="fa-solid fa-globe"></i> Guest</span>';
+            
+            return `
+                <tr>
+                    <td style="font-size:0.78rem; color:var(--soft-gray); white-space:nowrap;">${dateStr}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <strong style="color:white; font-size:0.9rem;">${q.name || 'N/A'}</strong><br>
+                        <small style="color:var(--emerald-green); font-size:0.8rem;">${q.email || 'N/A'}</small>
+                    </td>
+                    <td>
+                        <span style="font-size:0.85rem; color:white;">${q.institute || 'N/A'}</span><br>
+                        <small style="color:var(--soft-gray); font-size:0.78rem;">${q.phone || 'No phone'}</small>
+                    </td>
+                    <td><span style="background:rgba(255,255,255,0.06); padding:4px 10px; border-radius:6px; font-size:0.78rem; color:var(--white);">${q.category || 'General'}</span></td>
+                    <td style="max-width:320px; font-size:0.85rem; line-height:1.4; color:white;">${q.message || ''}</td>
+                    <td>
+                        <button onclick="deleteQuery('${q.id}')" class="btn-secondary" style="background:rgba(255,77,77,0.15); border-color:#ff4d4d; color:#ff8080; padding:0.35rem 0.7rem; font-size:0.75rem; border-radius:6px;">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error("Fetch Queries Error:", err);
+        if (list) list.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#ff8080; padding: 1.5rem;">Failed to load user queries.</td></tr>';
+    }
+}
+
+async function deleteQuery(queryId) {
+    if (!confirm('Are you sure you want to delete this query record?')) return;
+    try {
+        const res = await fetch(`/admin/api/queries/delete/${queryId}`, { method: 'POST' });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            window.showToast('Query deleted successfully.', 'success');
+            fetchQueries();
+        } else {
+            window.showToast(data.error || 'Failed to delete query.', 'error');
+        }
+    } catch (err) {
+        console.error("Delete Query Error:", err);
+        window.showToast('Network error while deleting query.', 'error');
     }
 }

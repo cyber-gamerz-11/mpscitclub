@@ -100,3 +100,53 @@ def get_public_stats():
         "projects": events_count, # Matching current frontend mapping
         "ec": ec_count
     })
+
+@user_bp.route('/submit_query', methods=['POST'])
+def submit_query():
+    try:
+        data = request.get_json() or {}
+        name = data.get('name', '').strip()
+        email = data.get('email', '').strip()
+        phone = data.get('phone', '').strip()
+        institute = data.get('institute', '').strip()
+        category = data.get('category', 'General Inquiry').strip()
+        message = data.get('message', '').strip()
+
+        if current_user.is_authenticated:
+            if not name:
+                name = getattr(current_user, 'full_name', 'Logged-in User')
+            if not email:
+                email = getattr(current_user, 'email', '')
+            if not phone:
+                phone = getattr(current_user, 'phone', '')
+            if not institute:
+                institute = getattr(current_user, 'section', 'MPSC IT Club Member')
+
+        if not message:
+            return jsonify({"success": False, "error": "Please enter your query message."}), 400
+
+        if not name or not email:
+            return jsonify({"success": False, "error": "Name and Email are required."}), 400
+
+        db = get_db()
+        if db:
+            try:
+                db.table("queries").insert({
+                    "name": name,
+                    "email": email,
+                    "phone": phone,
+                    "institute": institute,
+                    "category": category,
+                    "message": message,
+                    "user_id": current_user.id if current_user.is_authenticated else None
+                }).execute()
+            except Exception as db_err:
+                print(f"[Query Submission Note] DB Insert: {db_err}")
+
+        return jsonify({
+            "success": True,
+            "message": f"Thank you {name}! Your query has been submitted successfully. Our team will get back to you shortly."
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 400
+
