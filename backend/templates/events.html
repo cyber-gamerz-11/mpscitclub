@@ -428,6 +428,63 @@
             border-color: var(--emerald-green);
         }
 
+        /* Expandable Description & Rules Preview */
+        .popup-desc-container {
+            margin: 0.35rem 0 0.6rem 0;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 6px 9px;
+            font-size: 0.76rem;
+            line-height: 1.45;
+            color: #d1d5db;
+        }
+
+        .popup-desc-preview {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+
+        .popup-desc-preview.is-expanded {
+            display: block !important;
+            -webkit-line-clamp: unset !important;
+            max-height: 180px;
+            overflow-y: auto !important;
+            padding-right: 4px;
+        }
+
+        .popup-desc-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--emerald-green);
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 3px 0 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.2s;
+        }
+
+        .popup-desc-toggle-btn:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .popup-desc-toggle-btn i {
+            transition: transform 0.25s ease;
+        }
+
+        .popup-desc-toggle-btn.is-expanded i {
+            transform: rotate(180deg);
+        }
+
         /* Fixed & Solid Footer Anchored at Bottom */
         .modal-card-footer,
         .modal-sticky-footer {
@@ -1407,19 +1464,43 @@
                 const feeText = ev.fee > 0 ? `৳ ${ev.fee} BDT` : 'FREE ENTRY';
                 const hasImage = ev.banner && ev.banner.trim().length > 0;
                 const imgHtml = hasImage ? `<img src="${ev.banner}" class="popup-card-banner" alt="${ev.title}">` : '';
+                const hasDesc = ev.description && ev.description.trim().length > 0;
 
                 return `
                 <div class="popup-event-card ${isSelected ? 'is-selected' : ''}" id="popup-card-${ev.id}" onclick="togglePopupEventSelection('${ev.id}')">
                     ${imgHtml}
                     <div class="popup-card-content">
-                        <span class="popup-card-fee">${feeText}</span>
-                        <h4 class="popup-card-title">${ev.title}</h4>
-                        <div style="font-size:0.75rem; color:var(--soft-gray); margin-bottom:0.8rem;">
-                            <i class="fa-regular fa-calendar" style="color:var(--emerald-green);"></i> ${ev.date || 'TBA'}
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 0.35rem;">
+                            <span class="popup-card-fee">${feeText}</span>
+                            <span style="font-size:0.7rem; color:var(--soft-gray); background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 6px; white-space: nowrap;">
+                                <i class="fa-regular fa-calendar" style="color:var(--emerald-green);"></i> ${ev.date || 'TBA'}
+                            </span>
                         </div>
-                        <div class="popup-checkbox-pill">
-                            <i class="fa-${isSelected ? 'solid fa-check-circle' : 'regular fa-circle'}"></i>
-                            ${isSelected ? 'Selected' : 'Select'}
+                        <h4 class="popup-card-title">${ev.title}</h4>
+
+                        ${ev.venue ? `
+                        <div style="font-size:0.72rem; color:#9ca3af; display:flex; align-items:center; gap:5px; margin-bottom:0.4rem; line-height: 1.3;">
+                            <i class="fa-solid fa-location-dot" style="color:var(--emerald-green); font-size:0.75rem; flex-shrink: 0;"></i>
+                            <span>${ev.venue}</span>
+                        </div>
+                        ` : ''}
+
+                        ${hasDesc ? `
+                        <div class="popup-desc-container" onclick="event.stopPropagation();">
+                            <div class="popup-desc-preview" id="desc-preview-${ev.id}">
+                                ${escapeEventHtml(ev.description)}
+                            </div>
+                            <button type="button" class="popup-desc-toggle-btn" onclick="toggleEventDescription('${ev.id}', this, event)">
+                                <span>Details / Rules</span> <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        ` : ''}
+
+                        <div style="margin-top: auto; padding-top: 0.6rem; display: flex; align-items: center; justify-content: flex-end;">
+                            <div class="popup-checkbox-pill">
+                                <i class="fa-${isSelected ? 'solid fa-check-circle' : 'regular fa-circle'}"></i>
+                                ${isSelected ? 'Selected' : 'Select'}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1427,6 +1508,26 @@
             }).join('');
 
             updatePopupCartUI();
+        }
+
+        function escapeEventHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function toggleEventDescription(evId, btn, e) {
+            if (e) e.stopPropagation();
+            const preview = document.getElementById(`desc-preview-${evId}`);
+            if (!preview) return;
+
+            const isExpanded = preview.classList.toggle('is-expanded');
+            btn.classList.toggle('is-expanded', isExpanded);
+            const span = btn.querySelector('span');
+            if (span) {
+                span.innerText = isExpanded ? 'Hide Details' : 'Details / Rules';
+            }
         }
 
         function togglePopupEventSelection(eventId) {
