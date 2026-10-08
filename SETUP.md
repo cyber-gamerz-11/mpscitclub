@@ -197,8 +197,12 @@ create table events (
   status text default 'Upcoming',
   banner text,
   fee integer default 0,
+  category text default 'all',
   created_at timestamp default now()
 );
+
+-- If your events table already exists, run this 1-line update in Supabase SQL Editor:
+alter table events add column if not exists category text default 'all';
 ```
 
 #### Table 4: programs

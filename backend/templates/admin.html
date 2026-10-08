@@ -224,17 +224,76 @@
 
             <!-- Events -->
             <section id="events-section" class="dash-section" style="display:none;">
-                <div class="flex-between">
-                    <h2 class="section-title">Club Events</h2>
-                    <button onclick="toggleModal('event-modal')" class="btn-primary">Add Event</button>
+                
+                <!-- Main Program / Fest Banner Settings Card -->
+                <div class="glass-card" style="padding: 1.8rem; margin-bottom: 2rem; border-color: rgba(0, 255, 136, 0.4); background: rgba(0, 255, 136, 0.02);">
+                    <div class="flex-between" style="margin-bottom: 1rem;">
+                        <div>
+                            <span class="role-badge" style="background: var(--emerald-green); color: var(--matte-black); font-weight: 800;">ACTIVE FEST BANNER</span>
+                            <h2 style="font-size: 1.3rem; margin-top: 0.4rem; color: var(--white);">Current Main Fest / Program Poster & Info</h2>
+                            <p style="color: var(--soft-gray); font-size: 0.85rem; margin: 0;">This poster and description will be displayed as the grand hero header on the public Events page.</p>
+                        </div>
+                    </div>
+
+                    <form id="main-fest-form" enctype="multipart/form-data" style="margin-top: 1rem;">
+                        <div style="display: grid; grid-template-columns: 240px 1fr; gap: 1.5rem; align-items: start;">
+                            <div>
+                                <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.4rem;">Fest Poster / Banner</label>
+                                <div style="width: 100%; height: 140px; border-radius: 10px; overflow: hidden; border: 1px solid var(--glass-border); background: #000; margin-bottom: 0.6rem;">
+                                    <img id="admin-fest-preview" src="" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <input type="file" name="image" id="fest-image-input" accept="image/*" class="w-full" style="font-size: 0.75rem;">
+                            </div>
+
+                            <div>
+                                <div class="form-row">
+                                    <div class="input-group">
+                                        <label style="font-size: 0.8rem; color: var(--soft-gray);">Main Fest Title *</label>
+                                        <input type="text" name="title" id="fest-title-input" placeholder="e.g. MPSC National IT Fest 2026" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label style="font-size: 0.8rem; color: var(--soft-gray);">Fest Dates / Schedule</label>
+                                        <input type="text" name="date" id="fest-date-input" placeholder="e.g. 24 - 26 October 2026">
+                                    </div>
+                                </div>
+
+                                <div class="input-group mb-1">
+                                    <label style="font-size: 0.8rem; color: var(--soft-gray);">Campus Venue</label>
+                                    <input type="text" name="venue" id="fest-venue-input" placeholder="e.g. MPSC Main Campus Auditorium & Labs">
+                                </div>
+
+                                <div class="input-group mb-1">
+                                    <label style="font-size: 0.8rem; color: var(--soft-gray);">Overview / Guidelines</label>
+                                    <textarea name="description" id="fest-desc-input" rows="2" placeholder="General info about the overall fest and segments..." style="min-height: 60px;"></textarea>
+                                </div>
+
+                                <button type="submit" id="save-fest-btn" class="btn-primary" style="padding: 0.6rem 1.4rem; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> Save Fest Poster & Info
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
+
+                <!-- Sub-Events Section -->
+                <div class="flex-between">
+                    <div>
+                        <h2 class="section-title">Segment Competitions & Sub-Events</h2>
+                        <p style="color: var(--soft-gray); font-size: 0.85rem; margin: 0;">Sub-events running under the current main program. Filtered by student class on the frontend.</p>
+                    </div>
+                    <button onclick="toggleModal('event-modal')" class="btn-primary">
+                        <i class="fa-solid fa-plus"></i> Add Sub-Event
+                    </button>
+                </div>
+
                 <div class="glass-card mt-2">
                     <table class="list-table">
                         <thead>
                             <tr>
-                                <th>Title</th>
-                                <th>Date</th>
-                                <th>Venue</th>
+                                <th>Sub-Event & Poster</th>
+                                <th>Target Group</th>
+                                <th>Date & Venue</th>
+                                <th>Fee</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -563,22 +622,30 @@
 
     <!-- Add Offline Payment Modal -->
     <div id="offline-payment-modal" class="modal glass-card"
-        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 500px; padding: 2rem;">
-        <h3 class="emerald">Add Offline Registration</h3>
-        <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.5rem;">Create a verified record for
-            someone who registered manually. This will generate an offline account for them to appear in exports.</p>
+        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 520px; padding: 2rem; max-height: 90vh; overflow-y: auto;">
+        <h3 class="emerald"><i class="fa-solid fa-user-plus"></i> Add Offline Registration</h3>
+        <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.2rem;">Create a verified entry for manual registrations. This will record their participant details for ticket dispatch and Excel exports.</p>
         <form id="offline-payment-form" class="mt-1">
-            <input type="text" name="full_name" placeholder="Full Name *" required class="w-full mb-1">
-            <input type="text" name="phone" placeholder="Phone Number *" required class="w-full mb-1">
-            <input type="email" name="email" placeholder="Email Address (Optional)" class="w-full mb-1">
+            <input type="text" name="full_name" placeholder="Full Name *" required class="w-full mb-1" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 10px 14px; border-radius: 8px; color: white;">
+            <input type="text" name="phone" placeholder="WhatsApp / Phone Number *" required class="w-full mb-1" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 10px 14px; border-radius: 8px; color: white;">
+            <input type="email" name="email" placeholder="Email Address (Optional)" class="w-full mb-1" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 10px 14px; border-radius: 8px; color: white;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0.8rem;">
+                <input type="text" name="class" placeholder="Academic Class / Level *" required class="w-full" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 10px 14px; border-radius: 8px; color: white;">
+                <input type="text" name="institution" placeholder="Institution / School *" required class="w-full" value="Mohammadpur Preparatory School & College" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 10px 14px; border-radius: 8px; color: white;">
+            </div>
 
-            <select id="offline-event-select" name="event_id" required class="w-full mb-1">
+            <select id="offline-event-select" name="event_id" required class="w-full mb-1" style="background: rgba(0,0,0,0.7); border: 1px solid var(--glass-border); padding: 11px 14px; border-radius: 8px; color: white;">
                 <option value="">Select Event / Program (Loading...)</option>
             </select>
 
-            <button type="submit" class="btn-primary w-full">Save Offline Record</button>
+            <button type="submit" class="btn-primary w-full" style="padding: 11px; border-radius: 25px; font-weight: 700; font-size: 0.9rem;">
+                <i class="fa-solid fa-check"></i> Save Offline Record
+            </button>
             <button type="button" onclick="toggleModal('offline-payment-modal')"
-                class="btn-secondary w-full mt-1">Cancel</button>
+                class="w-full mt-1" style="background: #1e1e24; border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff !important; border-radius: 25px; font-size: 0.85rem; font-weight: 700; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+                Cancel
+            </button>
         </form>
     </div>
     <div id="gallery-modal" class="modal glass-card"
@@ -599,16 +666,71 @@
     </div>
 
     <div id="event-modal" class="modal glass-card"
-        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 500px; padding: 2rem;">
-        <h3 class="emerald">Create New Event</h3>
+        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 520px; padding: 2rem; max-height: 90vh; overflow-y: auto;">
+        <h3 class="emerald">Create New Event / Segment</h3>
+        <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.2rem;">Upload a main program event or class-specific segment competition.</p>
         <form id="add-event-form" class="mt-1" enctype="multipart/form-data">
-            <input type="text" name="title" placeholder="Event Title" required class="w-full mb-1">
-            <input type="date" name="date" required class="w-full mb-1">
-            <input type="text" name="venue" placeholder="Venue" required class="w-full mb-1">
-            <input type="number" name="fee" placeholder="Event Fee (0 for free)" class="w-full mb-1">
-            <input type="file" name="image" accept="image/*" class="w-full mb-1">
-            <textarea name="description" placeholder="Description" class="w-full mb-1"></textarea>
-            <button type="submit" class="btn-primary w-full">Publish</button>
+            <div class="input-group mb-1">
+                <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Event Title *</label>
+                <input type="text" name="title" placeholder="e.g. IT Olympiad 2026 / Project Showcasing" required class="w-full">
+            </div>
+
+            <div class="input-group mb-1">
+                <label style="font-size: 0.8rem; color: var(--soft-gray); display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <span>Eligible Class Groups *</span>
+                    <small style="color: var(--emerald-green); font-size: 0.72rem;">(Select all eligible groups)</small>
+                </label>
+                <div style="background: rgba(0,0,0,0.45); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.83rem; color: #60a5fa; cursor: pointer; grid-column: 1 / -1; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; font-weight: 600;">
+                        <input type="checkbox" name="categories" value="all" id="admin-cat-all" onchange="window.toggleAdminAllCategories(this)" checked style="accent-color: #3b82f6; transform: scale(1.15); cursor: pointer;">
+                        🌐 Open for All (Everyone / All Classes)
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #00ff88; cursor: pointer;">
+                        <input type="checkbox" name="categories" value="primary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #00ff88; transform: scale(1.15); cursor: pointer;">
+                        🟢 Primary (Class 3–5)
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #00d2ff; cursor: pointer;">
+                        <input type="checkbox" name="categories" value="junior" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #00d2ff; transform: scale(1.15); cursor: pointer;">
+                        🔵 Junior (Class 6–8)
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #b700ff; cursor: pointer;">
+                        <input type="checkbox" name="categories" value="secondary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #b700ff; transform: scale(1.15); cursor: pointer;">
+                        🟣 Secondary (Class 9–10)
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #ff9900; cursor: pointer;">
+                        <input type="checkbox" name="categories" value="higher_secondary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #ff9900; transform: scale(1.15); cursor: pointer;">
+                        🟠 Higher Sec (Class 11–12)
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" class="mb-1">
+                <div class="input-group">
+                    <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Event Date *</label>
+                    <input type="date" name="date" required class="w-full">
+                </div>
+                <div class="input-group">
+                    <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Registration Fee (BDT)</label>
+                    <input type="number" name="fee" placeholder="0 for Free" value="0" class="w-full">
+                </div>
+            </div>
+
+            <div class="input-group mb-1">
+                <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Venue / Location *</label>
+                <input type="text" name="venue" placeholder="e.g. MPSC Auditorium / Lab 2" required class="w-full">
+            </div>
+
+            <div class="input-group mb-1">
+                <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Banner / Poster Image</label>
+                <input type="file" name="image" accept="image/*" class="w-full">
+            </div>
+
+            <div class="input-group mb-1">
+                <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Description & Rules</label>
+                <textarea name="description" placeholder="Provide segment rules, guidelines, eligibility notes..." class="w-full" style="min-height: 90px;"></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary w-full" style="margin-top: 10px;">Publish Event</button>
             <button type="button" onclick="toggleModal('event-modal')" class="btn-secondary w-full mt-1">Cancel</button>
         </form>
     </div>
@@ -674,6 +796,88 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+
+    <!-- Verified Record PDF / Dispatch Modal -->
+    <div id="verified-receipt-modal" class="modal glass-card" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1100; width: 92%; max-width: 460px; padding: 1.5rem; max-height: 92vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.95);">
+        
+        <!-- Action Toolbar at Top -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">
+            <div style="font-weight: 700; color: var(--emerald-green); font-size: 0.95rem;">
+                <i class="fa-solid fa-certificate"></i> Official Verified Slip
+            </div>
+            <button type="button" onclick="closeVerifiedReceiptModal()" style="background:none; border:none; color:white; font-size:1.3rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <!-- Thermal / PDF Printable Ticket Slip -->
+        <div id="verified-ticket-printable" style="background: #ffffff; color: #111827; padding: 1.4rem; border-radius: 8px; font-family: 'Courier New', Courier, monospace; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div style="text-align: center; margin-bottom: 6px;">
+                <div style="font-size: 0.68rem; font-weight: 800; letter-spacing: 1px; color: #4b5563;">MOHAMMADPUR PREPARATORY SCHOOL & COLLEGE</div>
+                <div style="font-size: 1.1rem; font-weight: 900; color: #111827;">MPSC IT CLUB</div>
+                <div style="font-size: 0.85rem; font-weight: 800; color: #059669; margin-top: 2px;">TECH ODYSSEY 2.0</div>
+                <div style="font-size: 0.65rem; color: #6b7280;">*** OFFICIAL ENTRY CREDENTIAL ***</div>
+            </div>
+
+            <div style="border-top: 1px dashed #9ca3af; margin: 8px 0;"></div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.72rem; color: #4b5563;">
+                <span>STATUS: <strong style="color:#059669;">CONFIRMED</strong></span>
+                <span id="v-slip-type" style="font-weight: 800; font-size: 0.65rem; padding: 2px 7px; border-radius: 4px; background: #d1fae5; color: #065f46; border: 1px solid #10b981; letter-spacing: 0.5px;">ONLINE</span>
+                <span id="v-slip-date">DATE</span>
+            </div>
+
+            <div style="border-top: 1px dashed #9ca3af; margin: 8px 0;"></div>
+
+            <div style="font-size: 0.78rem; line-height: 1.5; color: #1f2937;">
+                <div><strong>NAME:</strong> <span id="v-slip-name">—</span></div>
+                <div><strong>CLASS:</strong> <span id="v-slip-class">—</span></div>
+                <div><strong>INSTITUTE:</strong> <span id="v-slip-inst">—</span></div>
+                <div><strong>PHONE/WA:</strong> <span id="v-slip-phone">—</span></div>
+                <div><strong>EMAIL:</strong> <span id="v-slip-email">—</span></div>
+            </div>
+
+            <div style="border-top: 1px dashed #9ca3af; margin: 8px 0;"></div>
+
+            <div style="font-size: 0.72rem; font-weight: 800; color: #4b5563; margin-bottom: 4px;">VERIFIED SEGMENT:</div>
+            <div id="v-slip-event" style="font-size: 0.85rem; font-weight: 900; color: #111827;">—</div>
+            
+            <div style="border-top: 1px dashed #9ca3af; margin: 8px 0;"></div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.95rem; font-weight: 900; color: #111827;">
+                <span>AMOUNT VERIFIED:</span>
+                <span id="v-slip-amount">৳ 0 BDT</span>
+            </div>
+            <div style="font-size: 0.72rem; color: #4b5563; margin-top: 2px;">
+                TRXID: <strong id="v-slip-txid">—</strong>
+            </div>
+
+            <div style="text-align: center; margin: 10px 0 4px 0;">
+                <div style="border: 2px dashed #059669; color: #059669; font-weight: 900; text-transform: uppercase; padding: 4px 10px; display: inline-block; transform: rotate(-4deg); border-radius: 4px; font-size: 0.78rem; letter-spacing: 1px;">
+                    <i class="fa-solid fa-circle-check"></i> OFFICIALLY VERIFIED &amp; APPROVED
+                </div>
+            </div>
+
+            <div style="text-align: center; font-size: 0.62rem; color: #6b7280; margin-top: 6px;">
+                Verified by Executive Committee, MPSC IT Club
+            </div>
+        </div>
+
+        <!-- 3-Way Dispatch Action Buttons -->
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px;">
+            <div style="display: flex; gap: 8px;">
+                <a id="v-whatsapp-btn" href="#" target="_blank" class="btn-primary" style="background: #25D366; border-color: #25D366; color: white; width: 50%; text-align: center; font-size: 0.82rem; padding: 9px; text-decoration: none; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> Send WhatsApp
+                </a>
+                <a id="v-email-btn" href="#" class="btn-primary" style="background: #3b82f6; border-color: #3b82f6; color: white; width: 50%; text-align: center; font-size: 0.82rem; padding: 9px; text-decoration: none; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fa-solid fa-envelope"></i> Send Email
+                </a>
+            </div>
+            <button onclick="printVerifiedTicket()" type="button" class="w-full" style="background: #1e1e24; border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff !important; border-radius: 25px; font-size: 0.85rem; font-weight: 700; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+                <i class="fa-solid fa-print" style="color: #00ff88;"></i> Print / Save as PDF
+            </button>
+        </div>
+
+    </div>
+
 </body>
 
 </html>

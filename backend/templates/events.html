@@ -1,82 +1,1224 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events | MPSC IT CLUB</title>
-    <link rel="icon" type="image/jpeg" href="https://scontent.cdninstagram.com/v/t51.2885-19/455707082_489548463706836_6164801201053764178_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=48d9Yn9vURoQ7kNvwFd-3tA&_nc_oc=Adr_H8iB-xjLSx2NJ4VlwXpcXKkgsY7MxncJnkO0FknjjVcu5uOXnPlZDbJ2y8sJ6u8&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_ss=7baaf&oh=00_AQCy3HT7xaZ433Z5jeSqEjKlHVX9xD9HDBmzFnAbNMOOTw&oe=6A4ACBA2">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Events & Competitions | MPSC IT CLUB</title>
+    <link rel="icon" type="image/jpeg"
+        href="https://scontent.cdninstagram.com/v/t51.2885-19/455707082_489548463706836_6164801201053764178_n.jpg?_nc_cat=111&ccb=7-5&_nc_sid=bf7eb4&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLnd3dy41MDAuQzMifQ%3D%3D&_nc_ohc=48d9Yn9vURoQ7kNvwFd-3tA&_nc_oc=Adr_H8iB-xjLSx2NJ4VlwXpcXKkgsY7MxncJnkO0FknjjVcu5uOXnPlZDbJ2y8sJ6u8&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&_nc_ss=7baaf&oh=00_AQCy3HT7xaZ433Z5jeSqEjKlHVX9xD9HDBmzFnAbNMOOTw&oe=6A4ACBA2">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <style>
+        :root {
+            --cat-primary: #00ff88;
+            --cat-junior: #00d2ff;
+            --cat-secondary: #b700ff;
+            --cat-higher: #ff9900;
+            --cat-all: #3b82f6;
+        }
+
+        /* Page Wrapper fitted for screen */
+        .page-wrapper {
+            padding-top: 90px;
+            padding-bottom: 2rem;
+            min-height: calc(100vh - 70px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .events-container-wrapper {
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Main Program Hero Banner Card */
+        .program-hero-card {
+            background: rgba(14, 14, 14, 0.92);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 255, 136, 0.35);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+            display: grid;
+            grid-template-columns: 1fr 1.25fr;
+            gap: 1.5rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .program-hero-card:hover {
+            border-color: var(--emerald-green);
+            box-shadow: 0 20px 60px rgba(0, 255, 136, 0.25);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 820px) {
+            .page-wrapper {
+                padding-top: 80px;
+                padding-bottom: 2rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .program-hero-card {
+                grid-template-columns: 1fr;
+                gap: 0;
+                max-width: 480px;
+                margin: 0 auto;
+            }
+        }
+
+        .program-poster-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 360px;
+            max-height: 520px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 820px) {
+            .program-poster-box {
+                height: auto;
+                min-height: 280px;
+                max-height: 440px;
+                padding: 0.85rem 0.85rem 0 0.85rem;
+                background: transparent;
+            }
+        }
+
+        .program-poster-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            border-radius: 14px;
+            transition: transform 0.4s ease;
+        }
+
+        @media (max-width: 820px) {
+            .program-poster-img {
+                height: auto;
+                max-height: 420px;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            }
+        }
+
+        .program-hero-card:hover .program-poster-img {
+            transform: scale(1.02);
+        }
+
+        .program-info-box {
+            padding: 2rem 2rem 2rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @media (max-width: 820px) {
+            .program-info-box {
+                padding: 1.2rem 1.25rem 1.5rem 1.25rem;
+            }
+        }
+
+        .program-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid var(--emerald-green);
+            color: var(--emerald-green);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: fit-content;
+            margin-bottom: 0.5rem;
+        }
+
+        .program-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+        }
+
+        @media (max-width: 600px) {
+            .program-title {
+                font-size: 1.4rem;
+                margin-bottom: 0.4rem;
+            }
+        }
+
+        .program-meta {
+            display: flex;
+            gap: 1.2rem;
+            color: var(--soft-gray);
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .program-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .program-meta i {
+            color: var(--emerald-green);
+        }
+
+        /* Compact & Truncated with ellipsis */
+        .program-desc {
+            color: #b0b0b0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 600px) {
+            .program-desc {
+                -webkit-line-clamp: 2;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .explore-segments-btn {
+            background: var(--emerald-green);
+            color: var(--matte-black);
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            width: fit-content;
+        }
+
+        @media (max-width: 820px) {
+            .explore-segments-btn {
+                width: 100%;
+                padding: 11px 20px;
+            }
+        }
+
+        .explore-segments-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.7);
+        }
+
+        /* Modal / Pop-Up Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 1rem;
+        }
+
+        .modal-overlay.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: rgba(18, 18, 18, 0.97);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: hidden !important;
+            padding: 1.8rem;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+            scrollbar-width: none;
+            /* Hide scrollbars Firefox */
+            -ms-overflow-style: none;
+            /* Hide scrollbars IE */
+        }
+
+        .modal-card::-webkit-scrollbar,
+        .checkout-modal-card::-webkit-scrollbar {
+            display: none;
+            /* Hide scrollbars Chrome/Safari/Edge */
+        }
+
+        .modal-card.wide-modal {
+            max-width: 900px;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            max-height: 88vh;
+        }
+
+        .modal-popup-header {
+            padding: 1.4rem 1.6rem 0.8rem 1.6rem;
+            border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+            position: relative;
+            background: rgba(18, 18, 18, 0.98);
+        }
+
+        .modal-popup-body {
+            padding: 1rem 1.6rem 1.4rem 1.6rem;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            flex: 1;
+            min-height: 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .modal-popup-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .modal-popup-body .popup-events-grid {
+            margin: 0.8rem 0 0.5rem 0;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: var(--white);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.3s;
+            z-index: 15;
+        }
+
+        .modal-close-btn:hover {
+            background: #ff4d4d;
+            transform: rotate(90deg);
+        }
+
+        /* Pop-Up Events Grid */
+        .popup-events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.2rem;
+            margin: 1.5rem 0 2rem 0;
+        }
+
+        .popup-event-card {
+            background: rgba(25, 25, 25, 0.7);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .popup-event-card:hover {
+            border-color: rgba(0, 255, 136, 0.4);
+            transform: translateY(-4px);
+        }
+
+        .popup-event-card.is-selected {
+            border-color: var(--emerald-green);
+            background: rgba(0, 255, 136, 0.08);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.25);
+        }
+
+        .popup-card-banner {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .popup-card-content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .popup-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 0.4rem;
+            line-height: 1.3;
+        }
+
+        .popup-card-fee {
+            color: var(--emerald-green);
+            font-weight: 700;
+            font-size: 0.88rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .popup-checkbox-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--glass-border);
+            color: var(--soft-gray);
+            margin-top: auto;
+            width: fit-content;
+            transition: 0.2s;
+        }
+
+        .popup-event-card.is-selected .popup-checkbox-pill {
+            background: var(--emerald-green);
+            color: var(--matte-black);
+            border-color: var(--emerald-green);
+        }
+
+        /* Fixed & Solid Footer Anchored at Bottom */
+        .modal-card-footer,
+        .modal-sticky-footer {
+            background: #111114 !important;
+            border-top: 1px solid var(--glass-border) !important;
+            padding: 1rem 1.6rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            gap: 12px !important;
+            flex-shrink: 0 !important;
+            z-index: 20 !important;
+            border-radius: 0 0 20px 20px !important;
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7) !important;
+        }
+
+        .modal-card-footer .footer-summary-text,
+        .modal-sticky-footer .footer-summary-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+        }
+
+        .modal-card-footer .explore-segments-btn,
+        .modal-sticky-footer .explore-segments-btn {
+            width: auto !important;
+            max-width: none !important;
+            flex-shrink: 0 !important;
+            margin: 0 !important;
+            padding: 10px 22px !important;
+            font-size: 0.88rem !important;
+            border-radius: 25px !important;
+            white-space: nowrap !important;
+        }
+
+        @media (max-width: 600px) {
+            .modal-popup-header {
+                padding: 1.1rem 1.1rem 0.7rem 1.1rem;
+            }
+
+            .modal-popup-body {
+                padding: 0.8rem 1.1rem 1rem 1.1rem;
+            }
+
+            .modal-card-footer,
+            .modal-sticky-footer {
+                padding: 0.8rem 1.1rem !important;
+                gap: 8px !important;
+            }
+
+            .modal-card-footer .footer-summary-text,
+            .modal-sticky-footer .footer-summary-text {
+                font-size: 0.76rem;
+                line-height: 1.3;
+            }
+
+            .modal-card-footer .footer-summary-text strong,
+            .modal-sticky-footer .footer-summary-text strong {
+                font-size: 0.9rem;
+            }
+
+            .modal-card-footer .explore-segments-btn,
+            .modal-sticky-footer .explore-segments-btn {
+                padding: 8px 14px !important;
+                font-size: 0.82rem !important;
+            }
+        }
+
+        /* Receipt Card Styles */
+        .receipt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.2rem 0;
+            font-size: 0.9rem;
+        }
+
+        .receipt-table th {
+            text-align: left;
+            padding: 8px 12px;
+            color: var(--soft-gray);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .receipt-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .receipt-table tr.total-row td {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--emerald-green);
+            border-top: 1px solid var(--emerald-green);
+            border-bottom: none;
+            padding-top: 14px;
+        }
+
+        .payment-box-pro {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 1.4rem;
+            margin: 1.5rem 0;
+        }
+
+        .bkash-number-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(226, 19, 110, 0.1);
+            border: 1px solid rgba(226, 19, 110, 0.4);
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin: 10px 0;
+        }
+
+        .bkash-number {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #ff3388;
+            letter-spacing: 1px;
+        }
+
+        .copy-pill-btn {
+            background: #ff3388;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .copy-pill-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Critical Notice Callout */
+        .critical-warning-box {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.4);
+            border-left: 4px solid #ff4d4d;
+            border-radius: 10px;
+            padding: 1rem 1.2rem;
+            margin: 1.5rem 0;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: #ffb3b3;
+        }
+
+        .critical-warning-box strong {
+            color: #ff4d4d;
+            display: block;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Class selection grid */
+        .class-select-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .class-btn-tile {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .class-btn-tile:hover {
+            border-color: var(--emerald-green);
+            background: rgba(0, 255, 136, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .class-btn-tile strong {
+            display: block;
+            font-size: 1.05rem;
+            color: var(--white);
+            margin-bottom: 2px;
+        }
+
+        .class-btn-tile span {
+            font-size: 0.72rem;
+            color: var(--soft-gray);
+        }
+
+        /* De-cluttered Compact Checkout Modal */
+        .checkout-modal-card {
+            background: rgba(16, 16, 18, 0.98);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 1.8rem 1.6rem;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95);
+        }
+
+        @media (max-width: 600px) {
+            .checkout-modal-card {
+                padding: 1.4rem 1.1rem;
+            }
+        }
+
+        .checkout-segments-card {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 0.9rem 1.1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .compact-segment-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.07);
+            font-size: 0.85rem;
+        }
+
+        .compact-segment-row:last-child {
+            border-bottom: none;
+        }
+
+        .compact-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            margin-top: 6px;
+            border-top: 1px solid rgba(0, 255, 136, 0.3);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--emerald-green);
+        }
+
+        /* ── Thermal Printer & Receipt Animation ───────────────── */
+        .printer-container {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        .printer-header-slot {
+            width: 100%;
+            height: 18px;
+            background: #0d0d0f;
+            border-radius: 10px 10px 0 0;
+            border: 2px solid rgba(0, 255, 136, 0.5);
+            border-bottom: none;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.35);
+            position: relative;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .printer-light-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00ff88;
+            box-shadow: 0 0 8px #00ff88;
+            animation: printerBlink 0.6s infinite alternate;
+        }
+
+        @keyframes printerBlink {
+            from {
+                opacity: 0.3;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .printer-paper-mouth {
+            position: absolute;
+            bottom: 0;
+            left: 8%;
+            width: 84%;
+            height: 3px;
+            background: #000;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+        }
+
+        /* The Physical Thermal Paper */
+        .thermal-receipt-paper {
+            background: #fafafc;
+            color: #111827;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 1.6rem 1.3rem 2rem 1.3rem;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 10;
+            margin-top: -2px;
+            /* Perforated Zigzag bottom edge */
+            clip-path: polygon(0% 0%, 100% 0%,
+                    100% calc(100% - 8px),
+                    97.5% 100%, 95% calc(100% - 8px), 92.5% 100%, 90% calc(100% - 8px),
+                    87.5% 100%, 85% calc(100% - 8px), 82.5% 100%, 80% calc(100% - 8px),
+                    77.5% 100%, 75% calc(100% - 8px), 72.5% 100%, 70% calc(100% - 8px),
+                    67.5% 100%, 65% calc(100% - 8px), 62.5% 100%, 60% calc(100% - 8px),
+                    57.5% 100%, 55% calc(100% - 8px), 52.5% 100%, 50% calc(100% - 8px),
+                    47.5% 100%, 45% calc(100% - 8px), 42.5% 100%, 40% calc(100% - 8px),
+                    37.5% 100%, 35% calc(100% - 8px), 32.5% 100%, 30% calc(100% - 8px),
+                    27.5% 100%, 25% calc(100% - 8px), 22.5% 100%, 20% calc(100% - 8px),
+                    17.5% 100%, 15% calc(100% - 8px), 12.5% 100%, 10% calc(100% - 8px),
+                    7.5% 100%, 5% calc(100% - 8px), 2.5% 100%, 0% calc(100% - 8px));
+            animation: thermalPaperPrint 1.4s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
+            transform-origin: top center;
+        }
+
+        @keyframes thermalPaperPrint {
+            0% {
+                max-height: 0;
+                opacity: 0;
+                transform: translateY(-90px) scaleY(0.05);
+            }
+
+            25% {
+                opacity: 1;
+            }
+
+            100% {
+                max-height: 1400px;
+                opacity: 1;
+                transform: translateY(0) scaleY(1);
+            }
+        }
+
+        .receipt-dashed-line {
+            border-top: 1px dashed #9ca3af;
+            margin: 10px 0;
+        }
+
+        .receipt-stamp {
+            border: 2px dashed #d97706;
+            color: #d97706;
+            background: rgba(217, 119, 6, 0.08);
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            display: inline-block;
+            transform: rotate(-4deg);
+            border-radius: 6px;
+            font-size: 0.76rem;
+            letter-spacing: 0.8px;
+            margin: 8px 0;
+        }
+
+        .barcode-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            height: 35px;
+            margin: 12px 0 6px 0;
+        }
+
+        .barcode-bar {
+            background: #111;
+            height: 100%;
+        }
+    </style>
 </head>
+
 <body>
     <div class="futuristic-grid"></div>
     <div class="cursor-glow" id="cursor-glow"></div>
 
     {% include 'components/navbar.html' %}
 
-    <header class="page-header">
-        <div class="container">
-            <h1 class="hero-title">Club Events</h1>
-            <p class="hero-subtitle">Step into the future of technology and innovation.</p>
-        </div>
-    </header>
+    <div class="page-wrapper">
+        <div class="events-container-wrapper">
 
-    <section class="events-list">
-        <div class="container">
-            <div class="events-grid" id="events-container">
-                <!-- Events loaded via JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Registration Modal -->
-    <div id="reg-modal" class="modal-overlay">
-        <div class="glass-card reg-modal-content">
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-            <div id="modal-body">
-                <h2 id="modal-title" class="emerald"></h2>
-                <div class="modal-info mt-1">
-                    <p id="modal-desc"></p>
-                    <div class="modal-meta">
-                        <span id="modal-date"></span> | <span id="modal-venue"></span>
+            <!-- Main Program Grand Hero Showcase (Poster & Details) -->
+            <div class="program-hero-card" id="main-program-hero" onclick="openEventsPopup()">
+                <div class="program-poster-box">
+                    <img id="program-poster-img" src="{{ main_fest.banner if main_fest and main_fest.banner else '' }}"
+                        class="program-poster-img" alt="Program Poster" {% if not main_fest or not main_fest.banner
+                        %}style="display:none;" {% endif %}>
+                </div>
+                <div class="program-info-box">
+                    <div class="program-badge">
+                        <i class="fa-solid fa-star"></i> Featured Main Program
                     </div>
-                </div>
+                    <h1 class="program-title" id="program-title">{{ main_fest.title if main_fest and main_fest.title
+                        else "MPSC IT Fest & Competitions 2026" }}</h1>
 
-                <div id="payment-section" class="mt-2" style="display:none;">
-                    <div class="payment-box">
-                        <h3>Manual Payment (bKash Only)</h3>
-                        <p>Please send <strong id="modal-fee" class="emerald"></strong> BDT to the number below:</p>
-                        <div class="payment-number">+880 1889 726721</div>
-                        <p class="small" style="color: #ff4d4d; margin-top: 10px;">&#9654; Give your email address as reference.</p>
-                        <p class="small">> Please save a proof of payment (screenshot) for verification.</p>
+                    <div class="program-meta">
+                        <span><i class="fa-regular fa-calendar"></i> <strong id="program-date">{{ main_fest.date if
+                                main_fest and main_fest.date else "Upcoming Season" }}</strong></span>
+                        <span><i class="fa-solid fa-location-dot"></i> <strong id="program-venue">{{ main_fest.venue if
+                                main_fest and main_fest.venue else "MPSC Main Campus" }}</strong></span>
                     </div>
-                    
-                    <form id="payment-form" class="mt-1">
-                        <input type="hidden" name="event_id" id="form-event-id">
-                        <div class="input-group">
-                            <label>Your Email (for reference)</label>
-                            <input type="email" name="ref_email" required placeholder="your@email.com">
-                        </div>
-                        <div class="input-group">
-                            <label>Transaction ID (TxID)</label>
-                            <input type="text" name="txid" required placeholder="8X7Y6Z5W">
-                        </div>
-                        <button type="submit" class="btn-primary w-full">Submit Verification</button>
-                    </form>
-                </div>
 
-                <div id="free-section" class="mt-2" style="display:none;">
-                    <button id="confirm-free-btn" class="btn-primary w-full">Confirm Free Registration</button>
-                </div>
-                
-                <div id="registered-section" class="mt-2" style="display:none; text-align: center;">
-                    <div class="payment-box" style="border-color: var(--emerald-green); background: rgba(0, 255, 136, 0.05);">
-                        <h3 class="emerald">✅ Registration Recorded</h3>
-                        <p>You have already submitted your registration or payment for this event. Please wait for EC verification if pending.</p>
+                    <p class="program-desc" id="program-desc">{{ main_fest.description if main_fest and
+                        main_fest.description else "Welcome to the flagship event of MPSC IT Club! Click below to view
+                        all segment competitions organized under this program and register for your eligible events." }}
+                    </p>
+
+                    <div>
+                        <button class="explore-segments-btn" onclick="openEventsPopup(); event.stopPropagation();">
+                            <i class="fa-solid fa-layer-group"></i> Explore Segment Competitions
+                        </button>
                     </div>
                 </div>
             </div>
+
+        </div>
+    </div>
+
+    <!-- 1. Pop-Up Window: Segment Events & Competitions List -->
+    <div id="events-popup-modal" class="modal-overlay">
+        <div class="modal-card wide-modal">
+            <button class="modal-close-btn" onclick="closeModal('events-popup-modal')">&times;</button>
+
+            <!-- Header -->
+            <div class="modal-popup-header">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <div class="program-badge"
+                            style="margin-bottom:0.25rem; font-size: 0.72rem; padding: 3px 10px;">
+                            <i class="fa-solid fa-trophy"></i> Segment Competitions
+                        </div>
+                        <h2 style="font-size: 1.35rem; color: var(--white); margin: 0; line-height: 1.2;"
+                            id="popup-program-title">Program Events</h2>
+                    </div>
+
+                    <div
+                        style="display:inline-flex; align-items:center; gap:6px; flex-wrap:nowrap; margin-right: 32px;">
+                        <span id="popup-category-badge" class="role-badge"
+                            style="background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid #00ff88; font-size:0.78rem; padding: 4px 10px; white-space:nowrap; display:inline-flex; align-items:center; gap:5px;">
+                            <i class="fa-solid fa-lock"></i> <span id="popup-category-name">Detecting...</span>
+                        </span>
+                        {% if not current_user.is_authenticated %}
+                        <button onclick="openClassModal()" type="button"
+                            style="background: rgba(0, 255, 136, 0.12); border: 1px solid #00ff88; color: #00ff88; font-size: 0.75rem; padding: 4px 10px; border-radius: 15px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; transition: 0.2s;">
+                            <i class="fa-solid fa-pen-to-square" style="font-size: 0.75rem;"></i> Change
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scrollable Body Container -->
+            <div class="modal-popup-body">
+                <p style="color: var(--soft-gray); font-size: 0.85rem; margin: 0 0 0.8rem 0;">
+                    Select the segment competitions you wish to participate in by checking the boxes:
+                </p>
+
+                <!-- Grid of Events inside the popup -->
+                <div class="popup-events-grid" id="popup-events-container"></div>
+            </div>
+
+            <!-- Modal Bottom Footer with Selection Summary (Solid & Anchored) -->
+            <div class="modal-card-footer">
+                <div class="footer-summary-text">
+                    <div style="font-size: 0.75rem; color: var(--soft-gray);">
+                        Selected: <strong id="popup-selected-count" style="color: var(--white);">0 Events</strong>
+                    </div>
+                    <div style="color: var(--emerald-green); font-weight: 800; font-size: 1.05rem;"
+                        id="popup-total-price">
+                        ৳ 0 BDT
+                    </div>
+                </div>
+
+                <button class="explore-segments-btn" onclick="openCheckoutModal()" id="popup-proceed-btn">
+                    Proceed to Register <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Guest Class Input Modal (Mandatory for Guests) -->
+    <div id="class-modal" class="modal-overlay">
+        <div class="modal-card text-center" style="max-width: 520px;">
+            <button class="modal-close-btn" onclick="closeModal('class-modal')">&times;</button>
+            <div class="program-badge" style="margin: 0 auto 0.8rem auto;">
+                <i class="fa-solid fa-graduation-cap"></i> Academic Level
+            </div>
+            <h2 style="font-size: 1.5rem; color: var(--white); margin-bottom: 0.4rem;">Select Your School / College
+                Class</h2>
+            <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.2rem;">
+                To view the exact events and competitions you can participate in, please select your current class:
+            </p>
+
+            <div class="class-select-grid">
+                <div class="class-btn-tile" onclick="submitGuestClass(3)">
+                    <strong>Class 3</strong>
+                    <span style="color:#00ff88;">Primary</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(4)">
+                    <strong>Class 4</strong>
+                    <span style="color:#00ff88;">Primary</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(5)">
+                    <strong>Class 5</strong>
+                    <span style="color:#00ff88;">Primary</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(6)">
+                    <strong>Class 6</strong>
+                    <span style="color:#00d2ff;">Junior</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(7)">
+                    <strong>Class 7</strong>
+                    <span style="color:#00d2ff;">Junior</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(8)">
+                    <strong>Class 8</strong>
+                    <span style="color:#00d2ff;">Junior</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(9)">
+                    <strong>Class 9</strong>
+                    <span style="color:#b700ff;">Secondary</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(10)">
+                    <strong>Class 10</strong>
+                    <span style="color:#b700ff;">Secondary</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(11)">
+                    <strong>Class 11</strong>
+                    <span style="color:#ff9900;">Higher Sec</span>
+                </div>
+                <div class="class-btn-tile" onclick="submitGuestClass(12)">
+                    <strong>Class 12</strong>
+                    <span style="color:#ff9900;">Higher Sec</span>
+                </div>
+            </div>
+
+            {% if not current_user.is_authenticated %}
+            <div
+                style="margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--glass-border); text-align: center;">
+                <p style="font-size: 0.82rem; color: var(--soft-gray); margin-bottom: 0.6rem;">Already an MPSC IT Club
+                    member?</p>
+                <a href="/auth/login" class="btn-primary"
+                    style="display: inline-block; width: 100%; max-width: 280px; padding: 9px 16px; border-radius: 25px; font-size: 0.82rem; font-weight: 700; text-decoration: none; box-sizing: border-box; text-align: center;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Log In to Auto-Detect Class
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 3. Event Rules / Details Modal -->
+    <div id="details-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closeModal('details-modal')">&times;</button>
+            <div id="details-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- 4. Checkout Modal (Streamlined & Compact) -->
+    <div id="checkout-modal" class="modal-overlay">
+        <div class="checkout-modal-card">
+            <button class="modal-close-btn" onclick="closeModal('checkout-modal')">&times;</button>
+
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem;">
+                <div>
+                    <h2 style="font-size: 1.3rem; color: var(--white); margin: 0;">Registration Checkout</h2>
+                    <span style="color: var(--soft-gray); font-size: 0.78rem;">Finalize participant details &
+                        payment</span>
+                </div>
+                <span class="role-badge" id="checkout-badge-count"
+                    style="background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid #00ff88; font-size: 0.75rem;">
+                    0 Segments
+                </span>
+            </div>
+
+            <!-- Compact Ticket Breakdown -->
+            <div class="checkout-segments-card">
+                <div
+                    style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--soft-gray); margin-bottom: 6px;">
+                    Selected Events
+                </div>
+                <div id="checkout-compact-items"></div>
+                <div class="compact-total-row">
+                    <span>Total Registration Fee</span>
+                    <span id="checkout-total-fee">৳ 0 BDT</span>
+                </div>
+            </div>
+
+            <!-- Registration Form -->
+            <form id="multi-registration-form">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0.6rem; align-items: start;">
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label for="reg-name" style="font-size: 0.76rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; height: 18px; line-height: 18px; margin-bottom: 4px;">Full Name *</label>
+                        <input type="text" id="reg-name" name="full_name" required placeholder="Participant Full Name"
+                            value="{{ current_user.full_name if current_user.is_authenticated else '' }}"
+                            style="padding: 9px 12px; font-size: 0.88rem; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label for="reg-phone" style="font-size: 0.76rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; height: 18px; line-height: 18px; margin-bottom: 4px;">WhatsApp No. *</label>
+                        <input type="tel" id="reg-phone" name="phone" required placeholder="017XXXXXXXX"
+                            value="{{ current_user.phone if current_user.is_authenticated else '' }}"
+                            style="padding: 9px 12px; font-size: 0.88rem; width: 100%; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0.6rem; align-items: start;">
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label for="reg-email" style="font-size: 0.76rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; height: 18px; line-height: 18px; margin-bottom: 4px;">Email Address *</label>
+                        <input type="email" id="reg-email" name="email" required placeholder="your.email@example.com"
+                            value="{{ current_user.email if current_user.is_authenticated else '' }}"
+                            style="padding: 9px 12px; font-size: 0.88rem; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label for="reg-class" style="font-size: 0.76rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; height: 18px; line-height: 18px; margin-bottom: 4px;">Academic Class *</label>
+                        <input type="text" id="reg-class" name="student_class" required readonly
+                            style="background:rgba(255,255,255,0.05); color:var(--emerald-green); cursor:not-allowed; padding: 9px 12px; font-size: 0.88rem; width: 100%; box-sizing: border-box;"
+                            value="{{ current_user.section if current_user.is_authenticated else '' }}">
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 0.8rem;">
+                    <label for="reg-institute" style="font-size: 0.76rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; height: 18px; line-height: 18px; margin-bottom: 4px;">School / College / Institution *</label>
+                    <input type="text" id="reg-institute" name="institution" required
+                        placeholder="e.g. Mohammadpur Preparatory School & College"
+                        value="{{ current_user.institution if current_user.is_authenticated else 'Mohammadpur Preparatory School & College' }}"
+                        style="padding: 9px 12px; font-size: 0.88rem; width: 100%; box-sizing: border-box;">
+                </div>
+
+                <!-- Compact bKash Box -->
+                <div id="bkash-payment-section"
+                    style="display:none; background: rgba(226, 19, 110, 0.08); border: 1px solid rgba(226, 19, 110, 0.35); border-radius: 10px; padding: 0.9rem; margin-bottom: 0.8rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; flex-wrap: nowrap; gap: 8px;">
+                        <span style="color: #ff3388; font-weight: 700; font-size: 0.82rem; white-space: nowrap;"><i
+                                class="fa-solid fa-wallet"></i> bKash Payment</span>
+                        <span style="font-size: 0.75rem; color: #ff80b3; white-space: nowrap;">Send Money / Payment</span>
+                    </div>
+
+                    <div
+                        style="display:flex; align-items:center; justify-content:space-between; background: rgba(0,0,0,0.4); padding: 7px 12px; border-radius: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 0.95rem; font-weight: 800; color: #ff3388; letter-spacing: 0.5px;"
+                            id="bkash-num-text">+880 1889 726721</span>
+                        <button type="button" class="copy-pill-btn" onclick="copyBkashNumber()"
+                            style="padding: 4px 10px; font-size: 0.75rem;">
+                            <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start;">
+                        <div class="input-group" style="margin:0;">
+                            <label for="reg-txid" style="color: #ff80b3; font-size: 0.75rem; font-weight: 700; height: 18px; line-height: 18px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">bKash TrxID *</label>
+                            <input type="text" id="reg-txid" name="txid" placeholder="e.g. 8X7Y6Z5W"
+                                style="padding: 8px 10px; font-size: 0.82rem; border-color: rgba(226,19,110,0.4); width: 100%; box-sizing: border-box;">
+                        </div>
+                        <div class="input-group" style="margin:0;">
+                            <label for="reg-sender-phone" style="font-size: 0.75rem; font-weight: 700; height: 18px; line-height: 18px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">Sender Number</label>
+                            <input type="text" id="reg-sender-phone" name="sender_phone" placeholder="017XXXXXXXX"
+                                style="padding: 8px 10px; font-size: 0.82rem; width: 100%; box-sizing: border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mandatory Warning Notice -->
+                <div
+                    style="background: rgba(255, 77, 77, 0.08); border-left: 3px solid #ff4d4d; border-radius: 6px; padding: 8px 12px; font-size: 0.78rem; color: #ffb3b3; line-height: 1.4; margin-bottom: 1rem;">
+                    <strong style="color: #ff4d4d; font-size: 0.75rem; text-transform: uppercase;">⚠️ Cancellation
+                        Notice:</strong>
+                    If Email or WhatsApp is unreachable, participation is <strong>automatically cancelled</strong>.
+                </div>
+
+                                <button type="submit" id="submit-registration-btn" class="btn-primary w-full"
+                    style="padding: 0.9rem; border-radius: 25px; font-size: 0.95rem; font-weight: 700; box-shadow: 0 0 25px rgba(0,255,136,0.35);">
+                    <i class="fa-solid fa-print"></i> Submit & Print Official Receipt
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. Success Receipt Modal (Thermal Printer Feed Simulation) -->
+    <div id="success-receipt-modal" class="modal-overlay"
+        style="align-items: flex-start; padding-top: 40px; overflow-y: auto;">
+        <div class="printer-container">
+
+            <!-- Mechanical Printer Slot at Top of Phone/Screen -->
+            <div class="printer-header-slot">
+                <div class="printer-light-indicator"></div>
+                <div class="printer-paper-mouth"></div>
+            </div>
+
+            <!-- Digital Thermal Paper Receipt that feeds out -->
+            <div class="thermal-receipt-paper" id="printable-receipt-card">
+
+                <!-- Receipt Header -->
+                <div style="text-align: center; margin-bottom: 8px;">
+                    <div style="font-size: 0.72rem; font-weight: 800; letter-spacing: 2px; color: #4b5563;">MOHAMMADPUR
+                        PREPARATORY SCHOOL & COLLEGE</div>
+                    <div style="font-size: 1.1rem; font-weight: 900; color: #111827; letter-spacing: 1px;">MPSC IT CLUB
+                    </div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: #059669; margin-top: 2px;"
+                        id="receipt-fest-name">TECH ODYSSEY 2.0</div>
+                    <div style="font-size: 0.68rem; color: #6b7280; margin-top: 2px;">*** OFFICIAL REGISTRATION RECEIPT
+                        ***</div>
+                </div>
+
+                <div class="receipt-dashed-line"></div>
+
+                <!-- Meta & Timestamp -->
+                <div style="display:flex; justify-content:space-between; font-size: 0.72rem; color: #4b5563;">
+                    <span>RECEIPT: <strong id="receipt-id-text">#REC-2026-0001</strong></span>
+                    <span id="receipt-date-text">08/10/2026 19:15</span>
+                </div>
+
+                <div class="receipt-dashed-line"></div>
+
+                <!-- Participant Info -->
+                <div style="font-size: 0.78rem; line-height: 1.5; color: #1f2937;">
+                    <div><strong>PARTICIPANT:</strong> <span id="receipt-p-name">MD RIFAQAT ISLAM</span></div>
+                    <div><strong>CLASS/LEVEL:</strong> <span id="receipt-p-class">Secondary (Class 9)</span></div>
+                    <div><strong>INSTITUTE:</strong> <span id="receipt-p-inst">MPSC</span></div>
+                    <div><strong>CONTACT:</strong> <span id="receipt-p-phone">01889726721</span></div>
+                    <div><strong>EMAIL:</strong> <span id="receipt-p-email">user@example.com</span></div>
+                </div>
+
+                <div class="receipt-dashed-line"></div>
+
+                <!-- Segments Table -->
+                <div style="font-size: 0.72rem; font-weight: 800; color: #4b5563; margin-bottom: 4px;">REGISTERED
+                    SEGMENTS:</div>
+                <div id="receipt-items-list" style="font-size: 0.78rem; line-height: 1.6; color: #111827;"></div>
+
+                <div class="receipt-dashed-line"></div>
+
+                <!-- Total & Payment Info -->
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; font-size: 0.95rem; font-weight: 900; color: #111827;">
+                    <span>TOTAL AMOUNT:</span>
+                    <span id="receipt-total-amount">৳ 100 BDT</span>
+                </div>
+                <div style="font-size: 0.72rem; color: #4b5563; margin-top: 2px;">
+                    PAYMENT: <strong id="receipt-txid-text">bKash (TrxID: 8X7Y6Z5W)</strong>
+                </div>
+
+                <div style="text-align: center; margin: 12px 0 6px 0;">
+                    <div class="receipt-stamp">
+                        <i class="fa-solid fa-hourglass-half"></i> RECORDED · PENDING EC VERIFICATION
+                    </div>
+                </div>
+
+                <!-- Barcode Graphic Simulation -->
+                <div class="barcode-strip" id="receipt-barcode-bars"></div>
+                <div style="text-align: center; font-size: 0.65rem; letter-spacing: 4px; color: #6b7280; font-weight: 700;"
+                    id="receipt-barcode-number">
+                    *MPSC-2026-ITFEST*
+                </div>
+
+                <div style="text-align: center; font-size: 0.65rem; color: #9ca3af; margin-top: 6px;">
+                    Keep this submission slip. Final confirmation will be sent after EC verification.
+                </div>
+            </div>
+
+            <!-- Action Buttons Beneath the Printed Receipt -->
+            <div style="display: flex; gap: 10px; margin-top: 14px; position: relative; z-index: 30;">
+                <button onclick="window.print()" type="button" class="w-full"
+                    style="background: #1e1e24; border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff !important; border-radius: 25px; font-size: 0.88rem; font-weight: 700; padding: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+                    <i class="fa-solid fa-print" style="color: #00ff88; font-size: 1rem;"></i> Print Receipt
+                </button>
+                <button onclick="closeModal('success-receipt-modal'); location.reload();" type="button" class="btn-primary w-full"
+                    style="border-radius: 25px; font-size: 0.88rem; font-weight: 700; padding: 11px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-check"></i> Done
+                </button>
+            </div>
+
         </div>
     </div>
 
@@ -86,165 +1228,433 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/circularMenu.js') }}"></script>
     <script>
-        let currentEvents = [];
-
         const isLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
+        const userSection = "{{ current_user.section if current_user.is_authenticated else '' }}";
+
+        let allEvents = {{ initial_events| tojson | safe if initial_events else '[]' }};
+        let selectedEventIds = new Set();
+        let userCategory = 'all'; // primary, junior, secondary, higher_secondary
+        let userClassLabel = '';
+
+        function parseClassToCategory(cls) {
+            if (!cls) return { cat: 'all', label: 'All Classes' };
+            const s = cls.toString().toLowerCase();
+            const num = parseInt(s.replace(/\D/g, ''), 10);
+
+            if (num >= 3 && num <= 5 || s.includes('primary')) {
+                return { cat: 'primary', label: `Primary (Class ${num || '3-5'})` };
+            }
+            if (num >= 6 && num <= 8 || s.includes('junior')) {
+                return { cat: 'junior', label: `Junior (Class ${num || '6-8'})` };
+            }
+            if (num >= 9 && num <= 10 || s.includes('secondary') && !s.includes('higher')) {
+                return { cat: 'secondary', label: `Secondary (Class ${num || '9-10'})` };
+            }
+            if (num >= 11 && num <= 12 || s.includes('higher') || s.includes('college') || s.includes('hsc')) {
+                return { cat: 'higher_secondary', label: `Higher Secondary (Class ${num || '11-12'})` };
+            }
+            return { cat: 'all', label: cls };
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('events-container');
-            
-            // Skeleton Loader
-            container.innerHTML = Array(3).fill(`
-                <div class="glass-card event-card" style="animation: pulse 1.5s infinite;">
-                    <div style="height: 200px; background: rgba(255,255,255,0.05); margin-bottom: 1rem; border-radius: 8px;"></div>
-                    <div style="height: 20px; background: rgba(255,255,255,0.05); width: 60%; margin-bottom: 1rem;"></div>
-                    <div style="height: 60px; background: rgba(255,255,255,0.05); width: 100%; margin-bottom: 1rem;"></div>
-                    <div style="height: 40px; background: rgba(255,255,255,0.05); width: 100%; border-radius: 6px;"></div>
-                </div>
-            `).join('');
-            
-            try {
-                // Fetch events
-                const eventsRes = await fetch('/events/');
-                currentEvents = await eventsRes.json();
-                
-                let registeredIds = [];
-                // Only fetch history if user is logged in
-                if (isLoggedIn) {
-                    const historyRes = await fetch('/payments/history');
-                    // Check if response is actually JSON to avoid redirect HTML parsing errors
-                    const contentType = historyRes.headers.get("content-type");
-                    if (contentType && contentType.indexOf("application/json") !== -1) {
-                        const userHistory = await historyRes.json();
-                        // Filter out rejected payments so user can pay again
-                        registeredIds = userHistory.filter(p => p.status !== 'rejected').map(p => p.event_id);
-                    }
+            await fetchMainProgram();
+            await fetchAllEvents();
+
+            if (isLoggedIn) {
+                const parsed = parseClassToCategory(userSection);
+                userCategory = parsed.cat;
+                userClassLabel = parsed.label;
+                applyCategoryUI(userCategory, userClassLabel);
+            } else {
+                const savedGuestClass = sessionStorage.getItem('mpsc_guest_class');
+                if (savedGuestClass) {
+                    const parsed = parseClassToCategory(savedGuestClass);
+                    userCategory = parsed.cat;
+                    userClassLabel = parsed.label;
+                    applyCategoryUI(userCategory, userClassLabel);
                 }
-
-            if (currentEvents.length === 0) {
-                container.innerHTML = '<p>No events scheduled.</p>';
-                return;
             }
-
-            container.innerHTML = currentEvents.map(event => {
-                const isRegistered = registeredIds.includes(event.id);
-                const buttonText = event.fee > 0 ? (isRegistered ? 'View Details (Registered)' : 'Register (' + event.fee + ' BDT)') : 'View Details';
-                return `
-                <div class="glass-card event-card">
-                    <div class="event-badge ${event.status.toLowerCase()}">${event.status}</div>
-                    <img src="${event.banner || 'https://picsum.photos/400/200?random=' + Math.random()}" class="event-banner">
-                    <h3>${event.title}</h3>
-                    <p class="event-desc">${event.description ? event.description.substring(0, 100) : ''}...</p>
-                    <div class="event-details">
-                        <span>${event.date}</span>
-                        <span>${event.venue}</span>
-                    </div>
-                    <button class="btn-primary w-full mt-1" onclick="openRegistration('${event.id}', ${isRegistered})">
-                        ${buttonText}
-                    </button>
-                </div>
-            `}).join('');
-
-            gsap.fromTo('.event-card', 
-                { opacity: 0, y: 30 }, 
-                { opacity: 1, y: 0, stagger: 0.1, duration: 0.5, ease: "power2.out", clearProps: "all" }
-            );
-            } catch (err) {
-                container.innerHTML = '<p>Error loading events.</p>';
-            }
-
-            gsap.fromTo('.event-card', 
-                { opacity: 0, y: 30 }, 
-                { opacity: 1, y: 0, stagger: 0.1, duration: 0.5, ease: "power2.out", clearProps: "all" }
-            );
         });
 
-        async function openRegistration(eventId, isRegistered) {
-            const event = currentEvents.find(e => e.id === eventId);
-            
-            // Redirect to login if user clicks register on a paid event and is not logged in
-            if (event.fee > 0 && !isLoggedIn && !isRegistered) {
-                window.showToast('Please login to register for this event', 'error');
-                setTimeout(() => window.location.href = '/auth/login', 1500);
+        async function fetchMainProgram() {
+            try {
+                const res = await fetch('/events/main_fest');
+                const prog = await res.json();
+                if (prog) {
+                    if (prog.banner) document.getElementById('program-poster-img').src = prog.banner;
+                    if (prog.title) {
+                        document.getElementById('program-title').innerText = prog.title;
+                        document.getElementById('popup-program-title').innerText = prog.title;
+                    }
+                    if (prog.date) document.getElementById('program-date').innerText = prog.date;
+                    if (prog.venue) document.getElementById('program-venue').innerText = prog.venue;
+                    if (prog.description) document.getElementById('program-desc').innerText = prog.description;
+                }
+            } catch (e) {
+                console.error("Program load note:", e);
+            }
+        }
+
+        async function fetchAllEvents() {
+            try {
+                const res = await fetch('/events/');
+                allEvents = await res.json();
+            } catch (e) {
+                console.error("Events load err:", e);
+            }
+        }
+
+        async function openEventsPopup() {
+            if (!isLoggedIn && !sessionStorage.getItem('mpsc_guest_class')) {
+                openClassModal();
+                return;
+            }
+            if (!allEvents || allEvents.length === 0) {
+                await fetchAllEvents();
+            }
+            renderPopupEvents();
+            openModal('events-popup-modal');
+        }
+
+        function submitGuestClass(classNum) {
+            sessionStorage.setItem('mpsc_guest_class', 'Class ' + classNum);
+            const parsed = parseClassToCategory('Class ' + classNum);
+            userCategory = parsed.cat;
+            userClassLabel = parsed.label;
+
+            closeModal('class-modal');
+            applyCategoryUI(userCategory, userClassLabel);
+            renderPopupEvents();
+            openModal('events-popup-modal');
+            window.showToast(`Level set to: ${userClassLabel}`, 'success');
+        }
+
+        function openClassModal() {
+            closeModal('events-popup-modal');
+            openModal('class-modal');
+        }
+
+        function applyCategoryUI(cat, label) {
+            const badgeEl = document.getElementById('popup-category-badge');
+            const nameEl = document.getElementById('popup-category-name');
+            const regClassInput = document.getElementById('reg-class');
+
+            const colorMap = {
+                'primary': { bg: 'rgba(0,255,136,0.15)', col: '#00ff88', border: '#00ff88' },
+                'junior': { bg: 'rgba(0,210,255,0.15)', col: '#00d2ff', border: '#00d2ff' },
+                'secondary': { bg: 'rgba(183,0,255,0.15)', col: '#b700ff', border: '#b700ff' },
+                'higher_secondary': { bg: 'rgba(255,153,0,0.15)', col: '#ff9900', border: '#ff9900' },
+                'all': { bg: 'rgba(59,130,246,0.15)', col: '#60a5fa', border: '#3b82f6' }
+            };
+
+            const style = colorMap[cat] || colorMap['all'];
+            if (badgeEl) {
+                badgeEl.style.background = style.bg;
+                badgeEl.style.color = style.col;
+                badgeEl.style.borderColor = style.border;
+            }
+            if (nameEl) nameEl.innerText = label;
+
+            if (regClassInput) {
+                regClassInput.value = label;
+            }
+        }
+
+        function isEligibleForEvent(evCat, uCat) {
+            const ecStr = (evCat || 'all').toLowerCase().trim();
+            const uc = (uCat || 'all').toLowerCase().trim();
+            const openKw = ['all', 'open', 'open for all', 'open_for_all', 'general', ''];
+
+            if (openKw.includes(uc)) return true;
+
+            const cats = ecStr.split(',').map(c => c.trim()).filter(Boolean);
+            if (cats.length === 0 || cats.some(c => openKw.includes(c))) return true;
+
+            return cats.includes(uc);
+        }
+
+        function formatCategoryDisplay(catStr) {
+            if (!catStr || catStr === 'all') return 'OPEN FOR ALL';
+            const map = {
+                'primary': 'Primary (3–5)',
+                'junior': 'Junior (6–8)',
+                'secondary': 'Secondary (9–10)',
+                'higher_secondary': 'Higher Sec (11–12)'
+            };
+            return catStr.split(',').map(c => map[c.trim().toLowerCase()] || c.trim().toUpperCase()).join(' · ');
+        }
+
+        function renderPopupEvents() {
+            const container = document.getElementById('popup-events-container');
+            if (!container) return;
+
+            const eligibleEvents = allEvents.filter(ev => isEligibleForEvent(ev.category, userCategory));
+
+            if (eligibleEvents.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 2.5rem; background: rgba(0,0,0,0.3); border-radius: 12px;">
+                        <i class="fa-solid fa-calendar-xmark" style="font-size: 2.2rem; color: var(--soft-gray); margin-bottom: 0.8rem;"></i>
+                        <h4 style="color: var(--white); margin-bottom: 0.4rem;">No Segment Competitions Found</h4>
+                        <p style="color: var(--soft-gray); font-size: 0.85rem; margin:0;">There are currently no events registered for ${userClassLabel || 'your class'}.</p>
+                    </div>
+                `;
+                updatePopupCartUI();
                 return;
             }
 
-            document.getElementById('modal-title').innerText = event.title;
-            document.getElementById('modal-desc').innerText = event.description;
-            document.getElementById('modal-date').innerText = event.date;
-            document.getElementById('modal-venue').innerText = event.venue;
-            document.getElementById('form-event-id').value = eventId;
-            
-            const pSection = document.getElementById('payment-section');
-            const fSection = document.getElementById('free-section');
-            const rSection = document.getElementById('registered-section');
+            container.innerHTML = eligibleEvents.map(ev => {
+                const isSelected = selectedEventIds.has(ev.id);
+                const feeText = ev.fee > 0 ? `৳ ${ev.fee} BDT` : 'FREE ENTRY';
+                const hasImage = ev.banner && ev.banner.trim().length > 0;
+                const imgHtml = hasImage ? `<img src="${ev.banner}" class="popup-card-banner" alt="${ev.title}">` : '';
 
-            if (isRegistered) {
-                pSection.style.display = 'none';
-                fSection.style.display = 'none';
-                rSection.style.display = 'block';
+                return `
+                <div class="popup-event-card ${isSelected ? 'is-selected' : ''}" id="popup-card-${ev.id}" onclick="togglePopupEventSelection('${ev.id}')">
+                    ${imgHtml}
+                    <div class="popup-card-content">
+                        <span class="popup-card-fee">${feeText}</span>
+                        <h4 class="popup-card-title">${ev.title}</h4>
+                        <div style="font-size:0.75rem; color:var(--soft-gray); margin-bottom:0.8rem;">
+                            <i class="fa-regular fa-calendar" style="color:var(--emerald-green);"></i> ${ev.date || 'TBA'}
+                        </div>
+                        <div class="popup-checkbox-pill">
+                            <i class="fa-${isSelected ? 'solid fa-check-circle' : 'regular fa-circle'}"></i>
+                            ${isSelected ? 'Selected' : 'Select'}
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            updatePopupCartUI();
+        }
+
+        function togglePopupEventSelection(eventId) {
+            if (selectedEventIds.has(eventId)) {
+                selectedEventIds.delete(eventId);
             } else {
-                rSection.style.display = 'none';
-                if (event.fee > 0) {
-                    pSection.style.display = 'block';
-                    fSection.style.display = 'none';
-                    document.getElementById('modal-fee').innerText = event.fee;
-                } else {
-                    // It's free, so just view details, no registration section at all
-                    pSection.style.display = 'none';
-                    fSection.style.display = 'none';
+                selectedEventIds.add(eventId);
+            }
+
+            const card = document.getElementById(`popup-card-${eventId}`);
+            if (card) {
+                const isSelected = selectedEventIds.has(eventId);
+                card.classList.toggle('is-selected', isSelected);
+                const pill = card.querySelector('.popup-checkbox-pill');
+                if (pill) {
+                    pill.innerHTML = `<i class="fa-${isSelected ? 'solid fa-check-circle' : 'regular fa-circle'}"></i> ${isSelected ? 'Selected' : 'Select'}`;
                 }
             }
 
-            document.getElementById('reg-modal').classList.add('is-open');
-            // Force re-run animation on modal content
-            const content = document.querySelector('.reg-modal-content');
-            content.style.animation = 'none';
-            content.offsetHeight; // reflow
-            content.style.animation = '';
+            updatePopupCartUI();
         }
 
-        function closeModal() {
-            document.getElementById('reg-modal').classList.remove('is-open');
+        function updatePopupCartUI() {
+            const count = selectedEventIds.size;
+            let total = 0;
+
+            selectedEventIds.forEach(id => {
+                const ev = allEvents.find(e => e.id === id);
+                if (ev) total += (parseInt(ev.fee, 10) || 0);
+            });
+
+            const countEl = document.getElementById('popup-selected-count');
+            const priceEl = document.getElementById('popup-total-price');
+            const proceedBtn = document.getElementById('popup-proceed-btn');
+
+            if (countEl) countEl.innerText = `${count} Event${count === 1 ? '' : 's'}`;
+            if (priceEl) priceEl.innerText = `৳ ${total} BDT`;
+
+            if (proceedBtn) {
+                proceedBtn.disabled = count === 0;
+                proceedBtn.style.opacity = count === 0 ? '0.5' : '1';
+                proceedBtn.style.pointerEvents = count === 0 ? 'none' : 'auto';
+            }
         }
 
-        document.getElementById('payment-form').addEventListener('submit', async (e) => {
+        function openCheckoutModal() {
+            if (selectedEventIds.size === 0) {
+                if (window.showToast) window.showToast('Please select at least one segment competition.', 'warning');
+                return;
+            }
+
+            closeModal('events-popup-modal');
+
+            const compactContainer = document.getElementById('checkout-compact-items');
+            const badgeCount = document.getElementById('checkout-badge-count');
+            let total = 0;
+
+            const selectedList = allEvents.filter(e => selectedEventIds.has(e.id));
+            if (badgeCount) badgeCount.innerText = `${selectedList.length} Segment${selectedList.length > 1 ? 's' : ''}`;
+
+            if (compactContainer) {
+                compactContainer.innerHTML = selectedList.map(ev => {
+                    const fee = parseInt(ev.fee, 10) || 0;
+                    total += fee;
+                    return `
+                    <div class="compact-segment-row">
+                        <div>
+                            <strong style="color:var(--white); font-size:0.9rem;">${ev.title}</strong>
+                            <div style="font-size:0.72rem; color:var(--soft-gray);">${formatCategoryDisplay(ev.category)}</div>
+                        </div>
+                        <strong style="color:${fee > 0 ? 'var(--white)' : 'var(--emerald-green)'}; font-size:0.9rem;">${fee > 0 ? '৳ ' + fee : 'FREE'}</strong>
+                    </div>
+                    `;
+                }).join('');
+            } else {
+                selectedList.forEach(ev => {
+                    total += (parseInt(ev.fee, 10) || 0);
+                });
+            }
+
+            const totalFeeEl = document.getElementById('checkout-total-fee');
+            if (totalFeeEl) totalFeeEl.innerText = `৳ ${total} BDT`;
+
+            const pSection = document.getElementById('bkash-payment-section');
+            const txidInput = document.getElementById('reg-txid');
+            if (pSection && txidInput) {
+                if (total > 0) {
+                    pSection.style.display = 'block';
+                    txidInput.required = true;
+                } else {
+                    pSection.style.display = 'none';
+                    txidInput.required = false;
+                }
+            }
+
+            openModal('checkout-modal');
+        }
+
+        function copyBkashNumber() {
+            navigator.clipboard.writeText('+8801889726721').then(() => {
+                window.showToast('bKash Number copied to clipboard!', 'success');
+            }).catch(() => {
+                window.showToast('+880 1889 726721', 'info');
+            });
+        }
+
+        function openModal(modalId) {
+            const m = document.getElementById(modalId);
+            if (m) m.classList.add('is-open');
+        }
+
+        function closeModal(modalId) {
+            const m = document.getElementById(modalId);
+            if (m) m.classList.remove('is-open');
+        }
+
+        document.getElementById('multi-registration-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
+            const btn = document.getElementById('submit-registration-btn');
+            const originalBtnText = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = 'Verifying...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Printing Digital Receipt...';
 
             const formData = new FormData(e.target);
-            const res = await fetch('/payments/submit', {
-                method: 'POST',
-                body: formData
-            });
+            const payload = {
+                event_ids: Array.from(selectedEventIds),
+                full_name: formData.get('full_name'),
+                phone: formData.get('phone'),
+                email: formData.get('email'),
+                student_class: userClassLabel || formData.get('student_class'),
+                institution: formData.get('institution'),
+                txid: formData.get('txid') || 'FREE-EVENT-REG'
+            };
 
-            if (res.ok) {
-                window.showToast('TxID Submitted! Wait for EC verification.', 'success');
-                closeModal();
-            } else {
-                window.showToast('Submission failed.', 'error');
+            try {
+                const res = await fetch('/payments/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    closeModal('checkout-modal');
+
+                    // Populate Digital Thermal Receipt
+                    const festTitle = document.getElementById('program-title') ? document.getElementById('program-title').innerText : 'TECH ODYSSEY 2.0';
+                    const festNameEl = document.getElementById('receipt-fest-name');
+                    if (festNameEl) festNameEl.innerText = festTitle.toUpperCase();
+
+                    const recId = 'REC-2026-' + Math.floor(10000 + Math.random() * 90000);
+                    const now = new Date();
+                    const timeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    const recIdEl = document.getElementById('receipt-id-text');
+                    if (recIdEl) recIdEl.innerText = '#' + recId;
+
+                    const dateEl = document.getElementById('receipt-date-text');
+                    if (dateEl) dateEl.innerText = timeStr;
+
+                    const p = data.participant || {};
+                    const pNameEl = document.getElementById('receipt-p-name');
+                    if (pNameEl) pNameEl.innerText = p.name || formData.get('full_name');
+
+                    const pClassEl = document.getElementById('receipt-p-class');
+                    if (pClassEl) pClassEl.innerText = p.class || userClassLabel;
+
+                    const pInstEl = document.getElementById('receipt-p-inst');
+                    if (pInstEl) pInstEl.innerText = p.institution || formData.get('institution');
+
+                    const pPhoneEl = document.getElementById('receipt-p-phone');
+                    if (pPhoneEl) pPhoneEl.innerText = p.phone || formData.get('phone');
+
+                    const pEmailEl = document.getElementById('receipt-p-email');
+                    if (pEmailEl) pEmailEl.innerText = p.email || formData.get('email');
+
+                    const itemsList = document.getElementById('receipt-items-list');
+                    if (itemsList) {
+                        const eventsArray = data.events || allEvents.filter(e => selectedEventIds.has(e.id));
+                        itemsList.innerHTML = eventsArray.map((ev, idx) => `
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
+                                <span>[${idx + 1}] ${ev.title}</span>
+                                <strong>${(ev.fee > 0) ? '৳ ' + ev.fee : 'FREE'}</strong>
+                            </div>
+                        `).join('');
+                    }
+
+                    const totalEl = document.getElementById('receipt-total-amount');
+                    if (totalEl) totalEl.innerText = `৳ ${data.total_fee || data.total_amount || 0} BDT`;
+
+                    const txidEl = document.getElementById('receipt-txid-text');
+                    if (txidEl) {
+                        const tx = p.txid || formData.get('txid');
+                        txidEl.innerText = (tx && tx !== 'FREE-EVENT-REG') ? `bKash TrxID: ${tx}` : 'FREE ENTRY / CONFIRMED';
+                    }
+
+                    // Generate barcode simulation bars
+                    const barcodeContainer = document.getElementById('receipt-barcode-bars');
+                    if (barcodeContainer) {
+                        const barWidths = [2, 1, 3, 1, 2, 4, 1, 3, 2, 1, 4, 2, 1, 3, 1, 2, 3, 1, 4, 2, 1, 2, 3, 1, 2, 4, 1, 3, 2];
+                        barcodeContainer.innerHTML = barWidths.map(w => `<div class="barcode-bar" style="width:${w * 1.5}px;"></div>`).join('');
+                    }
+
+                    // Trigger Print Slide-Down Animation
+                    const receiptPaper = document.getElementById('printable-receipt-card');
+                    if (receiptPaper) {
+                        receiptPaper.style.animation = 'none';
+                        receiptPaper.offsetHeight; // trigger reflow
+                        receiptPaper.style.animation = 'thermalPaperPrint 1.4s cubic-bezier(0.12, 0.8, 0.32, 1) forwards';
+                    }
+
+                    openModal('success-receipt-modal');
+                    selectedEventIds.clear();
+                    updatePopupCartUI();
+                    window.showToast('Official receipt printed successfully!', 'success');
+                } else {
+                    window.showToast(data.error || 'Submission failed. Please check fields.', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                window.showToast('Network error during registration.', 'error');
+            } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'Submit Verification';
-            }
-        });
-
-        document.getElementById('confirm-free-btn').addEventListener('click', async () => {
-            const eventId = document.getElementById('form-event-id').value;
-            const res = await fetch('/events/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ event_id: eventId })
-            });
-
-            if (res.ok) {
-                window.showToast('Successfully registered!', 'success');
-                closeModal();
-            } else {
-                window.showToast('Registration failed.', 'error');
+                btn.innerHTML = originalBtnText;
             }
         });
     </script>
 </body>
+
 </html>

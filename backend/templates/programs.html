@@ -60,7 +60,7 @@
                 container.innerHTML = programs.map(pg => `
                     <div class="glass-card event-card">
                         <div class="event-badge completed">Completed</div>
-                        <img src="${pg.banner || 'https://picsum.photos/400/200?random=' + Math.random()}" alt="${pg.title}" class="event-banner">
+                        <img src="${pg.banner || ''}" alt="${pg.title}" class="event-banner">
                         <h3>${pg.title}</h3>
                         <p class="event-desc">${pg.description}</p>
                         <div class="event-details">

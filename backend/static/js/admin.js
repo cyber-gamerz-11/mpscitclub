@@ -1,3 +1,94 @@
+
+let allVerifiedPaymentsList = [];
+
+window.openVerifiedReceiptModal = function(paymentId) {
+    const record = allVerifiedPaymentsList.find(p => p.payment_id === paymentId);
+    if (!record) {
+        window.showToast('Record not found', 'error');
+        return;
+    }
+
+    const d = new Date(record.date_verified || Date.now());
+    const timeStr = isNaN(d) ? (record.date_verified || '') : d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    document.getElementById('v-slip-date').innerText = timeStr;
+    document.getElementById('v-slip-name').innerText = record.member_name || 'Participant';
+    
+    const isOff = (record.registration_type === 'offline') || (record.transaction_id && record.transaction_id.toUpperCase().startsWith('OFFLINE'));
+    const typeBadge = document.getElementById('v-slip-type');
+    if (typeBadge) {
+        typeBadge.innerText = isOff ? 'OFFLINE MANUAL' : 'ONLINE bKash';
+        typeBadge.style.background = isOff ? '#fef3c7' : '#d1fae5';
+        typeBadge.style.color = isOff ? '#92400e' : '#065f46';
+        typeBadge.style.border = isOff ? '1px solid #f59e0b' : '1px solid #10b981';
+    }
+    document.getElementById('v-slip-class').innerText = record.student_class || 'N/A';
+    document.getElementById('v-slip-inst').innerText = record.institution || 'MPSC';
+    document.getElementById('v-slip-phone').innerText = record.phone || 'N/A';
+    document.getElementById('v-slip-email').innerText = record.email || record.ref_email || 'N/A';
+    document.getElementById('v-slip-event').innerText = record.event_name || 'Registered Event';
+    document.getElementById('v-slip-amount').innerText = `৳ ${record.event_fee || 0} BDT`;
+    document.getElementById('v-slip-txid').innerText = record.transaction_id || 'N/A';
+
+    // WhatsApp Direct Link
+    let cleanPhone = (record.phone || '').replace(/\D/g, '');
+    if (cleanPhone.startsWith('01')) cleanPhone = '88' + cleanPhone;
+    if (cleanPhone.length === 11 && cleanPhone.startsWith('1')) cleanPhone = '880' + cleanPhone;
+
+    const waMsg = `Assalamu Alaikum *${record.member_name}*,\n\nYour registration for *TECH ODYSSEY 2.0* (*${record.event_name}*) has been *OFFICIALLY VERIFIED & CONFIRMED* by MPSC IT Club!\n\n📋 *Verified Details:*\n• Participant: ${record.member_name}\n• Class / Level: ${record.student_class}\n• Institution: ${record.institution}\n• Verified TrxID: ${record.transaction_id}\n• Amount: ৳ ${record.event_fee} BDT\n\nPlease save this confirmation message as your official entry pass for the fest. See you there!\n\n— *Executive Committee, MPSC IT Club*`;
+    
+    const waBtn = document.getElementById('v-whatsapp-btn');
+    if (waBtn) {
+        waBtn.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`;
+    }
+
+    // Email Direct Link
+    const emailSubject = `[OFFICIAL CONFIRMATION] Registration Verified - TECH ODYSSEY 2.0 (${record.event_name})`;
+    const emailBody = `Dear ${record.member_name},\n\nCongratulations! Your registration for TECH ODYSSEY 2.0 has been successfully verified and confirmed by the MPSC IT Club Executive Committee.\n\nEvent: ${record.event_name}\nAcademic Level: ${record.student_class}\nInstitution: ${record.institution}\nTransaction ID: ${record.transaction_id}\nAmount Verified: BDT ${record.event_fee}\n\nPlease retain this email as proof of entry.\n\nBest Regards,\nExecutive Committee\nMPSC IT Club`;
+
+    const emailBtn = document.getElementById('v-email-btn');
+    if (emailBtn) {
+        emailBtn.href = `mailto:${record.email || record.ref_email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    }
+
+    const modal = document.getElementById('verified-receipt-modal');
+    if (modal) modal.style.display = 'block';
+};
+
+window.closeVerifiedReceiptModal = function() {
+    const modal = document.getElementById('verified-receipt-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.printVerifiedTicket = function() {
+    const printable = document.getElementById('verified-ticket-printable');
+    if (!printable) return;
+    const printWindow = window.open('', '', 'width=600,height=700');
+    printWindow.document.write('<html><head><title>MPSC IT Club - Official Verified Slip</title><style>body{font-family: monospace; padding: 20px; text-align: center;}</style></head><body>');
+    printWindow.document.write(printable.innerHTML);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+};
+
+
+window.toggleAdminAllCategories = function(allEl) {
+    if (allEl.checked) {
+        document.querySelectorAll('.admin-cat-item').forEach(el => el.checked = false);
+    }
+};
+
+window.onAdminCategoryItemChange = function() {
+    const items = document.querySelectorAll('.admin-cat-item');
+    const anyChecked = Array.from(items).some(el => el.checked);
+    const allEl = document.getElementById('admin-cat-all');
+    if (allEl) {
+        allEl.checked = !anyChecked;
+    }
+};
+
 // Admin Command Center Logic
 let allEcMembers = [];
 
@@ -28,8 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Form Submissions
-    handleAdminForm('add-event-form', '/admin/add_event');
-    handleAdminForm('add-program-form', '/admin/add_program');
+    handleAdminForm('add-event-form', '/admin/events/add');
+    handleAdminForm('add-program-form', '/admin/programs/add');
     handleAdminForm('add-ec-form', '/admin/ec/add');
     handleAdminForm('add-gallery-form', '/admin/gallery/add');
 
@@ -87,16 +178,41 @@ async function loadAllData() {
 
     // Render Events
     const eventsList = document.getElementById('events-list');
-    eventsList.innerHTML = data.events.map(ev => `
+    const catBadges = {
+        'primary': '<span class="role-badge" style="background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid #00ff88; font-size: 0.72rem; padding: 2px 8px; margin: 2px;">Primary (3-5)</span>',
+        'junior': '<span class="role-badge" style="background: rgba(0,210,255,0.15); color: #00d2ff; border: 1px solid #00d2ff; font-size: 0.72rem; padding: 2px 8px; margin: 2px;">Junior (6-8)</span>',
+        'secondary': '<span class="role-badge" style="background: rgba(183,0,255,0.15); color: #b700ff; border: 1px solid #b700ff; font-size: 0.72rem; padding: 2px 8px; margin: 2px;">Secondary (9-10)</span>',
+        'higher_secondary': '<span class="role-badge" style="background: rgba(255,153,0,0.15); color: #ff9900; border: 1px solid #ff9900; font-size: 0.72rem; padding: 2px 8px; margin: 2px;">Higher Sec (11-12)</span>',
+        'all': '<span class="role-badge" style="background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid #3b82f6; font-size: 0.72rem; padding: 2px 8px; margin: 2px;">Open for All</span>'
+    };
+
+    function renderAdminEventBadges(catStr) {
+        if (!catStr) return catBadges['all'];
+        const cats = catStr.split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
+        if (cats.length === 0 || cats.includes('all') || cats.includes('open') || cats.includes('open for all')) {
+            return catBadges['all'];
+        }
+        return cats.map(c => catBadges[c] || `<span class="role-badge" style="font-size:0.72rem; padding:2px 8px; margin:2px;">${c}</span>`).join(' ');
+    }
+
+    eventsList.innerHTML = data.events.map(ev => {
+        const badge = renderAdminEventBadges(ev.category);
+        const feeStr = ev.fee > 0 ? `${ev.fee} BDT` : '<span style="color:var(--emerald-green)">FREE</span>';
+        return `
         <tr>
-            <td>${ev.title}</td>
-            <td>${ev.date}</td>
-            <td>${ev.venue}</td>
+            <td style="display:flex; align-items:center; gap:10px;">
+                <img src="${ev.banner || ''}" style="width: 55px; height: 38px; object-fit: cover; border-radius: 4px; border: 1px solid var(--glass-border);">
+                <strong style="color:white;">${ev.title}</strong>
+            </td>
+            <td>${badge}</td>
+            <td>${ev.date || 'TBA'} <br><small style="color:var(--soft-gray);">${ev.venue || 'TBA'}</small></td>
+            <td>${feeStr}</td>
             <td>
                 <button class="action-btn delete-btn" onclick="deleteItem('events', '${ev.id}')">Delete</button>
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 
     // Render Programs
     const programsList = document.getElementById('programs-list');
@@ -196,19 +312,35 @@ async function fetchVerifiedPayments() {
             return;
         }
 
+        allVerifiedPaymentsList = data;
         list.innerHTML = data.map(p => {
             const d = new Date(p.date_verified);
             const dateStr = isNaN(d) ? (p.date_verified || '—') : d.toLocaleDateString();
             const name    = p.member_name   || '—';
             const phone   = p.phone         || '—';
             const event   = p.event_name    || '—';
+            const isOffline = (p.registration_type === 'offline') || (p.transaction_id && p.transaction_id.toUpperCase().startsWith('OFFLINE'));
+            const typeTag = isOffline
+                ? `<span style="background: rgba(255, 170, 0, 0.15); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.45); font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 8px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px; margin-left: 6px;"><i class="fa-solid fa-receipt"></i> OFFLINE</span>`
+                : `<span style="background: rgba(0, 210, 255, 0.15); color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.45); font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 8px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px; margin-left: 6px;"><i class="fa-solid fa-globe"></i> ONLINE</span>`;
+
             return `
             <tr>
-                <td>${name}</td>
+                <td>
+                    <div style="display:inline-flex; align-items:center; flex-wrap:nowrap;">
+                        <strong style="color:white; font-size:0.92rem;">${name}</strong>
+                        ${typeTag}
+                    </div>
+                </td>
                 <td>${phone}</td>
-                <td>${event}</td>
+                <td><span class="role-badge" style="background: rgba(0,255,136,0.12); color:#00ff88; font-size:0.75rem;">${event}</span></td>
                 <td>${dateStr}</td>
-                <td><button class="action-btn delete-btn" onclick="deleteVerifiedPayment('${p.payment_id}')">Delete</button></td>
+                <td style="display:flex; gap:6px;">
+                    <button class="action-btn" style="background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid #00ff88; padding: 4px 10px; font-size:0.75rem;" onclick="openVerifiedReceiptModal('${p.payment_id}')">
+                        <i class="fa-solid fa-file-invoice"></i> Slip / Dispatch
+                    </button>
+                    <button class="action-btn delete-btn" style="padding: 4px 10px; font-size:0.75rem;" onclick="deleteVerifiedPayment('${p.payment_id}')">Delete</button>
+                </td>
             </tr>
             `;
         }).join('');
@@ -285,20 +417,36 @@ function handleAdminForm(formId, url) {
         btn.innerHTML = `<span class="spinner"></span>Processing...`;
         
         try {
-            const res = await fetch(url, { method: 'POST', body: new FormData(form) });
-            if (res.ok) {
-                window.showToast('Content Published!', 'success');
+            const res = await fetch(url, { 
+                method: 'POST', 
+                body: new FormData(form),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            
+            let data = null;
+            try {
+                data = await res.json();
+            } catch (jsonErr) {
+                // If response is HTML / Redirect
+                if (res.status === 403 || res.status === 401) {
+                    window.showToast('Admin session expired. Please refresh and log in.', 'error');
+                    return;
+                }
+            }
+
+            if (res.ok && data) {
+                window.showToast(data.message || data.success || 'Content Published!', 'success');
                 form.reset();
                 toggleModal(formId.replace('add-', '').replace('-form', '-modal'));
                 loadAllData();
                 fetchStats();
             } else {
-                const err = await res.json();
-                window.showToast(err.error || 'Server Error', 'error');
+                const errMsg = (data && (data.error || data.message)) || `Server responded with status ${res.status}`;
+                window.showToast(errMsg, 'error');
             }
         } catch (err) {
             console.error("Form Submit Error:", err);
-            window.showToast('Network Error - Please check connection', 'error');
+            window.showToast('Connection failed. Please check your network or server status.', 'error');
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
@@ -773,3 +921,70 @@ async function deleteQuery(queryId) {
         window.showToast('Network error while deleting query.', 'error');
     }
 }
+
+
+// Main Fest Banner Handler
+async function loadMainFestSettings() {
+    try {
+        const res = await fetch('/admin/api/main_fest');
+        const data = await res.json();
+        if (data) {
+            if (data.title) document.getElementById('fest-title-input').value = data.title;
+            if (data.date) document.getElementById('fest-date-input').value = data.date;
+            if (data.venue) document.getElementById('fest-venue-input').value = data.venue;
+            if (data.description) document.getElementById('fest-desc-input').value = data.description;
+            if (data.banner) document.getElementById('admin-fest-preview').src = data.banner;
+        }
+    } catch (e) {
+        console.error("Fest load err:", e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadMainFestSettings();
+
+    const festForm = document.getElementById('main-fest-form');
+    if (festForm) {
+        festForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('save-fest-btn');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const res = await fetch('/admin/api/update_main_fest', {
+                    method: 'POST',
+                    body: new FormData(festForm)
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    window.showToast('Main Fest Banner & Info Saved!', 'success');
+                    if (data.data && data.data.banner) {
+                        document.getElementById('admin-fest-preview').src = data.data.banner;
+                    }
+                } else {
+                    window.showToast(data.error || 'Failed to save', 'error');
+                }
+            } catch (err) {
+                window.showToast('Network error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        });
+    }
+
+    const festImgInput = document.getElementById('fest-image-input');
+    if (festImgInput) {
+        festImgInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (re) => {
+                    document.getElementById('admin-fest-preview').src = re.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    }
+});

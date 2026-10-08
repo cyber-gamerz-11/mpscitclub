@@ -22,7 +22,8 @@ def create_app():
 
     # Register Blueprints
     from backend.routes.auth_routes import auth_bp
-    from backend.routes.event_routes import event_bp
+    from backend.routes.event_routes import event_bp, get_main_fest_data
+    from backend.models.event import Event
     from backend.routes.payment_routes import payment_bp
     from backend.routes.user_routes import user_bp
     from backend.routes.admin_routes import admin_bp
@@ -61,7 +62,9 @@ def create_app():
 
     @app.route('/events')
     def events_page():
-        return render_template('events.html')
+        fest_data = get_main_fest_data()
+        initial_events = Event.get_all()
+        return render_template('events.html', main_fest=fest_data, initial_events=initial_events)
 
     @app.route('/programs')
     def programs():

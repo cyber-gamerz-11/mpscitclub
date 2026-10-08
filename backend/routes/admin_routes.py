@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, current_app
 from flask_login import login_required, current_user
 from backend.config.db import get_db
@@ -8,11 +9,13 @@ from werkzeug.utils import secure_filename
 import csv
 import io
 from flask import Response
+import uuid
+import bcrypt
+
 admin_bp = Blueprint('admin', __name__)
 
 # --- Admin-only password reset helpers ---
 def _generate_reset_token(email):
-    """Reuse the same token logic as auth_routes so the link works on /auth/reset-password."""
     from itsdangerous import URLSafeTimedSerializer
     s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     return s.dumps(email, salt='password-reset-salt')
@@ -20,8 +23,11 @@ def _generate_reset_token(email):
 def admin_required(func):
     def wrapper(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != 'admin':
-            if request.path.startswith('/admin/api') or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({"error": "Unauthorized"}), 403
+            # If requesting via API / AJAX / Form submit or non-GET, return JSON 403
+            if request.method != 'GET' or request.path.startswith('/admin/api') or request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.is_json:
+                return jsonify({"error": "Admin access required. Please login with an administrator account."}), 403
+            if request.path != '/admin/':
+                return jsonify({"error": "Admin access required."}), 403
             return redirect(url_for('index'))
         return func(*args, **kwargs)
     wrapper.__name__ = func.__name__
@@ -32,7 +38,6 @@ def upload_to_supabase(file, folder):
         return None
     
     file_content = file.read()
-    # Add timestamp to prevent duplicate filename errors
     timestamp = int(time.time())
     filename = f"{timestamp}_{secure_filename(file.filename)}"
     storage_path = f"{folder}/{filename}"
@@ -40,7 +45,6 @@ def upload_to_supabase(file, folder):
     db = get_db()
     try:
         db.storage.from_('mpsc-it-club').upload(storage_path, file_content)
-        # Use official method to get public URL
         url = db.storage.from_('mpsc-it-club').get_public_url(storage_path)
         return url
     except Exception as e:
@@ -70,19 +74,33 @@ def admin_dashboard():
 @admin_required
 def get_all_data():
     db = get_db()
-    
-    events = db.table("events").select("*").order("created_at", desc=True).execute()
+    if not db:
+        return jsonify({"events": [], "programs": [], "gallery": [], "users": [], "ec_members": []})
+        
+    events_res = db.table("events").select("*").order("created_at", desc=True).execute()
+    events = events_res.data if events_res.data else []
+    for ev in events:
+        if not ev.get('category'):
+            desc = ev.get('description', '') or ''
+            if desc.startswith('[PRIMARY]'): ev['category'] = 'primary'
+            elif desc.startswith('[JUNIOR]'): ev['category'] = 'junior'
+            elif desc.startswith('[SECONDARY]'): ev['category'] = 'secondary'
+            elif desc.startswith('[HIGHER_SECONDARY]'): ev['category'] = 'higher_secondary'
+            else: ev['category'] = 'all'
+
     programs = db.table("programs").select("*").order("created_at", desc=True).execute()
     gallery = db.table("gallery").select("*").order("created_at", desc=True).execute()
-    users = db.table("users").select("id, full_name, email, role, join_date").order("join_date", desc=True).execute()
+    users_res = db.table("users").select("id, full_name, email, role, join_date, student_id, phone, section, institution").order("join_date", desc=True).execute()
+    # Filter out any guest entries so only registered members/admins appear in the Users tab
+    clean_users = [u for u in (users_res.data or []) if u.get('role') != 'guest' and not (u.get('email') or '').endswith('@mpsc.guest')]
     ec_members = db.table("ec_members").select("*").order("display_order", desc=False).execute()
 
     return jsonify({
-        "events": events.data,
-        "programs": programs.data,
-        "gallery": gallery.data,
-        "users": users.data,
-        "ec_members": ec_members.data
+        "events": events,
+        "programs": programs.data if programs.data else [],
+        "gallery": gallery.data if gallery.data else [],
+        "users": clean_users,
+        "ec_members": ec_members.data if ec_members.data else []
     })
 
 @admin_bp.route('/api/delete/<collection>/<id>', methods=['DELETE'])
@@ -90,18 +108,14 @@ def get_all_data():
 @admin_required
 def delete_item(collection, id):
     db = get_db()
-    
     try:
-        # 1. Fetch the record first to get the image URL
         res = db.table(collection).select("*").eq("id", id).execute()
         if res.data:
             item = res.data[0]
-            # Check common image fields
             image_url = item.get('image_path') or item.get('banner') or item.get('url')
             if image_url:
                 delete_file_from_supabase(image_url)
                 
-        # 2. Delete the record from DB
         db.table(collection).delete().eq("id", id).execute()
         return jsonify({"success": "Deleted successfully"})
     except Exception as e:
@@ -116,25 +130,67 @@ def update_user_role():
     db.table("users").update({"role": data['role']}).eq("id", data['user_id']).execute()
     return jsonify({"success": "Role updated"})
 
+def _save_event_helper():
+    data = request.form.to_dict()
+    banner_url = upload_to_supabase(request.files.get('image'), 'events')
+    
+    # Handle multi-select category checkboxes
+    categories = request.form.getlist('categories')
+    if not categories:
+        single_cat = data.get('category', '').strip()
+        categories = [single_cat] if single_cat else ['all']
+    
+    cats_cleaned = [c.lower().strip() for c in categories if c.strip()]
+    if 'all' in cats_cleaned or not cats_cleaned:
+        final_category = 'all'
+    else:
+        final_category = ",".join(cats_cleaned)
+    
+    event_payload = {
+        "title": data.get('title', '').strip(),
+        "description": data.get('description', ''),
+        "date": data.get('date', ''),
+        "venue": data.get('venue', ''),
+        "status": data.get('status', 'Upcoming'),
+        "banner": banner_url or '',
+        "fee": int(data.get('fee', 0) or 0),
+        "category": final_category
+    }
+
+    if not event_payload['title']:
+        return jsonify({"error": "Event title is required."}), 400
+
+    db = get_db()
+    if not db:
+        return jsonify({"error": "Database offline. Check Supabase connection."}), 500
+
+    try:
+        db.table("events").insert(event_payload).execute()
+        return jsonify({"success": "Event added successfully!"})
+    except Exception as e:
+        print(f"Initial event insert note: {e}")
+        # If category column does not exist yet in Supabase schema, retry without category
+        event_payload.pop('category', None)
+        if final_category and final_category != 'all':
+            event_payload['description'] = f"[{final_category.upper()}] " + (event_payload.get('description') or '')
+        try:
+            db.table("events").insert(event_payload).execute()
+            return jsonify({"success": "Event added successfully!"})
+        except Exception as e2:
+            print(f"Fallback event insert error: {e2}")
+            return jsonify({"error": f"Database Error: {str(e2)}"}), 500
+
 @admin_bp.route('/events/add', methods=['POST'])
 @login_required
 @admin_required
 def add_event():
-    data = request.form.to_dict()
-    banner_url = upload_to_supabase(request.files.get('image'), 'events')
-    
-    db = get_db()
-    db.table("events").insert({
-        "title": data['title'],
-        "description": data['description'],
-        "date": data['date'],
-        "venue": data['venue'],
-        "status": data.get('status', 'Upcoming'),
-        "banner": banner_url or '',
-        "fee": int(data.get('fee', 0))
-    }).execute()
-    
-    return jsonify({"success": "Event added"})
+    return _save_event_helper()
+
+@admin_bp.route('/add_event', methods=['POST'])
+@login_required
+@admin_required
+def add_event_alias():
+    return _save_event_helper()
 
 @admin_bp.route('/programs/add', methods=['POST'])
 @login_required
@@ -152,6 +208,12 @@ def add_program():
     }).execute()
     
     return jsonify({"success": "Program added"})
+
+@admin_bp.route('/add_program', methods=['POST'])
+@login_required
+@admin_required
+def add_program_alias():
+    return add_program()
 
 @admin_bp.route('/gallery/add', methods=['POST'])
 @login_required
@@ -177,7 +239,6 @@ def add_ec_member():
     data = request.form.to_dict()
     image_url = upload_to_supabase(request.files.get('image'), 'ec')
     
-    # Category stored in DB is "{year}_{category}" (e.g. "2026_BVB")
     year = data.get('year', '2026').strip()
     category = data['category']
     full_category = f"{year}_{category}"
@@ -208,41 +269,39 @@ def delete_ec_year():
         
     db = get_db()
     try:
-        # Fetch all members to delete their images
         res = db.table("ec_members").select("image_path").like("category", f"{year}_%").execute()
         if res.data:
             for m in res.data:
                 if m.get('image_path'):
                     delete_file_from_supabase(m['image_path'])
                     
-        # Now delete from DB
         db.table("ec_members").delete().like("category", f"{year}_%").execute()
         return jsonify({"success": f"All members for year {year} deleted successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @admin_bp.route('/stats')
 @login_required
 @admin_required
 def get_stats():
     db = get_db()
+    if not db:
+        return jsonify({"total_users": 0, "total_events": 0, "total_revenue": 0, "pending_payments": 0})
+        
+    users_count = db.table("users").select("id", count='exact').execute().count or 0
+    events_count = db.table("events").select("id", count='exact').execute().count or 0
     
-    users_count = db.table("users").select("id", count='exact').execute().count
-    events_count = db.table("events").select("id", count='exact').execute().count
-    
-    # Calculate real revenue from approved payments
-    payments = db.table("payments").select("event_id").eq("status", "approved").execute().data
+    payments = db.table("payments").select("event_id").eq("status", "approved").execute().data or []
     total_revenue = 0
     if payments:
         event_ids = list(set([p['event_id'] for p in payments if p.get('event_id')]))
         if event_ids:
-            events = db.table("events").select("id, fee").in_("id", event_ids).execute().data
+            events = db.table("events").select("id, fee").in_("id", event_ids).execute().data or []
             fee_map = {e['id']: int(e.get('fee', 0) or 0) for e in events}
             for p in payments:
                 total_revenue += fee_map.get(p['event_id'], 0)
     
-    pending_count = db.table("payments").select("id", count='exact').eq("status", "pending").execute().count
+    pending_count = db.table("payments").select("id", count='exact').eq("status", "pending").execute().count or 0
     
     return jsonify({
         "total_users": users_count,
@@ -251,29 +310,18 @@ def get_stats():
         "pending_payments": pending_count
     })
 
-# ── Password Reset Tools (Admin Only) ──────────────────────────────────────
-
+# Password Reset Tools
 @admin_bp.route('/api/find_user')
 @login_required
 @admin_required
 def find_user():
-    """
-    GET /admin/api/find_user?email=someone@email.com
-    Returns the user's name, member ID, join date, and role so the admin
-    can visually verify the person's identity before generating a reset link.
-    Passwords are never exposed.
-    """
     email = request.args.get('email', '').strip().lower()
     if not email:
         return jsonify({"error": "Email is required"}), 400
 
     db = get_db()
     try:
-        result = db.table("users") \
-            .select("id, full_name, email, role, join_date, student_id") \
-            .eq("email", email) \
-            .execute()
-
+        result = db.table("users").select("id, full_name, email, role, join_date, student_id").eq("email", email).execute()
         if not result.data:
             return jsonify({"error": "No account found with that email"}), 404
 
@@ -289,16 +337,10 @@ def find_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @admin_bp.route('/api/generate_reset_link', methods=['POST'])
 @login_required
 @admin_required
 def admin_generate_reset_link():
-    """
-    POST /admin/api/generate_reset_link   body: { "email": "..." }
-    Generates a secure, time-limited (1 hour) reset link for the given email.
-    The admin copies the link and sends it manually to the user.
-    """
     data = request.get_json()
     email = (data or {}).get('email', '').strip().lower()
 
@@ -314,11 +356,7 @@ def admin_generate_reset_link():
         return jsonify({"error": str(e)}), 500
 
     token = _generate_reset_token(email)
-    # Build an absolute URL so the admin can copy-paste it anywhere
     reset_link = url_for('auth.reset_password', token=token, _external=True)
-
-    # Also print to server console as a local dev convenience
-    print(f"\n[ADMIN RESET] Link for {email}: {reset_link}\n")
 
     return jsonify({
         "success": True,
@@ -330,35 +368,53 @@ def admin_generate_reset_link():
 @login_required
 @admin_required
 def get_verified_payments():
+    from backend.models.payment import get_registration_metadata
     db = get_db()
+    if not db: return jsonify([])
     
-    # Get all approved payments
     payments_res = db.table("payments").select("*").eq("status", "approved").order("created_at", desc=True).execute()
     payments = payments_res.data if payments_res.data else []
     
-    # Get users map
-    users_res = db.table("users").select("id, full_name, email, student_id, phone").execute()
+    users_res = db.table("users").select("id, full_name, email, student_id, phone, section, institution").execute()
     users_map = {u['id']: u for u in users_res.data} if users_res.data else {}
     
-    # Get events map
-    events_res = db.table("events").select("id, title").execute()
-    events_map = {e['id']: e['title'] for e in events_res.data} if events_res.data else {}
+    events_res = db.table("events").select("*").execute()
+    events_map = {e['id']: e for e in events_res.data} if events_res.data else {}
     
     result = []
     for p in payments:
-        user = users_map.get(p.get('member_id'), {})
-        event_title = events_map.get(p.get('event_id'), 'Unknown Event')
+        p_id = p.get('id', '')
+        tx = p.get('transaction_id') or p.get('tx_id') or ''
+        meta = get_registration_metadata(p_id, tx) or {}
+        
+        u_id = p.get('member_id') or p.get('user_id')
+        user = users_map.get(u_id, {})
+        ev = events_map.get(p.get('event_id'), {})
+        event_title = ev.get('title', 'Unknown Event')
         verified_date = p.get('updated_at', p.get('created_at', ''))
         
+        # Use exact submitted metadata first, fallback to user account
+        m_name = meta.get('participant_name') or user.get('full_name') or p.get('full_name') or 'Participant'
+        m_phone = meta.get('phone') or user.get('phone') or p.get('phone') or 'N/A'
+        m_email = meta.get('email') or p.get('ref_email') or user.get('email') or 'N/A'
+        m_class = meta.get('student_class') or user.get('section') or 'N/A'
+        m_inst = meta.get('institution') or user.get('institution') or 'MPSC'
+
+        is_offline = str(tx).upper().startswith('OFFLINE') or meta.get('source') == 'offline'
         result.append({
-            "payment_id": p.get('id', ''),
+            "payment_id": p_id,
             "event_name": event_title,
-            "member_name": user.get('full_name', 'Unknown'),
-            "student_id": user.get('student_id', 'Unknown'),
-            "phone": user.get('phone', 'N/A'),
-            "email": user.get('email', 'Unknown'),
-            "ref_email": p.get('ref_email', ''),
-            "transaction_id": p.get('transaction_id', ''),
+            "event_category": ev.get('category', 'all'),
+            "event_fee": ev.get('fee', 0),
+            "member_name": m_name,
+            "student_id": user.get('student_id', 'OFFLINE' if is_offline else 'ONLINE'),
+            "phone": m_phone,
+            "email": m_email,
+            "institution": m_inst,
+            "student_class": m_class,
+            "ref_email": m_email,
+            "transaction_id": tx,
+            "registration_type": "offline" if is_offline else "online",
             "date_verified": verified_date
         })
         
@@ -386,40 +442,55 @@ def delete_all_payments():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-import uuid
-import bcrypt
-
 @admin_bp.route('/api/add_offline_payment', methods=['POST'])
 @login_required
 @admin_required
 def add_offline_payment():
-    data = request.json
+    data = request.json or {}
     db = get_db()
     
-    # 1. Create a dummy offline user to hold the name and ID
-    dummy_email = f"offline_{uuid.uuid4().hex[:8]}@mpsc.local"
-    user_data = {
-        "email": dummy_email,
-        "full_name": data.get('full_name', 'Offline User'),
-        "student_id": data.get('student_id', 'N/A'),
-        "phone": data.get('phone', 'N/A'),
-        "password": bcrypt.hashpw(uuid.uuid4().hex.encode(), bcrypt.gensalt()).decode('utf-8'),
-        "role": "member",
-        "institution": "Offline Entry"
+    full_name = data.get('full_name', '').strip() or 'Offline Participant'
+    phone = data.get('phone', '').strip() or 'N/A'
+    email = data.get('email', '').strip() or f"offline_{uuid.uuid4().hex[:6]}@mpsc.local"
+    student_class = data.get('class', '').strip() or data.get('student_class', '').strip() or 'N/A'
+    institution = data.get('institution', '').strip() or 'Mohammadpur Preparatory School & College'
+    event_id = data.get('event_id')
+    txid = data.get('transaction_id') or f"OFFLINE-{uuid.uuid4().hex[:6].upper()}"
+    
+    # Check if a real registered user exists with this email
+    user_id = None
+    if email and not email.startswith('offline'):
+        try:
+            u_check = db.table("users").select("id, role").eq("email", email).execute()
+            if u_check.data and u_check.data[0].get('role') != 'guest':
+                user_id = u_check.data[0]['id']
+        except:
+            pass
+
+    payment_data = {
+        "member_id": user_id,
+        "event_id": event_id,
+        "transaction_id": txid,
+        "ref_email": email,
+        "status": "approved"
     }
     try:
-        user_res = db.table("users").insert(user_data).execute()
-        new_user_id = user_res.data[0]['id']
+        p_res = db.table("payments").insert(payment_data).execute()
+        payment_id = p_res.data[0]['id'] if p_res.data else None
         
-        # 2. Create the approved payment record
-        payment_data = {
-            "member_id": new_user_id,
-            "event_id": data.get('event_id'),
-            "transaction_id": data.get('transaction_id') or "OFFLINE-CASH",
-            "ref_email": data.get('email') or "Added by Admin (Offline)",
-            "status": "approved"
+        # Save exact submitted metadata for slip, dispatch & export
+        meta_dict = {
+            "participant_name": full_name,
+            "phone": phone,
+            "email": email,
+            "student_class": student_class,
+            "institution": institution,
+            "transaction_id": txid,
+            "submitted_at": datetime.datetime.now().isoformat()
         }
-        db.table("payments").insert(payment_data).execute()
+        from backend.models.payment import save_registration_metadata
+        save_registration_metadata(payment_id, txid, meta_dict)
+        
         return jsonify({"success": "Offline record added successfully!"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -429,88 +500,145 @@ def add_offline_payment():
 @admin_required
 def export_verified_payments():
     db = get_db()
+    if not db: return jsonify({"error": "DB offline"}), 500
     
-    # Get all approved payments
     payments_res = db.table("payments").select("*").eq("status", "approved").execute()
     if not payments_res.data:
         return jsonify({"error": "No verified payments found"}), 404
         
     payments = payments_res.data
-    
-    # Get all users and create a map
-    users_res = db.table("users").select("id, full_name, email, student_id, phone").execute()
+    users_res = db.table("users").select("id, full_name, email, student_id, phone, section, institution").execute()
     users_map = {u['id']: u for u in users_res.data} if users_res.data else {}
     
-    # Get all events and create a map
-    events_res = db.table("events").select("id, title").execute()
-    events_map = {e['id']: e['title'] for e in events_res.data} if events_res.data else {}
+    events_res = db.table("events").select("*").execute()
+    events_map = {e['id']: e for e in events_res.data} if events_res.data else {}
     
-    # Generate CSV
     output = io.StringIO()
     writer = csv.writer(output)
-    
-    # Header
     writer.writerow([
-        'Event Name',
-        'Member Name',
-        'Student ID',
-        'Phone Number',
-        'Registered Email',
-        'Payment Reference Email',
-        'Transaction ID',
-        'Date Verified'
+        "Payment ID", "Participant Name", "Phone / WhatsApp", "Email", 
+        "Institution", "Class / Group", "Event Name", "Event Category", 
+        "Fee (BDT)", "Transaction ID", "Status", "Date"
     ])
     
     for p in payments:
-        user = users_map.get(p.get('member_id'), {})
-        event_title = events_map.get(p.get('event_id'), 'Unknown Event')
+        p_id = p.get('id', '')
+        tx = p.get('transaction_id') or p.get('tx_id') or ''
+        meta = get_registration_metadata(p_id, tx) or {}
+
+        u_id = p.get('member_id') or p.get('user_id')
+        user = users_map.get(u_id, {})
+        ev = events_map.get(p.get('event_id'), {})
         
-        # created_at or updated_at for verified date. We'll use created_at or updated_at if available.
-        verified_date = p.get('updated_at', p.get('created_at', ''))
-        
+        m_name = meta.get('participant_name') or user.get('full_name') or p.get('full_name') or 'N/A'
+        m_phone = meta.get('phone') or user.get('phone') or p.get('phone') or 'N/A'
+        m_email = meta.get('email') or p.get('ref_email') or user.get('email') or 'N/A'
+        m_inst = meta.get('institution') or user.get('institution', 'MPSC')
+        m_class = meta.get('student_class') or user.get('section', 'N/A')
+
         writer.writerow([
-            event_title,
-            user.get('full_name', 'Unknown'),
-            user.get('student_id', 'Unknown'),
-            user.get('phone', 'N/A'),
-            user.get('email', 'Unknown'),
-            p.get('ref_email', ''),
-            p.get('transaction_id', ''),
-            verified_date
+            p_id,
+            m_name,
+            m_phone,
+            m_email,
+            m_inst,
+            m_class,
+            ev.get('title', 'Unknown Event'),
+            ev.get('category', 'All'),
+            ev.get('fee', 0),
+            tx,
+            p.get('status', 'approved'),
+            p.get('updated_at') or p.get('created_at', '')
         ])
-    
+        
+    output.seek(0)
     return Response(
         output.getvalue(),
         mimetype="text/csv",
-        headers={"Content-disposition": "attachment; filename=Verified_Payments_Report.csv"}
+        headers={"Content-Disposition": "attachment;filename=mpsc_verified_event_registrations.csv"}
     )
 
-# ── Query / Messages Management ───────────────────
+
+# ── Main Fest Banner & Settings ───────────────────────────────────────
+MAIN_FEST_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'main_fest.json')
+
+def get_main_fest_data():
+    db = get_db()
+    if db:
+        try:
+            res = db.table("main_fest").select("*").eq("id", "current").execute()
+            if res.data and len(res.data) > 0:
+                return res.data[0]
+        except Exception:
+            pass
+            
+    if os.path.exists(MAIN_FEST_FILE):
+        try:
+            with open(MAIN_FEST_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            pass
+    return {
+        "title": "MPSC IT Carnival & Competitions 2026",
+        "description": "Step into the grandest tech arena of MPSC IT Club! Explore all competitions, workshops, and segment events below. Select the events matching your class level and register now.",
+        "date": "Coming Soon / 2026",
+        "venue": "MPSC Main Campus",
+        "banner": ""
+    }
+
+@admin_bp.route('/api/main_fest', methods=['GET'])
+@login_required
+@admin_required
+def get_admin_main_fest():
+    return jsonify(get_main_fest_data())
+
+@admin_bp.route('/api/update_main_fest', methods=['POST'])
+@login_required
+@admin_required
+def update_main_fest():
+    title = request.form.get('title', '').strip() or "MPSC IT Carnival & Competitions 2026"
+    description = request.form.get('description', '').strip()
+    date = request.form.get('date', '').strip()
+    venue = request.form.get('venue', '').strip()
+    
+    current_data = get_main_fest_data()
+    banner_url = upload_to_supabase(request.files.get('image'), 'events')
+    if not banner_url:
+        banner_url = current_data.get('banner', '')
+
+    updated_data = {
+        "id": "current",
+        "title": title,
+        "description": description,
+        "date": date,
+        "venue": venue,
+        "banner": banner_url
+    }
+
+    # Save to Supabase main_fest table if exists
+    db = get_db()
+    if db:
+        try:
+            db.table("main_fest").upsert(updated_data).execute()
+        except Exception as e:
+            print(f"Supabase main_fest table sync note: {e}")
+
+    os.makedirs(os.path.dirname(MAIN_FEST_FILE), exist_ok=True)
+    with open(MAIN_FEST_FILE, 'w', encoding='utf-8') as f:
+        json.dump(updated_data, f, indent=2)
+
+    return jsonify({"success": True, "message": "Main Fest Banner & Info updated in database & system!", "data": updated_data})
+
+
 @admin_bp.route('/api/queries', methods=['GET'])
 @login_required
 @admin_required
 def get_queries():
     db = get_db()
-    if not db:
-        return jsonify([])
+    if not db: return jsonify([])
     try:
-        response = db.table("queries").select("*").order("created_at", desc=True).execute()
-        return jsonify(response.data or [])
+        res = db.table("queries").select("*").order("created_at", desc=True).execute()
+        return jsonify(res.data if res.data else [])
     except Exception as e:
-        print(f"[Admin Queries Fetch Error] {e}")
+        print(f"Error fetching queries: {e}")
         return jsonify([])
-
-@admin_bp.route('/api/queries/delete/<query_id>', methods=['DELETE', 'POST'])
-@login_required
-@admin_required
-def delete_query(query_id):
-    db = get_db()
-    if not db:
-        return jsonify({"error": "Database unavailable"}), 500
-    try:
-        db.table("queries").delete().eq("id", query_id).execute()
-        return jsonify({"success": True, "message": "Query deleted successfully."})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-
