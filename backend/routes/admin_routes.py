@@ -132,7 +132,9 @@ def update_user_role():
 
 def _save_event_helper():
     data = request.form.to_dict()
-    banner_url = upload_to_supabase(request.files.get('image'), 'events')
+    event_id = data.get('event_id', '').strip()
+    image_file = request.files.get('image')
+    banner_url = upload_to_supabase(image_file, 'events') if image_file and image_file.filename else None
     
     # Handle multi-select category checkboxes
     categories = request.form.getlist('categories')
@@ -152,10 +154,11 @@ def _save_event_helper():
         "date": data.get('date', ''),
         "venue": data.get('venue', ''),
         "status": data.get('status', 'Upcoming'),
-        "banner": banner_url or '',
         "fee": int(data.get('fee', 0) or 0),
         "category": final_category
     }
+    if banner_url:
+        event_payload["banner"] = banner_url
 
     if not event_payload['title']:
         return jsonify({"error": "Event title is required."}), 400
@@ -165,19 +168,28 @@ def _save_event_helper():
         return jsonify({"error": "Database offline. Check Supabase connection."}), 500
 
     try:
-        db.table("events").insert(event_payload).execute()
-        return jsonify({"success": "Event added successfully!"})
+        if event_id:
+            db.table("events").update(event_payload).eq("id", event_id).execute()
+            return jsonify({"success": "Event updated successfully!"})
+        else:
+            if not banner_url:
+                event_payload["banner"] = ''
+            db.table("events").insert(event_payload).execute()
+            return jsonify({"success": "Event added successfully!"})
     except Exception as e:
-        print(f"Initial event insert note: {e}")
-        # If category column does not exist yet in Supabase schema, retry without category
+        print(f"Initial event save note: {e}")
         event_payload.pop('category', None)
         if final_category and final_category != 'all':
             event_payload['description'] = f"[{final_category.upper()}] " + (event_payload.get('description') or '')
         try:
-            db.table("events").insert(event_payload).execute()
-            return jsonify({"success": "Event added successfully!"})
+            if event_id:
+                db.table("events").update(event_payload).eq("id", event_id).execute()
+                return jsonify({"success": "Event updated successfully!"})
+            else:
+                db.table("events").insert(event_payload).execute()
+                return jsonify({"success": "Event added successfully!"})
         except Exception as e2:
-            print(f"Fallback event insert error: {e2}")
+            print(f"Fallback event save error: {e2}")
             return jsonify({"error": f"Database Error: {str(e2)}"}), 500
 
 @admin_bp.route('/events/add', methods=['POST'])

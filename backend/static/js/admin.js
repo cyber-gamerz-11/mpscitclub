@@ -1,3 +1,4 @@
+let allAdminEvents = [];
 
 let allVerifiedPaymentsList = [];
 
@@ -195,6 +196,7 @@ async function loadAllData() {
         return cats.map(c => catBadges[c] || `<span class="role-badge" style="font-size:0.72rem; padding:2px 8px; margin:2px;">${c}</span>`).join(' ');
     }
 
+    allAdminEvents = data.events || [];
     eventsList.innerHTML = data.events.map(ev => {
         const badge = renderAdminEventBadges(ev.category);
         const feeStr = ev.fee > 0 ? `${ev.fee} BDT` : '<span style="color:var(--emerald-green)">FREE</span>';
@@ -207,8 +209,13 @@ async function loadAllData() {
             <td>${badge}</td>
             <td>${ev.date || 'TBA'} <br><small style="color:var(--soft-gray);">${ev.venue || 'TBA'}</small></td>
             <td>${feeStr}</td>
-            <td>
-                <button class="action-btn delete-btn" onclick="deleteItem('events', '${ev.id}')">Delete</button>
+            <td style="display:flex; gap:6px; align-items:center;">
+                <button class="action-btn" style="background:rgba(0, 210, 255, 0.15); color:#00d2ff; border:1px solid #00d2ff; padding: 4px 10px; font-size:0.75rem;" onclick="openEditEventModal('${ev.id}')">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
+                <button class="action-btn delete-btn" style="padding: 4px 10px; font-size:0.75rem;" onclick="deleteItem('events', '${ev.id}')">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </button>
             </td>
         </tr>
         `;
@@ -988,3 +995,70 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+window.openCreateEventModal = function() {
+    const form = document.getElementById('add-event-form');
+    if (form) form.reset();
+    document.getElementById('event-edit-id').value = '';
+    document.getElementById('event-modal-title').innerHTML = '<i class="fa-solid fa-trophy"></i> Create New Event / Segment';
+    document.getElementById('event-modal-desc').innerText = 'Upload a main program event or class-specific segment competition.';
+    document.getElementById('event-submit-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Publish Event';
+    
+    const bannerWrap = document.getElementById('event-current-banner-wrap');
+    if (bannerWrap) bannerWrap.style.display = 'none';
+
+    const allCat = document.getElementById('admin-cat-all');
+    if (allCat) allCat.checked = true;
+    document.querySelectorAll('.admin-cat-item').forEach(el => el.checked = false);
+
+    toggleModal('event-modal');
+};
+
+window.openEditEventModal = function(eventId) {
+    const ev = allAdminEvents.find(e => e.id === eventId);
+    if (!ev) {
+        window.showToast('Event not found', 'error');
+        return;
+    }
+
+    const form = document.getElementById('add-event-form');
+    if (form) form.reset();
+
+    document.getElementById('event-edit-id').value = ev.id;
+    document.getElementById('event-modal-title').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Event / Segment';
+    document.getElementById('event-modal-desc').innerText = `Update settings, eligibility, and rules for "${ev.title}".`;
+    document.getElementById('event-submit-btn').innerHTML = '<i class="fa-solid fa-check"></i> Save Event Changes';
+
+    document.getElementById('event-title-input').value = ev.title || '';
+    document.getElementById('event-date-input').value = ev.date || '';
+    document.getElementById('event-fee-input').value = ev.fee !== undefined ? ev.fee : 0;
+    document.getElementById('event-venue-input').value = ev.venue || '';
+    document.getElementById('event-desc-input').value = ev.description || '';
+
+    // Category Checkboxes
+    const rawCat = (ev.category || 'all').toLowerCase();
+    const cats = rawCat.split(',').map(c => c.trim()).filter(Boolean);
+    const allCat = document.getElementById('admin-cat-all');
+
+    if (cats.includes('all') || cats.length === 0) {
+        if (allCat) allCat.checked = true;
+        document.querySelectorAll('.admin-cat-item').forEach(el => el.checked = false);
+    } else {
+        if (allCat) allCat.checked = false;
+        document.querySelectorAll('.admin-cat-item').forEach(el => {
+            el.checked = cats.includes(el.value.toLowerCase());
+        });
+    }
+
+    // Current Banner Preview
+    const bannerWrap = document.getElementById('event-current-banner-wrap');
+    const bannerImg = document.getElementById('event-current-banner-img');
+    if (ev.banner && bannerWrap && bannerImg) {
+        bannerImg.src = ev.banner;
+        bannerWrap.style.display = 'flex';
+    } else if (bannerWrap) {
+        bannerWrap.style.display = 'none';
+    }
+
+    toggleModal('event-modal');
+};

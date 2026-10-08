@@ -281,7 +281,7 @@
                         <h2 class="section-title">Segment Competitions & Sub-Events</h2>
                         <p style="color: var(--soft-gray); font-size: 0.85rem; margin: 0;">Sub-events running under the current main program. Filtered by student class on the frontend.</p>
                     </div>
-                    <button onclick="toggleModal('event-modal')" class="btn-primary">
+                    <button onclick="openCreateEventModal()" class="btn-primary">
                         <i class="fa-solid fa-plus"></i> Add Sub-Event
                     </button>
                 </div>
@@ -666,13 +666,15 @@
     </div>
 
     <div id="event-modal" class="modal glass-card"
-        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 520px; padding: 2rem; max-height: 90vh; overflow-y: auto;">
-        <h3 class="emerald">Create New Event / Segment</h3>
-        <p style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.2rem;">Upload a main program event or class-specific segment competition.</p>
+        style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 540px; padding: 2rem; max-height: 90vh; overflow-y: auto;">
+        <h3 class="emerald" id="event-modal-title"><i class="fa-solid fa-trophy"></i> Create New Event / Segment</h3>
+        <p id="event-modal-desc" style="color: var(--soft-gray); font-size: 0.85rem; margin-bottom: 1.2rem;">Upload a main program event or class-specific segment competition.</p>
         <form id="add-event-form" class="mt-1" enctype="multipart/form-data">
+            <input type="hidden" name="event_id" id="event-edit-id" value="">
+
             <div class="input-group mb-1">
                 <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Event Title *</label>
-                <input type="text" name="title" placeholder="e.g. IT Olympiad 2026 / Project Showcasing" required class="w-full">
+                <input type="text" name="title" id="event-title-input" placeholder="e.g. IT Olympiad 2026 / Project Showcasing" required class="w-full" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 10px 14px; border-radius: 8px; color: white;">
             </div>
 
             <div class="input-group mb-1">
@@ -686,19 +688,19 @@
                         🌐 Open for All (Everyone / All Classes)
                     </label>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #00ff88; cursor: pointer;">
-                        <input type="checkbox" name="categories" value="primary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #00ff88; transform: scale(1.15); cursor: pointer;">
+                        <input type="checkbox" name="categories" value="primary" id="admin-cat-primary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #00ff88; transform: scale(1.15); cursor: pointer;">
                         🟢 Primary (Class 3–5)
                     </label>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #00d2ff; cursor: pointer;">
-                        <input type="checkbox" name="categories" value="junior" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #00d2ff; transform: scale(1.15); cursor: pointer;">
+                        <input type="checkbox" name="categories" value="junior" id="admin-cat-junior" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #00d2ff; transform: scale(1.15); cursor: pointer;">
                         🔵 Junior (Class 6–8)
                     </label>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #b700ff; cursor: pointer;">
-                        <input type="checkbox" name="categories" value="secondary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #b700ff; transform: scale(1.15); cursor: pointer;">
+                        <input type="checkbox" name="categories" value="secondary" id="admin-cat-secondary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #b700ff; transform: scale(1.15); cursor: pointer;">
                         🟣 Secondary (Class 9–10)
                     </label>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #ff9900; cursor: pointer;">
-                        <input type="checkbox" name="categories" value="higher_secondary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #ff9900; transform: scale(1.15); cursor: pointer;">
+                        <input type="checkbox" name="categories" value="higher_secondary" id="admin-cat-higher_secondary" class="admin-cat-item" onchange="window.onAdminCategoryItemChange()" style="accent-color: #ff9900; transform: scale(1.15); cursor: pointer;">
                         🟠 Higher Sec (Class 11–12)
                     </label>
                 </div>
@@ -707,31 +709,39 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" class="mb-1">
                 <div class="input-group">
                     <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Event Date *</label>
-                    <input type="date" name="date" required class="w-full">
+                    <input type="date" name="date" id="event-date-input" required class="w-full" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 9px 12px; border-radius: 8px; color: white;">
                 </div>
                 <div class="input-group">
                     <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Registration Fee (BDT)</label>
-                    <input type="number" name="fee" placeholder="0 for Free" value="0" class="w-full">
+                    <input type="number" name="fee" id="event-fee-input" placeholder="0 for Free" value="0" class="w-full" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 9px 12px; border-radius: 8px; color: white;">
                 </div>
             </div>
 
             <div class="input-group mb-1">
                 <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Venue / Location *</label>
-                <input type="text" name="venue" placeholder="e.g. MPSC Auditorium / Lab 2" required class="w-full">
+                <input type="text" name="venue" id="event-venue-input" placeholder="e.g. MPSC Auditorium / Lab 2" required class="w-full" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 9px 12px; border-radius: 8px; color: white;">
             </div>
 
             <div class="input-group mb-1">
                 <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Banner / Poster Image</label>
-                <input type="file" name="image" accept="image/*" class="w-full">
+                <div id="event-current-banner-wrap" style="display:none; margin-bottom: 8px; align-items:center; gap: 10px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px;">
+                    <img id="event-current-banner-img" src="" style="width: 70px; height: 45px; object-fit: cover; border-radius: 4px; border: 1px solid var(--glass-border);">
+                    <small style="color: var(--soft-gray); font-size: 0.75rem;">Current banner. Upload a new file below to replace it.</small>
+                </div>
+                <input type="file" name="image" id="event-image-input" accept="image/*" class="w-full" style="background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 8px; color: white;">
             </div>
 
             <div class="input-group mb-1">
                 <label style="font-size: 0.8rem; color: var(--soft-gray); display: block; margin-bottom: 0.3rem;">Description & Rules</label>
-                <textarea name="description" placeholder="Provide segment rules, guidelines, eligibility notes..." class="w-full" style="min-height: 90px;"></textarea>
+                <textarea name="description" id="event-desc-input" placeholder="Provide segment rules, guidelines, eligibility notes..." class="w-full" style="min-height: 90px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); padding: 10px 12px; border-radius: 8px; color: white;"></textarea>
             </div>
 
-            <button type="submit" class="btn-primary w-full" style="margin-top: 10px;">Publish Event</button>
-            <button type="button" onclick="toggleModal('event-modal')" class="btn-secondary w-full mt-1">Cancel</button>
+            <button type="submit" id="event-submit-btn" class="btn-primary w-full" style="margin-top: 10px; padding: 11px; border-radius: 25px; font-weight: 700;">
+                <i class="fa-solid fa-check"></i> Publish Event
+            </button>
+            <button type="button" onclick="toggleModal('event-modal')" class="w-full mt-1" style="background: #1e1e24; border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff !important; border-radius: 25px; font-size: 0.85rem; font-weight: 700; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+                Cancel
+            </button>
         </form>
     </div>
 
