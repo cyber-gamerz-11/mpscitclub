@@ -1062,3 +1062,98 @@ window.openEditEventModal = function(eventId) {
 
     toggleModal('event-modal');
 };
+
+// ── Verified Receipt / Dispatch Slip Modal ──────────────────────
+window.openVerifiedReceiptModal = function(paymentId) {
+    const item = (typeof allVerifiedPaymentsList !== 'undefined' ? allVerifiedPaymentsList : []).find(p => p.payment_id === paymentId);
+    if (!item) {
+        window.showToast('Record details not found', 'error');
+        return;
+    }
+
+    const existingModal = document.getElementById('admin-slip-modal');
+    if (existingModal) existingModal.remove();
+
+    const isOffline = item.registration_type === 'offline' || (item.transaction_id && item.transaction_id.toUpperCase().startsWith('OFFLINE'));
+    const badgeHtml = isOffline
+        ? '<span style="background:rgba(255,170,0,0.15); color:#ffaa00; border:1px solid rgba(255,170,0,0.4); padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:700;">OFFLINE ON-SPOT ENTRY</span>'
+        : '<span style="background:rgba(0,210,255,0.15); color:#00d2ff; border:1px solid rgba(0,210,255,0.4); padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:700;">ONLINE VERIFIED (bKash)</span>';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'admin-slip-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; padding:15px;';
+    overlay.onclick = (e) => { if (e.target === overlay) closeVerifiedReceiptModal(); };
+
+    overlay.innerHTML = `
+        <div style="background:#0c1511; border:1px solid rgba(0,245,180,0.3); border-radius:18px; max-width:460px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.8); overflow:hidden; animation:slipIn 0.3s cubic-bezier(0.34,1.56,0.64,1); font-family:'Outfit', sans-serif;">
+            <style>
+                @keyframes slipIn { from{opacity:0; transform:scale(0.92) translateY(10px);} to{opacity:1; transform:none;} }
+                @media print {
+                    body * { visibility: hidden; }
+                    #admin-slip-printable, #admin-slip-printable * { visibility: visible; }
+                    #admin-slip-printable { position: fixed; left: 0; top: 0; width: 100%; background: #fff !important; color: #000 !important; }
+                }
+            </style>
+            
+            <div style="height:4px; background:linear-gradient(90deg, #00f5b4, #00d2ff, #00f5b4);"></div>
+
+            <div id="admin-slip-printable" style="padding:28px 30px; background:#0c1511; color:#fff;">
+                <!-- Header -->
+                <div style="text-align:center; border-bottom:1px dashed rgba(255,255,255,0.18); padding-bottom:16px; margin-bottom:16px;">
+                    <div style="font-size:0.7rem; font-weight:800; letter-spacing:3px; color:#00f5b4; text-transform:uppercase; margin-bottom:4px;">MPSC IT CLUB</div>
+                    <h2 style="font-size:1.35rem; font-weight:800; margin:0 0 6px 0; color:#fff;">ENTRY DISPATCH SLIP</h2>
+                    <div style="margin-bottom:6px;">${badgeHtml}</div>
+                    <div style="font-size:0.75rem; color:rgba(255,255,255,0.45);">Verified Reg ID: <span style="color:#00f5b4; font-family:monospace; font-weight:700;">${(item.payment_id || '').substring(0, 13)}...</span></div>
+                </div>
+
+                <!-- Participant Details -->
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px 16px; font-size:0.85rem; line-height:1.7; margin-bottom:16px;">
+                    <div style="display:flex; justify-content:space-between;"><span style="color:rgba(255,255,255,0.5);">Participant:</span><strong style="color:#fff;">${item.member_name}</strong></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:rgba(255,255,255,0.5);">Contact Phone:</span><span style="color:#00f5b4; font-weight:600;">${item.phone}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:rgba(255,255,255,0.5);">Email / Ref:</span><span style="color:rgba(255,255,255,0.85); font-size:0.8rem;">${item.email}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:rgba(255,255,255,0.5);">Class / Group:</span><span style="color:#fff;">${item.student_class}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:rgba(255,255,255,0.5);">Institution:</span><span style="color:#fff; text-align:right; max-width:60%; font-size:0.8rem;">${item.institution}</span></div>
+                </div>
+
+                <!-- Event Info -->
+                <div style="border-top:1px dashed rgba(255,255,255,0.18); border-bottom:1px dashed rgba(255,255,255,0.18); padding:12px 0; margin-bottom:16px; font-size:0.88rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong style="color:#fff; font-size:0.95rem;">${item.event_name}</strong><br>
+                            <small style="color:rgba(255,255,255,0.45);">Category: ${(item.event_category || 'ALL').toUpperCase()}</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="color:#00ff88; font-weight:800; font-size:1.1rem;">৳ ${item.event_fee} BDT</div>
+                            <small style="color:rgba(255,255,255,0.4); font-size:0.72rem;">${item.transaction_id}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Status -->
+                <div style="text-align:center; font-size:0.75rem; color:rgba(255,255,255,0.4);">
+                    <div>Verified on: <strong style="color:rgba(255,255,255,0.7);">${new Date(item.date_verified).toLocaleString()}</strong></div>
+                    <div style="color:#00f5b4; font-weight:700; margin-top:4px;">★ OFFICIAL EC VERIFIED ENTRY ★</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="padding:16px 30px 24px; display:flex; gap:12px; background:rgba(0,0,0,0.3); border-top:1px solid rgba(255,255,255,0.06);">
+                <button onclick="window.print()" style="flex:1; padding:11px 16px; background:#00f5b4; color:#050d07; border:none; border-radius:10px; font-weight:700; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="fa-solid fa-print"></i> Print Slip
+                </button>
+                <button onclick="closeVerifiedReceiptModal()" style="padding:11px 20px; background:transparent; border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.7); border-radius:10px; font-weight:600; font-size:0.85rem; cursor:pointer;">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeVerifiedReceiptModal = function() {
+    const modal = document.getElementById('admin-slip-modal');
+    if (modal) modal.remove();
+    document.body.style.overflow = '';
+};

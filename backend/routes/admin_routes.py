@@ -380,7 +380,7 @@ def admin_generate_reset_link():
 @login_required
 @admin_required
 def get_verified_payments():
-    from backend.models.payment import get_registration_metadata
+    from backend.models.payment import parse_payment_meta
     db = get_db()
     if not db: return jsonify([])
     
@@ -388,16 +388,15 @@ def get_verified_payments():
     payments = payments_res.data if payments_res.data else []
     
     users_res = db.table("users").select("id, full_name, email, student_id, phone, section, institution").execute()
-    users_map = {u['id']: u for u in users_res.data} if users_res.data else {}
+    users_map = {u['id']: u for u in (users_res.data or [])} if users_res.data else {}
     
     events_res = db.table("events").select("*").execute()
-    events_map = {e['id']: e for e in events_res.data} if events_res.data else {}
+    events_map = {e['id']: e for e in (events_res.data or [])} if events_res.data else {}
     
     result = []
     for p in payments:
         p_id = p.get('id', '')
         tx = p.get('transaction_id') or p.get('tx_id') or ''
-        meta = get_registration_metadata(p_id, tx) or {}
         
         u_id = p.get('member_id') or p.get('user_id')
         user = users_map.get(u_id, {})
@@ -405,14 +404,14 @@ def get_verified_payments():
         event_title = ev.get('title', 'Unknown Event')
         verified_date = p.get('updated_at', p.get('created_at', ''))
         
-        # Use exact submitted metadata first, fallback to user account
-        m_name = meta.get('participant_name') or user.get('full_name') or p.get('full_name') or 'Participant'
-        m_phone = meta.get('phone') or user.get('phone') or p.get('phone') or 'N/A'
-        m_email = meta.get('email') or p.get('ref_email') or user.get('email') or 'N/A'
-        m_class = meta.get('student_class') or user.get('section') or 'N/A'
-        m_inst = meta.get('institution') or user.get('institution') or 'MPSC'
+        meta = parse_payment_meta(p, p_id, tx, user)
+        m_name = meta.get('participant_name')
+        m_phone = meta.get('phone')
+        m_email = meta.get('email')
+        m_class = meta.get('student_class')
+        m_inst = meta.get('institution')
+        is_offline = (meta.get('source') == 'offline') or str(tx).upper().startswith('OFFLINE')
 
-        is_offline = str(tx).upper().startswith('OFFLINE') or meta.get('source') == 'offline'
         result.append({
             "payment_id": p_id,
             "event_name": event_title,
@@ -458,6 +457,7 @@ def delete_all_payments():
 @login_required
 @admin_required
 def add_offline_payment():
+    from backend.models.payment import Payment, save_registration_metadata
     data = request.json or {}
     db = get_db()
     
@@ -479,31 +479,35 @@ def add_offline_payment():
         except:
             pass
 
-    payment_data = {
+    meta_dict = {
+        "participant_name": full_name,
+        "phone": phone,
+        "email": email,
+        "student_class": student_class,
+        "institution": institution,
+        "transaction_id": txid,
+        "source": "offline",
+        "submitted_at": datetime.datetime.now().isoformat()
+    }
+
+    cloud_ref_payload = json.dumps(meta_dict)
+
+    payment_item = {
         "member_id": user_id,
+        "user_id": user_id,
         "event_id": event_id,
         "transaction_id": txid,
-        "ref_email": email,
+        "ref_email": cloud_ref_payload,
+        "full_name": full_name,
+        "phone": phone,
+        "institution": institution,
+        "student_class": student_class,
         "status": "approved"
     }
     try:
-        p_res = db.table("payments").insert(payment_data).execute()
-        payment_id = p_res.data[0]['id'] if p_res.data else None
-        
-        # Save exact submitted metadata for slip, dispatch & export
-        meta_dict = {
-            "participant_name": full_name,
-            "phone": phone,
-            "email": email,
-            "student_class": student_class,
-            "institution": institution,
-            "transaction_id": txid,
-            "submitted_at": datetime.datetime.now().isoformat()
-        }
-        from backend.models.payment import save_registration_metadata
+        payment_id = Payment.create(payment_item)
         save_registration_metadata(payment_id, txid, meta_dict)
-        
-        return jsonify({"success": "Offline record added successfully!"})
+        return jsonify({"success": "Offline record added successfully!", "payment_id": payment_id})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -511,64 +515,86 @@ def add_offline_payment():
 @login_required
 @admin_required
 def export_verified_payments():
-    db = get_db()
-    if not db: return jsonify({"error": "DB offline"}), 500
-    
-    payments_res = db.table("payments").select("*").eq("status", "approved").execute()
-    if not payments_res.data:
-        return jsonify({"error": "No verified payments found"}), 404
+    try:
+        from backend.models.payment import parse_payment_meta
+        db = get_db()
+        if not db:
+            return jsonify({"error": "Database is offline. Check connection."}), 500
         
-    payments = payments_res.data
-    users_res = db.table("users").select("id, full_name, email, student_id, phone, section, institution").execute()
-    users_map = {u['id']: u for u in users_res.data} if users_res.data else {}
-    
-    events_res = db.table("events").select("*").execute()
-    events_map = {e['id']: e for e in events_res.data} if events_res.data else {}
-    
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow([
-        "Payment ID", "Participant Name", "Phone / WhatsApp", "Email", 
-        "Institution", "Class / Group", "Event Name", "Event Category", 
-        "Fee (BDT)", "Transaction ID", "Status", "Date"
-    ])
-    
-    for p in payments:
-        p_id = p.get('id', '')
-        tx = p.get('transaction_id') or p.get('tx_id') or ''
-        meta = get_registration_metadata(p_id, tx) or {}
-
-        u_id = p.get('member_id') or p.get('user_id')
-        user = users_map.get(u_id, {})
-        ev = events_map.get(p.get('event_id'), {})
+        payments_res = db.table("payments").select("*").eq("status", "approved").order("created_at", desc=True).execute()
+        payments = payments_res.data if payments_res.data else []
         
-        m_name = meta.get('participant_name') or user.get('full_name') or p.get('full_name') or 'N/A'
-        m_phone = meta.get('phone') or user.get('phone') or p.get('phone') or 'N/A'
-        m_email = meta.get('email') or p.get('ref_email') or user.get('email') or 'N/A'
-        m_inst = meta.get('institution') or user.get('institution', 'MPSC')
-        m_class = meta.get('student_class') or user.get('section', 'N/A')
-
+        users_res = db.table("users").select("id, full_name, email, student_id, phone, section, institution").execute()
+        users_map = {u['id']: u for u in (users_res.data or [])} if users_res.data else {}
+        
+        events_res = db.table("events").select("*").execute()
+        events_map = {e['id']: e for e in (events_res.data or [])} if events_res.data else {}
+        
+        output = io.StringIO()
+        output.write('\ufeff')
+        writer = csv.writer(output)
         writer.writerow([
-            p_id,
-            m_name,
-            m_phone,
-            m_email,
-            m_inst,
-            m_class,
-            ev.get('title', 'Unknown Event'),
-            ev.get('category', 'All'),
-            ev.get('fee', 0),
-            tx,
-            p.get('status', 'approved'),
-            p.get('updated_at') or p.get('created_at', '')
+            "Payment ID", "Participant Name", "Registration Type", "Phone / WhatsApp", "Email", 
+            "Institution", "Class / Group", "Event Name", "Event Category", 
+            "Fee (BDT)", "Transaction ID", "Status", "Date Verified"
         ])
         
-    output.seek(0)
-    return Response(
-        output.getvalue(),
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=mpsc_verified_event_registrations.csv"}
-    )
+        if not payments:
+            writer.writerow([
+                "—", "No verified payments found", "—", "—", "—", 
+                "—", "—", "—", "—", 
+                "0", "—", "No Records", datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            ])
+        else:
+            for p in payments:
+                p_id = p.get('id', '')
+                tx = p.get('transaction_id') or p.get('tx_id') or ''
+
+                u_id = p.get('member_id') or p.get('user_id')
+                user = users_map.get(u_id, {})
+                ev = events_map.get(p.get('event_id'), {})
+                
+                meta = parse_payment_meta(p, p_id, tx, user)
+                is_offline = (meta.get('source') == 'offline') or str(tx).upper().startswith('OFFLINE')
+                reg_type = "Offline Entry" if is_offline else "Online (bKash)"
+
+                m_name = meta.get('participant_name')
+                m_phone = meta.get('phone')
+                m_email = meta.get('email')
+                m_inst = meta.get('institution')
+                m_class = meta.get('student_class')
+                event_title = ev.get('title', 'Unknown Event')
+                event_cat = ev.get('category', 'All')
+                event_fee = ev.get('fee', 0)
+                date_str = p.get('updated_at') or p.get('created_at', '')
+
+                writer.writerow([
+                    p_id,
+                    m_name,
+                    reg_type,
+                    m_phone,
+                    m_email,
+                    m_inst,
+                    m_class,
+                    event_title,
+                    event_cat,
+                    event_fee,
+                    tx,
+                    p.get('status', 'approved').upper(),
+                    date_str
+                ])
+            
+        output.seek(0)
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename=mpsc_verified_registrations_{datetime.datetime.now().strftime('%Y%m%d')}.csv"
+            }
+        )
+    except Exception as e:
+        print(f"Export Error: {e}")
+        return jsonify({"error": f"Failed to export CSV: {str(e)}"}), 500
 
 
 # ── Main Fest Banner & Settings ───────────────────────────────────────
